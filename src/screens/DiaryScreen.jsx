@@ -87,7 +87,10 @@ export default function DiaryScreen({ onWrite, onOpen }) {
                   <span
                     className="text-[15px] font-normal text-ink-2"
                     style={{
-                      fontFamily: e.lang === 'EN' ? "'Inter'" : "'Pretendard'",
+                      fontFamily:
+                        e.lang === 'EN'
+                          ? "'Inter Variable', 'Inter', sans-serif"
+                          : "'Pretendard Variable', 'Pretendard', sans-serif",
                       lineHeight: e.lang === 'EN' ? '24px' : '20.8px',
                       letterSpacing: '-.2px',
                       display: '-webkit-box',

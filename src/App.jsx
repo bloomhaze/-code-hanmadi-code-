@@ -84,7 +84,7 @@ export default function App() {
         height: 812,
         borderRadius: 44,
         boxShadow: '0 24px 70px rgba(30,34,50,.28)',
-        fontFamily: "'Pretendard', -apple-system, sans-serif",
+        fontFamily: "'Pretendard Variable', 'Pretendard', -apple-system, sans-serif",
       }}
     >
       <StatusBar />

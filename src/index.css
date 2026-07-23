@@ -1,9 +1,14 @@
+/* Self-hosted fonts (bundled by Vite — no external CDN).
+   Inter: weight-axis variable, latin subset lazy-loaded via unicode-range.
+   Pretendard: dynamic-subset variable, only used Korean glyph ranges fetched. */
+@import '@fontsource-variable/inter/wght.css';
+@import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
 @import 'tailwindcss';
 
 /* ---- Design tokens (from "한마디 홈탭" 시안) ---- */
 @theme {
-  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-inter: 'Inter', 'Pretendard', sans-serif;
+  --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-inter: 'Inter Variable', 'Inter', 'Pretendard Variable', 'Pretendard', sans-serif;
 
   --color-accent: #0066ff;
   --color-accent-soft: #dcebff;
