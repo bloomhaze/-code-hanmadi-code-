@@ -8,9 +8,10 @@ import FixPopup from './components/FixPopup.jsx'
 import HomeScreen from './screens/HomeScreen.jsx'
 import DiaryScreen from './screens/DiaryScreen.jsx'
 import VocabScreen from './screens/VocabScreen.jsx'
-import PlaceholderScreen from './screens/PlaceholderScreen.jsx'
+import MyScreen from './screens/MyScreen.jsx'
 import WriteScreen from './screens/WriteScreen.jsx'
 import DiaryDetailScreen from './screens/DiaryDetailScreen.jsx'
+import PremiumScreen from './screens/PremiumScreen.jsx'
 import { findEntryByKo } from './data/diary.js'
 import { lookupWord, lookupFix } from './data/lookups.js'
 
@@ -99,7 +100,9 @@ export default function App() {
       )}
       {tab === 'diary' && <DiaryScreen onWrite={openWriteSheet} onOpen={openDetail} />}
       {tab === 'vocab' && <VocabScreen onWrite={openWriteSheet} onToast={showToast} />}
-      {tab === 'my' && <PlaceholderScreen title="마이페이지" message="프로필과 설정이 여기에 있어요" />}
+      {tab === 'my' && (
+        <MyScreen userName={USER_NAME} onPremium={() => setOverlay({ type: 'premium' })} onToast={showToast} />
+      )}
 
       {showTabBar && <TabBar active={tab} onChange={setTab} />}
 
@@ -125,6 +128,10 @@ export default function App() {
           onTapFix={tapFix}
           activeWord={activeWord}
         />
+      )}
+
+      {overlay?.type === 'premium' && (
+        <PremiumScreen onClose={closeOverlay} onToast={showToast} />
       )}
 
       {/* ---- sheets & popups ---- */}
