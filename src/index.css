@@ -1,0 +1,98 @@
+@import 'tailwindcss';
+
+/* ---- Design tokens (from "한마디 홈탭" 시안) ---- */
+@theme {
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-inter: 'Inter', 'Pretendard', sans-serif;
+
+  --color-accent: #0066ff;
+  --color-accent-soft: #dcebff;
+  --color-ink: #121212;
+  --color-ink-2: #1a1a1b;
+  --color-muted: #9b9b9b;
+  --color-muted-2: #a0a0a0;
+  --color-sub: #737373;
+  --color-card: #f7f7f7;
+  --color-card-2: #f7f7f8;
+  --color-line: #eeeeee;
+  --color-wrong: #ff4242;
+  --color-wrong-soft: #ffe1e1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #e6e6ea;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 24px 0;
+}
+
+/* hide scrollbars inside the phone scroll areas */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes promptFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  18% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  82% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+@keyframes tabPop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.14);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.tab-item {
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tab-item:active {
+  transform: scale(0.92);
+}
+.tab-pop {
+  animation: tabPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
