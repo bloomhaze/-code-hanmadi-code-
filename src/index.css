@@ -107,3 +107,12 @@ body {
     opacity: 1;
   }
 }
+
+@keyframes sheetUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

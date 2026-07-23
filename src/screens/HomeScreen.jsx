@@ -20,7 +20,7 @@ import {
 
 const ACCENT = '#0066FF'
 
-export default function HomeScreen({ userName = '현진', onWrite, onToast }) {
+export default function HomeScreen({ userName = '현진', onWrite, onToast, onOpenEntry }) {
   const [selOff, setSelOff] = useState(0) // 0 = today (6/4)
   const [todayWritten] = useState(false)
   const [promptIdx, setPromptIdx] = useState(0)
@@ -239,7 +239,8 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast }) {
             {entries.map((e, i) => (
               <div
                 key={i}
-                className="flex items-start gap-3 rounded-[20px] bg-[#f7f7f7] p-4"
+                onClick={() => onOpenEntry?.(e.ko)}
+                className="flex cursor-pointer items-start gap-3 rounded-[20px] bg-[#f7f7f7] p-4"
                 style={{ boxShadow: 'inset 0 0 0 .5px #eee' }}
               >
                 <div className="flex flex-1 flex-col items-end gap-3">
@@ -276,19 +277,27 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast }) {
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
-                      onClick={() =>
+                      onClick={(ev) => {
+                        ev.stopPropagation()
                         toggleListen(
                           i,
                           e.hasCorrection
                             ? e.fixSegs.map((g) => g.t).join('')
                             : e.enSegs.map((g) => g.t).join(''),
                         )
-                      }
+                      }}
                       className="flex h-8 w-8"
                     >
                       <ListenIcon on={!!listen[i]} />
                     </button>
-                    <button type="button" onClick={() => toggleBookmark(i)} className="flex h-8 w-8">
+                    <button
+                      type="button"
+                      onClick={(ev) => {
+                        ev.stopPropagation()
+                        toggleBookmark(i)
+                      }}
+                      className="flex h-8 w-8"
+                    >
                       <BookmarkIcon on={!!bookmark[i]} />
                     </button>
                   </div>

@@ -1,0 +1,78 @@
+import { SpeakerSmall, BookmarkSmall } from './icons.jsx'
+import { hlSegs } from '../lib/text.js'
+import { speak } from '../lib/speak.js'
+
+// Bottom-sheet showing a tapped word's meaning + example (단어 뜻 팝업).
+export default function WordPopup({ state, onClose, onToast }) {
+  if (!state?.open) return null
+  const { term, loading, kr, ex, exKr, saved } = state
+  const segs = hlSegs(ex || '', term)
+
+  return (
+    <>
+      <div className="absolute inset-0 z-[60] bg-black/35" onClick={onClose} />
+      <div
+        className="absolute inset-x-0 bottom-0 z-[61] rounded-t-[20px] bg-white px-5 pb-[34px] pt-3"
+        style={{ animation: 'sheetUp .3s cubic-bezier(.22,1,.36,1)' }}
+      >
+        <div className="mx-auto mb-6 h-1 w-9 rounded-full bg-[#dcdcdc]" />
+        <div className="flex min-h-8 items-center justify-between">
+          <span
+            className="font-inter text-[22px] font-semibold text-ink-2"
+            style={{ lineHeight: '100%', letterSpacing: '-.3px' }}
+          >
+            {term}
+          </span>
+          <div className="flex shrink-0 gap-2.5">
+            <button
+              type="button"
+              onClick={() => speak(`${term}. ${ex || ''}`)}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f1f1f2]"
+            >
+              <SpeakerSmall color="#121212" />
+            </button>
+            <button
+              type="button"
+              onClick={() => onToast?.(saved ? '저장을 취소했어요' : '단어를 저장했어요')}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f1f1f2]"
+            >
+              <BookmarkSmall fill="none" stroke="#121212" />
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center gap-2.5 py-3">
+            <div
+              className="h-5 w-5 rounded-full border-[2.5px] border-[#e6e6e6]"
+              style={{ borderTopColor: '#0066ff', animation: 'spin .8s linear infinite' }}
+            />
+            <span className="font-sans text-[14px] font-medium text-muted">뜻과 예문을 찾고 있어요</span>
+          </div>
+        ) : (
+          <>
+            <div className="mt-[7px] py-0.5">
+              <span className="font-sans text-[16px] font-medium text-ink-2" style={{ lineHeight: '100%' }}>
+                {kr}
+              </span>
+            </div>
+            {ex && (
+              <div className="mt-4 flex flex-col gap-1.5 rounded-2xl bg-[#f7f7f7] p-4">
+                <span className="font-inter text-[15px] text-ink" style={{ lineHeight: '20.8px' }}>
+                  {segs.map((g, i) => (
+                    <span key={i} style={{ color: g.accent ? '#0066ff' : '#121212' }}>
+                      {g.t}
+                    </span>
+                  ))}
+                </span>
+                <span className="font-sans text-[14px] font-light text-sub" style={{ lineHeight: '20.8px' }}>
+                  {exKr}
+                </span>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
+  )
+}

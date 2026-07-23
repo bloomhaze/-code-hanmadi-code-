@@ -1,19 +1,79 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import StatusBar from './components/StatusBar.jsx'
 import TabBar from './components/TabBar.jsx'
 import Toast from './components/Toast.jsx'
+import WriteMethodSheet from './components/WriteMethodSheet.jsx'
+import WordPopup from './components/WordPopup.jsx'
+import FixPopup from './components/FixPopup.jsx'
 import HomeScreen from './screens/HomeScreen.jsx'
 import DiaryScreen from './screens/DiaryScreen.jsx'
 import VocabScreen from './screens/VocabScreen.jsx'
 import PlaceholderScreen from './screens/PlaceholderScreen.jsx'
+import WriteScreen from './screens/WriteScreen.jsx'
+import DiaryDetailScreen from './screens/DiaryDetailScreen.jsx'
+import { findEntryByKo } from './data/diary.js'
+import { lookupWord, lookupFix } from './data/lookups.js'
 
 const USER_NAME = '현진'
 
 export default function App() {
   const [tab, setTab] = useState('home')
+  const [overlay, setOverlay] = useState(null) // {type:'write', mode} | {type:'detail', id}
+  const [writeSheet, setWriteSheet] = useState(false)
   const [toast, setToast] = useState('')
+  const [wordPop, setWordPop] = useState({ open: false })
+  const [fixPop, setFixPop] = useState({ open: false })
+  const [activeWord, setActiveWord] = useState(null)
+  const lookTimer = useRef(null)
 
   const showToast = (msg) => setToast(msg)
+
+  // ---- navigation ----
+  const openWriteSheet = () => setWriteSheet(true)
+  const chooseWrite = (mode) => {
+    setWriteSheet(false)
+    setOverlay({ type: 'write', mode })
+  }
+  const openDetail = (id) => setOverlay({ type: 'detail', id })
+  const openEntryByKo = (ko) => {
+    const e = findEntryByKo(ko)
+    if (e) openDetail(e.id)
+  }
+  const closeOverlay = () => {
+    setOverlay(null)
+    setActiveWord(null)
+    setWordPop({ open: false })
+    setFixPop({ open: false })
+  }
+  const saveWrite = () => {
+    closeOverlay()
+    showToast('일기를 저장했어요')
+    setTab('diary')
+  }
+
+  // ---- word / correction popups (mock async lookups) ----
+  const tapWord = (wid, term, sentence) => {
+    setActiveWord(wid)
+    setWordPop({ open: true, term, loading: true })
+    clearTimeout(lookTimer.current)
+    lookTimer.current = setTimeout(() => {
+      setWordPop({ open: true, loading: false, ...lookupWord(term) })
+    }, 450)
+  }
+  const closeWordPop = () => {
+    setWordPop({ open: false })
+    setActiveWord(null)
+  }
+  const tapFix = (word) => {
+    setFixPop({ open: true, loading: true })
+    clearTimeout(lookTimer.current)
+    lookTimer.current = setTimeout(() => {
+      setFixPop({ open: true, loading: false, reason: lookupFix(word) })
+    }, 450)
+  }
+  const closeFixPop = () => setFixPop({ open: false })
+
+  const showTabBar = !overlay
 
   return (
     <div
@@ -28,28 +88,49 @@ export default function App() {
     >
       <StatusBar />
 
+      {/* ---- tab screens ---- */}
       {tab === 'home' && (
         <HomeScreen
           userName={USER_NAME}
-          onWrite={() => showToast('일기 작성 화면은 다음 단계에서 만들어요')}
+          onWrite={openWriteSheet}
           onToast={showToast}
+          onOpenEntry={openEntryByKo}
         />
       )}
-      {tab === 'diary' && (
-        <DiaryScreen
-          onWrite={() => showToast('일기 작성 화면은 다음 단계에서 만들어요')}
-          onOpen={() => showToast('일기 상세 화면은 다음 단계에서 만들어요')}
-        />
-      )}
-      {tab === 'vocab' && (
-        <VocabScreen
-          onWrite={() => showToast('일기 작성 화면은 다음 단계에서 만들어요')}
-          onToast={showToast}
-        />
-      )}
+      {tab === 'diary' && <DiaryScreen onWrite={openWriteSheet} onOpen={openDetail} />}
+      {tab === 'vocab' && <VocabScreen onWrite={openWriteSheet} onToast={showToast} />}
       {tab === 'my' && <PlaceholderScreen title="마이페이지" message="프로필과 설정이 여기에 있어요" />}
 
-      <TabBar active={tab} onChange={setTab} />
+      {showTabBar && <TabBar active={tab} onChange={setTab} />}
+
+      {/* ---- full-screen overlays ---- */}
+      {overlay?.type === 'write' && (
+        <WriteScreen
+          mode={overlay.mode}
+          onBack={closeOverlay}
+          onSave={saveWrite}
+          onToast={showToast}
+          onTapWord={tapWord}
+          onTapFix={tapFix}
+          activeWord={activeWord}
+        />
+      )}
+      {overlay?.type === 'detail' && (
+        <DiaryDetailScreen
+          id={overlay.id}
+          onBack={closeOverlay}
+          onDelete={() => showToast('삭제 기능은 다음 단계에서 만들어요')}
+          onToast={showToast}
+          onTapWord={tapWord}
+          onTapFix={tapFix}
+          activeWord={activeWord}
+        />
+      )}
+
+      {/* ---- sheets & popups ---- */}
+      {writeSheet && <WriteMethodSheet onChoose={chooseWrite} onClose={() => setWriteSheet(false)} />}
+      <WordPopup state={wordPop} onClose={closeWordPop} onToast={showToast} />
+      <FixPopup state={fixPop} onClose={closeFixPop} />
 
       <Toast message={toast} onDone={() => setToast('')} />
     </div>

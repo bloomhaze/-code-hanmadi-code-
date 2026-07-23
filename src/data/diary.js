@@ -94,41 +94,118 @@ export const PROMPTS = (name) => [
   '오늘 꼭 기억하고 싶은 순간은?',
 ]
 
-// ---- Diary list entries (일기 탭) — ported from the 시안 diaryData() ----
-// Each: { id, date, title, lang: 'KR'|'EN', preview }
-export const DIARY_ENTRIES = [
+// ---- Diary list + detail entries — ported from the 시안 diaryData() ----
+// Translation entry sentence: { ko, en }
+// Correction entry sentence:  { correction: true, ko, enSegs, fixSegs }
+const RAW_ENTRIES = [
   {
     id: 0,
     date: '6월 4일',
     title: '2026년 6월 4일',
     lang: 'KR',
+    correction: false,
     preview: '여름엔 모기, 장마, 습도 내가 좋아하는 게 없다. 여름이 없는 나라로 떠나고싶다.',
+    sentences: [
+      {
+        ko: '여름엔 모기, 장마, 습도 내가 좋아하는 게 없다.',
+        en: "There's nothing I like about summer. It's full of mosquitoes, rain, and humidity.",
+      },
+      { ko: '여름이 없는 나라로 떠나고싶다.', en: 'I want to live somewhere without summer.' },
+    ],
   },
   {
     id: 1,
     date: '6월 3일',
     title: '2026년 6월 3일',
     lang: 'KR',
+    correction: false,
     preview:
       '오늘 카페에서 오랜 친구를 만났다. 정말 오랜 만이라 어색할 줄 알았는데 막상 만나니까 금방 예전처럼 편해졌다. 같이 커피 마시면서 근황을 이야기하고 어쩌구',
+    sentences: [
+      { ko: '오늘 카페에서 오랜 친구를 만났다.', en: 'I ran into an old friend at a café today.' },
+      {
+        ko: '정말 오랜만이라 어색할 줄 알았는데 막상 만나니까 금방 예전처럼 편해졌다.',
+        en: 'It had been so long that I thought it would be awkward, but I felt at ease right away.',
+      },
+      { ko: '같이 커피 마시면서 근황을 이야기했다.', en: "We caught up on how we'd been over coffee." },
+    ],
   },
   {
     id: 2,
     date: '6월 2일',
     title: '2026년 6월 2일',
     lang: 'EN',
+    correction: true,
     preview:
       "Today, I went to a cafe with my friend whom I hadn't seem for a long time. We talked about many things and it was such a great time.",
+    sentences: [
+      {
+        correction: true,
+        ko: '오늘 나는 오랫동안 못봤던 친구와 카페에 갔다.',
+        enSegs: [
+          seg('Today, I '),
+          seg('goed', 'w'),
+          seg(' to a café with my friend '),
+          seg('who I not seen', 'w'),
+          seg(' for a long time.'),
+        ],
+        fixSegs: [
+          seg('Today, I '),
+          seg('went', 'f'),
+          seg(' to a café with my friend '),
+          seg("whom I hadn't seen", 'f'),
+          seg(' for a long time.'),
+        ],
+      },
+      {
+        correction: true,
+        ko: '우리는 많은 이야기를 했고 정말 재밌었다.',
+        enSegs: [seg('We '), seg('talke', 'w'), seg(' about many things and it was '), seg('very fun time.', 'w')],
+        fixSegs: [seg('We '), seg('talked', 'f'), seg(' about many things and it was '), seg('such a great time.', 'f')],
+      },
+      {
+        correction: true,
+        ko: '최근에 있었던 많은 이야기들을 했다.',
+        enSegs: [seg('We '), seg('catch up our story about what happend', 'w'), seg(' to us recently.')],
+        fixSegs: [seg('We '), seg('caught up on what had happened', 'f'), seg(' to us recently.')],
+      },
+    ],
   },
   {
     id: 3,
     date: '6월 1일',
     title: '2026년 6월 1일',
     lang: 'KR',
+    correction: false,
     preview:
       '나는 요즘 남자친구한테 책을 빌려서 읽고있다. 쇼펜하우어의 철학이 담긴 책이다. 쇼펜하우는 대부분 뼈를 때리는 말을 많이해서 정말 도움이 되는 것 같다아아',
+    sentences: [
+      { ko: '나는 요즘 남자친구한테 책을 빌려서 읽고 있다.', en: "These days I've been reading a book I borrowed from my boyfriend." },
+      { ko: '쇼펜하우어의 철학이 담긴 책이다.', en: "It's a book about Schopenhauer's philosophy." },
+      {
+        ko: '쇼펜하우어는 뼈 때리는 말을 많이 해서 정말 도움이 되는 것 같다.',
+        en: 'Schopenhauer says a lot of blunt, hard-hitting things, so it really feels helpful.',
+      },
+    ],
   },
 ]
+
+const segText = (segs) => segs.map((g) => g.t).join('')
+
+// Attach allKo / allEn (전체 보기 text) to each entry.
+export const DIARY_ENTRIES = RAW_ENTRIES.map((e) => ({
+  ...e,
+  allKo: e.sentences.map((s) => s.ko).join(' '),
+  allEn: e.sentences.map((s) => (s.correction ? segText(s.fixSegs) : s.en)).join(' '),
+}))
+
+export const getEntry = (id) => DIARY_ENTRIES.find((e) => e.id === id)
+
+// Resolve the diary entry a home-tab card belongs to, by its Korean line.
+export function findEntryByKo(ko) {
+  const t = (ko || '').trim()
+  return DIARY_ENTRIES.find((e) => e.sentences.some((s) => (s.ko || '').trim() === t))
+}
 
 // Badge styling for the diary list (KR badge is white on the grey card).
 export function diaryBadge(lang) {

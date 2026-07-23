@@ -1,7 +1,7 @@
 // iOS-style status bar (9:41, signal, wifi, battery) matching the 시안.
 export default function StatusBar() {
   return (
-    <div className="absolute left-0 top-0 z-30 flex h-12 w-full items-center justify-between pl-[34px] pr-[26px]">
+    <div className="absolute left-0 top-0 z-[45] flex h-12 w-full items-center justify-between pl-[34px] pr-[26px]">
       <span
         className="font-inter text-[15px] font-semibold text-ink"
         style={{ letterSpacing: '-.2px' }}
