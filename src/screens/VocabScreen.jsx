@@ -19,7 +19,7 @@ const TABS = [
 ]
 
 // 단어장 탭 — Quick Quiz card, filter chips, and saved word/phrase/sentence cards.
-export default function VocabScreen({ onWrite, onToast, locked = false }) {
+export default function VocabScreen({ onWrite, onToast, onStartQuiz, locked = false }) {
   const [tab, setTab] = useState('word')
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -147,7 +147,7 @@ export default function VocabScreen({ onWrite, onToast, locked = false }) {
                 <button
                   type="button"
                   onClick={() =>
-                    onToast?.(locked ? '프리미엄에서 무제한으로 복습할 수 있어요' : '퀴즈는 곧 지원돼요')
+                    locked ? onToast?.('프리미엄에서 무제한으로 복습할 수 있어요') : onStartQuiz?.()
                   }
                   className="mt-2 flex h-[50px] items-center justify-center gap-2 rounded-[20px] bg-ink"
                 >

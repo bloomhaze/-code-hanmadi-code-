@@ -12,15 +12,21 @@ import MyScreen from './screens/MyScreen.jsx'
 import WriteScreen from './screens/WriteScreen.jsx'
 import DiaryDetailScreen from './screens/DiaryDetailScreen.jsx'
 import PremiumScreen from './screens/PremiumScreen.jsx'
+import OnboardingScreen from './screens/OnboardingScreen.jsx'
+import QuizScreen from './screens/QuizScreen.jsx'
+import QuizTypeSheet from './components/QuizTypeSheet.jsx'
 import { findEntryByKo } from './data/diary.js'
 import { lookupWord, lookupFix } from './data/lookups.js'
 
 const USER_NAME = '현진'
 
 export default function App() {
+  const [onboarding, setOnboarding] = useState(true)
   const [tab, setTab] = useState('home')
   const [overlay, setOverlay] = useState(null) // {type:'write', mode} | {type:'detail', id}
   const [writeSheet, setWriteSheet] = useState(false)
+  const [quizSheet, setQuizSheet] = useState(false)
+  const [quiz, setQuiz] = useState(null) // { type }
   const [toast, setToast] = useState('')
   const [wordPop, setWordPop] = useState({ open: false })
   const [fixPop, setFixPop] = useState({ open: false })
@@ -74,7 +80,14 @@ export default function App() {
   }
   const closeFixPop = () => setFixPop({ open: false })
 
-  const showTabBar = !overlay
+  // ---- quiz ----
+  const openQuizSheet = () => setQuizSheet(true)
+  const startQuiz = (type) => {
+    setQuizSheet(false)
+    setQuiz({ type })
+  }
+
+  const showTabBar = !overlay && !onboarding && !quiz
 
   return (
     <div
@@ -99,7 +112,9 @@ export default function App() {
         />
       )}
       {tab === 'diary' && <DiaryScreen onWrite={openWriteSheet} onOpen={openDetail} />}
-      {tab === 'vocab' && <VocabScreen onWrite={openWriteSheet} onToast={showToast} />}
+      {tab === 'vocab' && (
+        <VocabScreen onWrite={openWriteSheet} onToast={showToast} onStartQuiz={openQuizSheet} />
+      )}
       {tab === 'my' && (
         <MyScreen userName={USER_NAME} onPremium={() => setOverlay({ type: 'premium' })} onToast={showToast} />
       )}
@@ -134,8 +149,15 @@ export default function App() {
         <PremiumScreen onClose={closeOverlay} onToast={showToast} />
       )}
 
+      {quiz && <QuizScreen type={quiz.type} onClose={() => setQuiz(null)} onToast={showToast} />}
+
+      {onboarding && (
+        <OnboardingScreen onComplete={() => setOnboarding(false)} onToast={showToast} />
+      )}
+
       {/* ---- sheets & popups ---- */}
       {writeSheet && <WriteMethodSheet onChoose={chooseWrite} onClose={() => setWriteSheet(false)} />}
+      {quizSheet && <QuizTypeSheet onStart={startQuiz} onClose={() => setQuizSheet(false)} />}
       <WordPopup state={wordPop} onClose={closeWordPop} onToast={showToast} />
       <FixPopup state={fixPop} onClose={closeFixPop} />
 
