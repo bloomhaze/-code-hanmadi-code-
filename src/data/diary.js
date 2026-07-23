@@ -94,6 +94,49 @@ export const PROMPTS = (name) => [
   '오늘 꼭 기억하고 싶은 순간은?',
 ]
 
+// ---- Diary list entries (일기 탭) — ported from the 시안 diaryData() ----
+// Each: { id, date, title, lang: 'KR'|'EN', preview }
+export const DIARY_ENTRIES = [
+  {
+    id: 0,
+    date: '6월 4일',
+    title: '2026년 6월 4일',
+    lang: 'KR',
+    preview: '여름엔 모기, 장마, 습도 내가 좋아하는 게 없다. 여름이 없는 나라로 떠나고싶다.',
+  },
+  {
+    id: 1,
+    date: '6월 3일',
+    title: '2026년 6월 3일',
+    lang: 'KR',
+    preview:
+      '오늘 카페에서 오랜 친구를 만났다. 정말 오랜 만이라 어색할 줄 알았는데 막상 만나니까 금방 예전처럼 편해졌다. 같이 커피 마시면서 근황을 이야기하고 어쩌구',
+  },
+  {
+    id: 2,
+    date: '6월 2일',
+    title: '2026년 6월 2일',
+    lang: 'EN',
+    preview:
+      "Today, I went to a cafe with my friend whom I hadn't seem for a long time. We talked about many things and it was such a great time.",
+  },
+  {
+    id: 3,
+    date: '6월 1일',
+    title: '2026년 6월 1일',
+    lang: 'KR',
+    preview:
+      '나는 요즘 남자친구한테 책을 빌려서 읽고있다. 쇼펜하우어의 철학이 담긴 책이다. 쇼펜하우는 대부분 뼈를 때리는 말을 많이해서 정말 도움이 되는 것 같다아아',
+  },
+]
+
+// Badge styling for the diary list (KR badge is white on the grey card).
+export function diaryBadge(lang) {
+  return lang === 'EN'
+    ? { bg: '#dcebff', color: '#0066ff' }
+    : { bg: '#ffffff', color: '#7a7b7d' }
+}
+
 const DOW_KO = ['일', '월', '화', '수', '목', '금', '토']
 
 // Build the Sun..Sat week that contains the selected date (offset in days from TODAY).

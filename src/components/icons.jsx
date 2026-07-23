@@ -136,6 +136,94 @@ export function ChevronRight({ color = '#121212' }) {
   )
 }
 
+export function SearchIcon({ color = '#121212' }) {
+  return (
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <path
+        d="M25.875 25.8746L22.0775 22.0771"
+        stroke={color}
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M17.125 24.125C20.991 24.125 24.125 20.991 24.125 17.125C24.125 13.259 20.991 10.125 17.125 10.125C13.259 10.125 10.125 13.259 10.125 17.125C10.125 20.991 13.259 24.125 17.125 24.125Z"
+        stroke={color}
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+// Small circular speaker (used on vocab cards). variant color controlled by parent.
+export function SpeakerSmall({ color = '#121212' }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <path
+        d="M3.33374 7.49984C2.64338 7.49984 2.08374 8.05948 2.08374 8.74984V11.2498C2.08374 11.9402 2.64338 12.4998 3.33374 12.4998H5.41707L8.50822 15.7146C8.89826 16.1203 9.58374 15.8442 9.58374 15.2814V4.71824C9.58374 4.1555 8.89826 3.8794 8.50822 4.28505L5.41707 7.49984H3.33374Z"
+        fill={color}
+      />
+      <path
+        d="M11.6663 7.0835C12.4297 7.86237 12.8573 8.90953 12.8573 10.0002C12.8573 11.0908 12.4297 12.138 11.6663 12.9168"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M14.1663 5C14.8756 5.62561 15.4438 6.39501 15.8329 7.25708C16.2221 8.11915 16.4233 9.05416 16.4233 10C16.4233 10.9458 16.2221 11.8808 15.8329 12.7429C15.4438 13.605 14.8756 14.3744 14.1663 15"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+// Small bookmark glyph (used on vocab cards). fill/stroke controlled by parent.
+export function BookmarkSmall({ fill = 'none', stroke = '#121212' }) {
+  return (
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+      <path
+        d="M5 3.5H15C15.1933 3.5 15.35 3.6567 15.35 3.85V16.8291C15.35 17.1123 15.0312 17.2786 14.7992 17.1162L10.9467 14.4191C10.3786 14.0215 9.62141 14.0215 9.05332 14.4191L5.20083 17.1162C4.96878 17.2786 4.65 17.1123 4.65 16.8291V3.85C4.65 3.6567 4.8067 3.5 5 3.5Z"
+        fill={fill}
+        stroke={stroke}
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+export function LockIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+      <rect x="3.92578" y="7.88916" width="11.5742" height="10.1274" rx="1.44678" fill="white" />
+      <path
+        d="M9.71387 2.3252C11.536 2.3252 13.0127 3.80192 13.0127 5.62402V7.51465C13.0125 9.05186 11.7667 10.2978 10.2295 10.2979H9.19824C7.66103 10.2978 6.41525 9.05184 6.41504 7.51465V5.62402C6.41506 3.80193 7.89177 2.32522 9.71387 2.3252Z"
+        stroke="white"
+        strokeWidth="1.64963"
+      />
+    </svg>
+  )
+}
+
+export function PlayIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path
+        d="M3.33333 3.33373C3.33326 3.09912 3.3951 2.86865 3.51259 2.66559C3.63008 2.46252 3.79907 2.29406 4.0025 2.17719C4.20593 2.06033 4.43659 1.99921 4.67119 2.00001C4.9058 2.0008 5.13604 2.06349 5.33867 2.18173L13.3367 6.84706C13.5385 6.96418 13.7061 7.13223 13.8226 7.3344C13.9392 7.53657 14.0006 7.76579 14.0008 7.99915C14.001 8.23252 13.94 8.46184 13.8238 8.66422C13.7076 8.86659 13.5403 9.03493 13.3387 9.1524L5.33867 13.8191C5.13604 13.9373 4.9058 14 4.67119 14.0008C4.43659 14.0016 4.20593 13.9405 4.0025 13.8236C3.79907 13.7067 3.63008 13.5383 3.51259 13.3352C3.3951 13.1321 3.33326 12.9017 3.33333 12.6671V3.33373Z"
+        fill="white"
+        stroke="white"
+        strokeWidth="1.33333"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 export function ChevronDownSmall() {
   return (
     <svg width="8" height="8" viewBox="0 0 8 8" fill="none">

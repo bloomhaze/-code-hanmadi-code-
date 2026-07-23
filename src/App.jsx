@@ -3,6 +3,8 @@ import StatusBar from './components/StatusBar.jsx'
 import TabBar from './components/TabBar.jsx'
 import Toast from './components/Toast.jsx'
 import HomeScreen from './screens/HomeScreen.jsx'
+import DiaryScreen from './screens/DiaryScreen.jsx'
+import VocabScreen from './screens/VocabScreen.jsx'
 import PlaceholderScreen from './screens/PlaceholderScreen.jsx'
 
 const USER_NAME = '현진'
@@ -33,8 +35,18 @@ export default function App() {
           onToast={showToast}
         />
       )}
-      {tab === 'diary' && <PlaceholderScreen title="일기" message="작성한 일기가 여기에 모여요" />}
-      {tab === 'vocab' && <PlaceholderScreen title="단어장" message="저장한 단어·표현이 여기에 모여요" />}
+      {tab === 'diary' && (
+        <DiaryScreen
+          onWrite={() => showToast('일기 작성 화면은 다음 단계에서 만들어요')}
+          onOpen={() => showToast('일기 상세 화면은 다음 단계에서 만들어요')}
+        />
+      )}
+      {tab === 'vocab' && (
+        <VocabScreen
+          onWrite={() => showToast('일기 작성 화면은 다음 단계에서 만들어요')}
+          onToast={showToast}
+        />
+      )}
       {tab === 'my' && <PlaceholderScreen title="마이페이지" message="프로필과 설정이 여기에 있어요" />}
 
       <TabBar active={tab} onChange={setTab} />
