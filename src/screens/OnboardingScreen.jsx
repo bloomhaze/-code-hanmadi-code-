@@ -23,6 +23,9 @@ const SLIDES = [
   },
 ]
 
+// Apple 로그인은 App Store 출시 때 추가 예정 — 그전까지 화면에서 숨김.
+const SHOW_APPLE = false
+
 // 온보딩 — 로그인(auth) → 소개 4단계 → 완료(onComplete).
 export default function OnboardingScreen({ onComplete, onToast }) {
   const [step, setStep] = useState('auth') // 'auth' | 1..4
@@ -51,20 +54,23 @@ export default function OnboardingScreen({ onComplete, onToast }) {
             Google로 로그인
           </span>
         </button>
+        {SHOW_APPLE && (
+          <button
+            type="button"
+            onClick={startIntro}
+            className="absolute left-5 top-[549px] flex h-[50px] w-[335px] items-center justify-center gap-2 rounded-[20px] bg-ink"
+          >
+            <img src="/brand/apple-logo.svg" width="20" height="20" alt="" />
+            <span className="font-sans text-[15px] font-medium text-white" style={{ letterSpacing: '-.2px' }}>
+              Apple로 로그인
+            </span>
+          </button>
+        )}
         <button
           type="button"
           onClick={startIntro}
-          className="absolute left-5 top-[549px] flex h-[50px] w-[335px] items-center justify-center gap-2 rounded-[20px] bg-ink"
-        >
-          <img src="/brand/apple-logo.svg" width="20" height="20" alt="" />
-          <span className="font-sans text-[15px] font-medium text-white" style={{ letterSpacing: '-.2px' }}>
-            Apple로 로그인
-          </span>
-        </button>
-        <button
-          type="button"
-          onClick={startIntro}
-          className="absolute left-0 top-[623px] flex w-full justify-center opacity-70"
+          className="absolute left-0 flex w-full justify-center opacity-70"
+          style={{ top: SHOW_APPLE ? 623 : 563 }}
         >
           <div className="flex items-center gap-1 border-b border-ink pb-0.5">
             <img src="/brand/eyes.svg" width="20" height="20" alt="" />
