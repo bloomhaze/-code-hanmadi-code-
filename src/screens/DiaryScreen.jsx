@@ -5,15 +5,16 @@ import { DIARY_ENTRIES, diaryBadge } from '../data/diary.js'
 const ACCENT = '#0066FF'
 
 // 일기 탭 — grouped list of diary entries with a togglable search field.
-export default function DiaryScreen({ onWrite, onOpen }) {
+export default function DiaryScreen({ onWrite, onOpen, deletedIds }) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
 
   const q = query.trim().toLowerCase()
-  const list = DIARY_ENTRIES.filter(
+  const visible = DIARY_ENTRIES.filter((e) => !deletedIds?.has(e.id))
+  const list = visible.filter(
     (e) => !q || e.preview.toLowerCase().includes(q) || e.date.toLowerCase().includes(q),
   )
-  const hasItems = DIARY_ENTRIES.length > 0
+  const hasItems = visible.length > 0
 
   return (
     <>

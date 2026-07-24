@@ -15,6 +15,9 @@ import PremiumScreen from './screens/PremiumScreen.jsx'
 import OnboardingScreen from './screens/OnboardingScreen.jsx'
 import QuizScreen from './screens/QuizScreen.jsx'
 import QuizTypeSheet from './components/QuizTypeSheet.jsx'
+import NotifScreen from './screens/NotifScreen.jsx'
+import DeleteDialog from './components/DeleteDialog.jsx'
+import ConfirmDialog from './components/ConfirmDialog.jsx'
 import { findEntryByKo } from './data/diary.js'
 import { lookupWord, lookupFix } from './data/lookups.js'
 
@@ -27,6 +30,8 @@ export default function App() {
   const [writeSheet, setWriteSheet] = useState(false)
   const [quizSheet, setQuizSheet] = useState(false)
   const [quiz, setQuiz] = useState(null) // { type }
+  const [dialog, setDialog] = useState(null) // { kind:'delete', id } | { kind:'logout'|'withdraw' }
+  const [deletedIds, setDeletedIds] = useState(() => new Set())
   const [toast, setToast] = useState('')
   const [wordPop, setWordPop] = useState({ open: false })
   const [fixPop, setFixPop] = useState({ open: false })
@@ -87,6 +92,21 @@ export default function App() {
     setQuiz({ type })
   }
 
+  // ---- dialogs ----
+  const confirmDelete = () => {
+    const id = dialog?.id
+    setDeletedIds((s) => new Set(s).add(id))
+    setDialog(null)
+    closeOverlay()
+    setTab('diary')
+    showToast('일기를 삭제했어요')
+  }
+  const confirmDialog = () => {
+    const kind = dialog?.kind
+    setDialog(null)
+    showToast(kind === 'withdraw' ? '탈퇴가 완료되었어요' : '로그아웃되었어요')
+  }
+
   const showTabBar = !overlay && !onboarding && !quiz
 
   return (
@@ -111,12 +131,21 @@ export default function App() {
           onOpenEntry={openEntryByKo}
         />
       )}
-      {tab === 'diary' && <DiaryScreen onWrite={openWriteSheet} onOpen={openDetail} />}
+      {tab === 'diary' && (
+        <DiaryScreen onWrite={openWriteSheet} onOpen={openDetail} deletedIds={deletedIds} />
+      )}
       {tab === 'vocab' && (
         <VocabScreen onWrite={openWriteSheet} onToast={showToast} onStartQuiz={openQuizSheet} />
       )}
       {tab === 'my' && (
-        <MyScreen userName={USER_NAME} onPremium={() => setOverlay({ type: 'premium' })} onToast={showToast} />
+        <MyScreen
+          userName={USER_NAME}
+          onPremium={() => setOverlay({ type: 'premium' })}
+          onNotif={() => setOverlay({ type: 'notif' })}
+          onLogout={() => setDialog({ kind: 'logout' })}
+          onWithdraw={() => setDialog({ kind: 'withdraw' })}
+          onToast={showToast}
+        />
       )}
 
       {showTabBar && <TabBar active={tab} onChange={setTab} />}
@@ -137,7 +166,7 @@ export default function App() {
         <DiaryDetailScreen
           id={overlay.id}
           onBack={closeOverlay}
-          onDelete={() => showToast('삭제 기능은 다음 단계에서 만들어요')}
+          onDelete={() => setDialog({ kind: 'delete', id: overlay.id })}
           onToast={showToast}
           onTapWord={tapWord}
           onTapFix={tapFix}
@@ -148,6 +177,7 @@ export default function App() {
       {overlay?.type === 'premium' && (
         <PremiumScreen onClose={closeOverlay} onToast={showToast} />
       )}
+      {overlay?.type === 'notif' && <NotifScreen onClose={closeOverlay} />}
 
       {quiz && <QuizScreen type={quiz.type} onClose={() => setQuiz(null)} onToast={showToast} />}
 
@@ -160,6 +190,11 @@ export default function App() {
       {quizSheet && <QuizTypeSheet onStart={startQuiz} onClose={() => setQuizSheet(false)} />}
       <WordPopup state={wordPop} onClose={closeWordPop} onToast={showToast} />
       <FixPopup state={fixPop} onClose={closeFixPop} />
+
+      {dialog?.kind === 'delete' && <DeleteDialog onConfirm={confirmDelete} onClose={() => setDialog(null)} />}
+      {(dialog?.kind === 'logout' || dialog?.kind === 'withdraw') && (
+        <ConfirmDialog kind={dialog.kind} onYes={confirmDialog} onClose={() => setDialog(null)} />
+      )}
 
       <Toast message={toast} onDone={() => setToast('')} />
     </div>

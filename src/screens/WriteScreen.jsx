@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import SentenceResult from '../components/SentenceResult.jsx'
+import WordSearchSheet from '../components/WordSearchSheet.jsx'
 import { speak, stopSpeak } from '../lib/speak.js'
 import { MOCK_KO_RESULT, MOCK_EN_RESULT } from '../data/lookups.js'
 
@@ -14,6 +15,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
   const [listen, setListen] = useState({})
   const [bookmark, setBookmark] = useState({})
   const [playing, setPlaying] = useState(false)
+  const [wordSheet, setWordSheet] = useState(false)
   const timer = useRef(null)
 
   const isEn = mode === 'en'
@@ -89,7 +91,33 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
             </span>
           </button>
         )}
+        {step === 'edit' && isEn && (
+          <button
+            type="button"
+            onClick={() => setWordSheet(true)}
+            className="flex h-6 w-6 items-center justify-center"
+            aria-label="단어 검색"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <rect x="5" y="4" width="14" height="14" rx="1" fill="#1A1A1B" />
+              <path
+                d="M5 19.5C5 19.2239 5.22386 19 5.5 19H18.5C18.7761 19 19 19.2239 19 19.5V20C19 20.2761 18.7761 20.5 18.5 20.5H6C5.44772 20.5 5 20.0523 5 19.5Z"
+                fill="#1A1A1B"
+              />
+              <path
+                d="M6 6C6.55228 6 7 6.44772 7 7L7 19.5C7 20.0523 6.55228 20.5 6 20.5C5.44772 20.5 5 20.0523 5 19.5L5 7C5 6.44771 5.44772 6 6 6Z"
+                fill="#1A1A1B"
+              />
+              <path
+                d="M10.0857 14.4014C9.96471 14.7592 9.62909 15 9.25142 15C8.64194 15 8.21674 14.3958 8.42253 13.8221L10.632 7.66236C10.7745 7.26504 11.1512 7 11.5733 7H12.4304C12.8527 7 13.2295 7.26525 13.3719 7.66279L15.5782 13.8223C15.7837 14.396 15.3584 15 14.749 15C14.3711 15 14.0354 14.7589 13.9146 14.4008L12.0449 8.8589C12.0387 8.84051 12.0214 8.82812 12.002 8.82812C11.9826 8.82812 11.9654 8.8405 11.9592 8.85888L10.0857 14.4014ZM9.7656 12.5156C9.7656 12.151 10.0612 11.8555 10.4258 11.8555H13.5539C13.9185 11.8555 14.2141 12.151 14.2141 12.5156C14.2141 12.8802 13.9185 13.1758 13.5539 13.1758H10.4258C10.0612 13.1758 9.7656 12.8802 9.7656 12.5156Z"
+                fill="white"
+              />
+            </svg>
+          </button>
+        )}
       </div>
+
+      {wordSheet && <WordSearchSheet onClose={() => setWordSheet(false)} onToast={onToast} />}
 
       {/* EDIT */}
       {step === 'edit' && (

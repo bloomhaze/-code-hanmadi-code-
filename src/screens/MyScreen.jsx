@@ -5,7 +5,7 @@ import { VOCAB_DATA } from '../data/vocab.js'
 const ACCENT = '#0066FF'
 
 // 마이페이지 — profile, stats, settings menu, premium entry.
-export default function MyScreen({ userName = '현진', onPremium, onToast }) {
+export default function MyScreen({ userName = '현진', onPremium, onNotif, onLogout, onWithdraw, onToast }) {
   const displayName = userName.length <= 2 ? userName.split('').join(' ') : userName
   const diaryCount = DIARY_ENTRIES.length
   const vocabCount = VOCAB_DATA.word.length + VOCAB_DATA.phrase.length + VOCAB_DATA.sentence.length
@@ -122,7 +122,7 @@ export default function MyScreen({ userName = '현진', onPremium, onToast }) {
             <div className="flex flex-col gap-2.5">
               <SectionLabel>설정</SectionLabel>
               <div className="rounded-2xl bg-[#f7f7f8]">
-                <Row label="알림 설정" onClick={() => onToast?.('알림 설정은 다음 단계에서 만들어요')} single />
+                <Row label="알림 설정" onClick={onNotif} single />
               </div>
             </div>
 
@@ -153,7 +153,7 @@ export default function MyScreen({ userName = '현진', onPremium, onToast }) {
             <div className="flex flex-row items-center gap-2.5 px-4">
               <button
                 type="button"
-                onClick={() => onToast?.('로그아웃할까요?')}
+                onClick={onLogout}
                 className="font-sans text-[13px] text-ink"
                 style={{ letterSpacing: '-.3px' }}
               >
@@ -162,7 +162,7 @@ export default function MyScreen({ userName = '현진', onPremium, onToast }) {
               <div className="h-2.5 w-px bg-[#c4c4c4]" />
               <button
                 type="button"
-                onClick={() => onToast?.('정말 탈퇴하시겠어요?')}
+                onClick={onWithdraw}
                 className="font-sans text-[13px]"
                 style={{ color: '#ff4242', letterSpacing: '-.3px' }}
               >

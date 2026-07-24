@@ -199,3 +199,17 @@ body {
     transform: scale(1);
   }
 }
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.72);
+    opacity: 0;
+  }
+  55% {
+    opacity: 1;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

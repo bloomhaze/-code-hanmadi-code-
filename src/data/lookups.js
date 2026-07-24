@@ -51,6 +51,36 @@ export function lookupFix(word) {
   return FIX_REASONS[key] || '이 부분이 더 자연스러운 표현으로 다듬어졌어요.'
 }
 
+// ---- Mock word/expression search (단어 검색 시트) ----
+// Stands in for the 시안's LLM expression search. Keyed by Korean query;
+// results are ordered most-common-first. Unknown queries get a generic set.
+const SEARCH_DB = {
+  두근거리다: [
+    { term: 'my heart is racing', kr: '심장이 두근거리다', ex: 'My heart was racing before the interview.', exKr: '면접 전에 심장이 두근거렸어.' },
+    { term: 'butterflies in my stomach', kr: '긴장돼서 두근거리다', ex: 'I had butterflies in my stomach on stage.', exKr: '무대에서 긴장돼 두근거렸어.' },
+    { term: 'nervous', kr: '초조한, 떨리는', ex: 'I felt so nervous before the show.', exKr: '공연 전에 너무 떨렸어.' },
+  ],
+  어색하다: [
+    { term: 'awkward', kr: '어색한, 불편한', ex: 'It felt awkward seeing him again.', exKr: '그를 다시 보니 어색했어.' },
+    { term: 'feel out of place', kr: '겉도는 느낌이다', ex: 'I felt out of place at the party.', exKr: '파티에서 나 혼자 겉도는 느낌이었어.' },
+  ],
+  따라잡다: [
+    { term: 'catch up on', kr: '(밀린 것을) 따라잡다', ex: 'I need to catch up on my emails.', exKr: '밀린 이메일을 확인해야 해.' },
+    { term: 'keep up with', kr: '(뒤처지지 않고) 따라가다', ex: 'It’s hard to keep up with the news.', exKr: '뉴스를 따라가기가 벅차.' },
+  ],
+}
+
+export function searchExpressions(query) {
+  const q = (query || '').trim()
+  if (!q) return []
+  if (SEARCH_DB[q]) return SEARCH_DB[q]
+  // generic fallback so any query returns something plausible
+  return [
+    { term: q, kr: '입력한 표현', ex: `Here is how you might use "${q}".`, exKr: '이렇게 활용해볼 수 있어요.' },
+    { term: 'you could also say…', kr: '이렇게도 표현할 수 있어요', ex: 'Try describing it in your own words.', exKr: '내 말로 자유롭게 표현해보세요.' },
+  ]
+}
+
 // ---- Mock write results (translation / correction) ----
 // The 시안 sends the diary to an LLM; here we return a canned, well-formed
 // result so the full flow (loading → sentence/all view, word & fix popups)
