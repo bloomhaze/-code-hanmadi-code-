@@ -1,4 +1,5 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { supabase } from './lib/supabase.js'
 import StatusBar from './components/StatusBar.jsx'
 import TabBar from './components/TabBar.jsx'
 import Toast from './components/Toast.jsx'
@@ -24,7 +25,9 @@ import { lookupWord, lookupFix } from './data/lookups.js'
 const USER_NAME = '현진'
 
 export default function App() {
-  const [onboarding, setOnboarding] = useState(true)
+  const [session, setSession] = useState(null)
+  const [authReady, setAuthReady] = useState(false)
+  const [guestMode, setGuestMode] = useState(false) // "먼저 둘러볼래요"
   const [tab, setTab] = useState('home')
   const [overlay, setOverlay] = useState(null) // {type:'write', mode} | {type:'detail', id}
   const [writeSheet, setWriteSheet] = useState(false)
@@ -39,6 +42,31 @@ export default function App() {
   const lookTimer = useRef(null)
 
   const showToast = (msg) => setToast(msg)
+
+  // ---- auth (Supabase) ----
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session)
+      setAuthReady(true)
+    })
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => setSession(s))
+    return () => sub.subscription.unsubscribe()
+  }, [])
+
+  const loginWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin },
+    })
+    if (error) showToast('로그인을 시작하지 못했어요. 잠시 후 다시 시도해주세요.')
+    // on success the browser redirects to Google, then back here
+  }
+
+  const authed = !!session
+  const user = session?.user
+  const userEmail = user?.email || ''
+  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || USER_NAME
+  const showOnboarding = authReady && !authed && !guestMode
 
   // ---- navigation ----
   const openWriteSheet = () => setWriteSheet(true)
@@ -101,13 +129,18 @@ export default function App() {
     setTab('diary')
     showToast('일기를 삭제했어요')
   }
-  const confirmDialog = () => {
+  const confirmDialog = async () => {
     const kind = dialog?.kind
     setDialog(null)
+    // Both logout and withdraw end the session here. (True account deletion
+    // needs a server-side admin call; this signs the user out for now.)
+    await supabase.auth.signOut()
+    setGuestMode(false)
+    setTab('home')
     showToast(kind === 'withdraw' ? '탈퇴가 완료되었어요' : '로그아웃되었어요')
   }
 
-  const showTabBar = !overlay && !onboarding && !quiz
+  const showTabBar = !overlay && !showOnboarding && !quiz
 
   return (
     <div
@@ -125,7 +158,7 @@ export default function App() {
       {/* ---- tab screens ---- */}
       {tab === 'home' && (
         <HomeScreen
-          userName={USER_NAME}
+          userName={userName}
           onWrite={openWriteSheet}
           onToast={showToast}
           onOpenEntry={openEntryByKo}
@@ -139,7 +172,9 @@ export default function App() {
       )}
       {tab === 'my' && (
         <MyScreen
-          userName={USER_NAME}
+          userName={userName}
+          email={userEmail}
+          isGuest={!authed}
           onPremium={() => setOverlay({ type: 'premium' })}
           onNotif={() => setOverlay({ type: 'notif' })}
           onLogout={() => setDialog({ kind: 'logout' })}
@@ -181,8 +216,12 @@ export default function App() {
 
       {quiz && <QuizScreen type={quiz.type} onClose={() => setQuiz(null)} onToast={showToast} />}
 
-      {onboarding && (
-        <OnboardingScreen onComplete={() => setOnboarding(false)} onToast={showToast} />
+      {showOnboarding && (
+        <OnboardingScreen
+          onGoogle={loginWithGoogle}
+          onComplete={() => setGuestMode(true)}
+          onToast={showToast}
+        />
       )}
 
       {/* ---- sheets & popups ---- */}

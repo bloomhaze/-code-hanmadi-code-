@@ -5,8 +5,18 @@ import { VOCAB_DATA } from '../data/vocab.js'
 const ACCENT = '#0066FF'
 
 // 마이페이지 — profile, stats, settings menu, premium entry.
-export default function MyScreen({ userName = '현진', onPremium, onNotif, onLogout, onWithdraw, onToast }) {
+export default function MyScreen({
+  userName = '현진',
+  email,
+  isGuest = false,
+  onPremium,
+  onNotif,
+  onLogout,
+  onWithdraw,
+  onToast,
+}) {
   const displayName = userName.length <= 2 ? userName.split('').join(' ') : userName
+  const displayEmail = email || 'svs9645@gmail.com'
   const diaryCount = DIARY_ENTRIES.length
   const vocabCount = VOCAB_DATA.word.length + VOCAB_DATA.phrase.length + VOCAB_DATA.sentence.length
 
@@ -62,7 +72,7 @@ export default function MyScreen({ userName = '현진', onPremium, onNotif, onLo
                   className="truncate font-inter text-[13px] font-extralight"
                   style={{ color: '#AFAFAF', letterSpacing: '-.2px' }}
                 >
-                  svs9645@gmail.com
+                  {displayEmail}
                 </span>
                 <span className="font-sans text-[13px] font-light" style={{ color: ACCENT, letterSpacing: '-.2px' }}>
                   2026년 1월 8일 가입

@@ -27,7 +27,8 @@ const SLIDES = [
 const SHOW_APPLE = false
 
 // 온보딩 — 로그인(auth) → 소개 4단계 → 완료(onComplete).
-export default function OnboardingScreen({ onComplete, onToast }) {
+// onGoogle: start Supabase Google OAuth. Guest("먼저 둘러볼래요") goes to intro.
+export default function OnboardingScreen({ onGoogle, onComplete, onToast }) {
   const [step, setStep] = useState('auth') // 'auth' | 1..4
 
   const startIntro = () => setStep(1)
@@ -45,7 +46,7 @@ export default function OnboardingScreen({ onComplete, onToast }) {
 
         <button
           type="button"
-          onClick={startIntro}
+          onClick={onGoogle}
           className="absolute left-5 top-[489px] flex h-[50px] w-[335px] items-center justify-center gap-2 rounded-[20px] bg-white"
           style={{ boxShadow: 'inset 0 0 0 1px #ececee' }}
         >
