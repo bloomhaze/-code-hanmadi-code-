@@ -194,8 +194,13 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
               <div className="flex h-6 items-center justify-center overflow-hidden">
                 <span
                   key={promptIdx}
-                  className="font-sans text-[15px] text-ink"
-                  style={{ animation: 'promptFade 3.6s ease-in-out', letterSpacing: '-.2px' }}
+                  className="font-inter text-[15px] font-medium"
+                  style={{
+                    color: ACCENT,
+                    lineHeight: '24px',
+                    letterSpacing: '-.2px',
+                    animation: 'promptFade 3.6s ease-in-out',
+                  }}
                 >
                   {prompts[promptIdx]}
                 </span>
