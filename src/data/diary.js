@@ -242,6 +242,34 @@ export function buildWeek(selOff) {
   })
 }
 
+// Build a month grid (weeks of 7 cells; null = blank pad day) for the calendar.
+export function buildMonth(year, month) {
+  const base = Date.UTC(TODAY.year, TODAY.month - 1, TODAY.day)
+  const startDow = new Date(year, month - 1, 1).getDay() // 0 = Sun
+  const daysInMonth = new Date(year, month, 0).getDate()
+
+  const cells = []
+  for (let i = 0; i < startDow; i++) cells.push(null)
+  for (let d = 1; d <= daysInMonth; d++) {
+    const off = Math.round((Date.UTC(year, month - 1, d) - base) / 86400000)
+    cells.push({
+      day: d,
+      off,
+      isToday: off === 0,
+      isFuture: off > 0,
+      hasEntry: DAYS_WITH_ENTRY.has(`${month}-${d}`),
+    })
+  }
+  while (cells.length % 7 !== 0) cells.push(null)
+
+  const weeks = []
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7))
+  return { title: `${year}년 ${month}월`, weeks }
+}
+
+// Months shown in the calendar sheet (matches the 시안's May–June demo range).
+export const calendarMonths = () => [buildMonth(2026, 5), buildMonth(2026, 6)]
+
 export function dateFromOff(selOff) {
   const base = new Date(TODAY.year, TODAY.month - 1, TODAY.day)
   const d = new Date(base)

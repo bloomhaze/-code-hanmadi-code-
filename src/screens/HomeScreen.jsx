@@ -8,6 +8,7 @@ import {
   PencilIcon,
 } from '../components/icons.jsx'
 import SegmentText from '../components/SegmentText.jsx'
+import CalendarSheet from '../components/CalendarSheet.jsx'
 import { speak } from '../lib/speak.js'
 import {
   buildWeek,
@@ -23,6 +24,7 @@ const ACCENT = '#0066FF'
 export default function HomeScreen({ userName = '현진', onWrite, onToast, onOpenEntry }) {
   const [selOff, setSelOff] = useState(0) // 0 = today (6/4)
   const [todayWritten] = useState(false)
+  const [calendarOpen, setCalendarOpen] = useState(false)
   const [promptIdx, setPromptIdx] = useState(0)
   const [listen, setListen] = useState({})
   const [bookmark, setBookmark] = useState({})
@@ -74,7 +76,7 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
           <button
             type="button"
             className="flex items-center gap-1.5 px-1"
-            onClick={() => onToast?.('달력은 곧 지원돼요')}
+            onClick={() => setCalendarOpen(true)}
           >
             <span
               className="font-inter text-[20px] font-semibold text-ink"
@@ -322,6 +324,19 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
       >
         <PencilIcon size={26} />
       </button>
+
+      {/* ===== CALENDAR ===== */}
+      {calendarOpen && (
+        <CalendarSheet
+          selOff={selOff}
+          onSelect={(off) => {
+            setSelOff(off)
+            setCalendarOpen(false)
+          }}
+          onClose={() => setCalendarOpen(false)}
+          onToast={onToast}
+        />
+      )}
     </>
   )
 }
