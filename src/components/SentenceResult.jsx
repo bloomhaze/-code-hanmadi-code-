@@ -178,7 +178,7 @@ export default function SentenceResult({
                     />
                   </>
                 ) : (
-                  <span className="font-inter text-[16px] font-medium text-ink-2" style={{ lineHeight: '26px', letterSpacing: '-.2px' }}>
+                  <span className="font-inter text-[16px] font-normal text-ink-2" style={{ lineHeight: '26px', letterSpacing: '-.2px' }}>
                     {mkWords(s.en).map((w, wi) => {
                       const wid = `${i}-${wi}`
                       return (
@@ -190,7 +190,7 @@ export default function SentenceResult({
                               borderRadius: 6,
                               padding: '1px 3px',
                               margin: '0 -1px',
-                              fontWeight: 200,
+                              fontWeight: 400,
                               background: activeWord === wid ? '#ededed' : 'transparent',
                               transition: 'background .15s ease',
                             }}
