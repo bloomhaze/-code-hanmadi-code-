@@ -19,6 +19,7 @@ logs
 .env
 .env.local
 .env.*.local
+!.env.example
 
 # editor / os
 .DS_Store
