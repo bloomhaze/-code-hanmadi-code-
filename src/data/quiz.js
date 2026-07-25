@@ -125,28 +125,4 @@ export function koOf(cur) {
   return (cur && (cur.ko || cur.kr || cur.exKr)) || ''
 }
 
-// Mock writing grader (stands in for the 시안's AI 첨삭).
-export function gradeWriting(cur, answer) {
-  const model = cur.kind === 'sentence' ? cur.term : cur.ex || cur.term
-  const norm = (s) =>
-    (s || '')
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '')
-      .replace(/\s+/g, ' ')
-      .trim()
-  const a = norm(answer)
-  const m = norm(model)
-  // token overlap ratio against the model answer
-  const at = new Set(a.split(' ').filter(Boolean))
-  const mt = m.split(' ').filter(Boolean)
-  const hit = mt.filter((w) => at.has(w)).length
-  const ratio = mt.length ? hit / mt.length : 0
-  // Lenient: a reasonably-overlapping answer counts as OK (semantic/grammar
-  // judgement would need a real grader; the 시안 uses an AI call here).
-  const ok = a === m || ratio >= 0.5
-  return {
-    ok,
-    better: model,
-    feedback: '뜻은 통하지만, 모범 답안처럼 쓰면 더 자연스러워요.',
-  }
-}
+// 작문 채점은 src/lib/grade.js 로 이동 (Supabase Edge Function 기반 AI 채점 + 엄격 폴백).

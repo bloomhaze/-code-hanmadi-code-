@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
-import { buildQuizList, blankAnswerFor, writeHintFor, koOf, gradeWriting } from '../data/quiz.js'
+import { buildQuizList, blankAnswerFor, writeHintFor, koOf } from '../data/quiz.js'
+import { gradeWriting } from '../lib/grade.js'
 
 // left is a % of the container so confetti spreads across the full width (max 500)
 const CONFETTI = [
@@ -477,16 +478,16 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
   // ("이렇게도 쓸 수 있어요") — but only if it differs from what the user wrote.
   const showAlt = !!(graded && graded.ok && (graded.better || '').trim().toLowerCase() !== writeText.trim().toLowerCase())
 
-  const doGrade = () => {
-    if (!writeText.trim()) return
+  const doGrade = async () => {
+    if (!writeText.trim() || grading) return
     setGrading(true)
-    clearTimeout(gradeTimer.current)
-    gradeTimer.current = setTimeout(() => {
-      const res = gradeWriting(cur, writeText)
+    try {
+      const res = await gradeWriting(cur, writeText)
       setGraded(res)
-      setGrading(false)
       applyMark(res.ok)
-    }, 1000)
+    } finally {
+      setGrading(false)
+    }
   }
   const btnAction = grading ? () => {} : graded ? next : doGrade
   const btnLabel = grading ? 'AI 첨삭 중' : graded ? (qi >= total - 1 ? '완료' : '다음') : '정답 확인'
