@@ -61,9 +61,13 @@ function gradePrompt(ko: string, answer: string, model: string) {
 function translatePrompt(text: string) {
   return (
     '너는 한국어 일기를 자연스러운 원어민 영어로 번역하는 번역가야.\n' +
-    '아래 일기를 문장 단위로 나누고, 각 문장을 자연스럽고 문법적으로 정확한 영어로 번역해.\n' +
+    '아래 일기를 문장 단위로 나누고, 각 문장마다 다음을 제공해:\n' +
+    '- ko: 원문 한국어 문장\n' +
+    '- en: 자연스럽고 문법적으로 정확한 영어 번역\n' +
+    '- phrases: 그 en 문장 안에 등장하는 구동사(phrasal verb)나 관용 표현을, en에 나타난 표면형(철자·활용형) 그대로 배열로. ' +
+    '단어 하나짜리는 넣지 말고, 두 단어 이상으로 묶어야 뜻이 통하는 표현만. 없으면 빈 배열 []. 예: ["ran into", "caught up on"]\n' +
     '일기:\n' + text + '\n' +
-    '반드시 이 JSON만 반환: {"sentences": [{"ko": "원문 한국어 문장", "en": "English translation"}]}'
+    '반드시 이 JSON만 반환: {"sentences": [{"ko": "...", "en": "...", "phrases": ["..."]}]}'
   )
 }
 
@@ -102,7 +106,8 @@ function wordPrompt(word: string, sentence: string) {
     '단어/표현: "' + word + '"\n' +
     '요구사항:\n' +
     '- kr: 이 문맥에서의 한국어 뜻. 앞에 품사를 괄호로 붙여줘. 예: "(동사) 끌어들이다, 유치하다"\n' +
-    '- ex: 그 단어/표현을 사용한 자연스럽고 쉬운 영어 예문 1개\n' +
+    '- ex: 위 단어/표현("' + word + '")을 그 철자·형태 그대로 반드시 포함하는 자연스럽고 쉬운 영어 예문 1개. ' +
+    '절대 파생어나 다른 형태로 바꾸지 마 (예: whole→wholeheartedly, run→running 금지). 구동사면 그 구동사를 통째로 사용해.\n' +
     '- exKr: 그 예문의 한국어 번역\n' +
     '반드시 이 JSON만 반환: {"kr": "...", "ex": "...", "exKr": "..."}'
   )

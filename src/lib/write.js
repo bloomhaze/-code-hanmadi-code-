@@ -22,7 +22,11 @@ export async function translateOrCorrect(text, mode) {
   }
 
   if (action === 'translate') {
-    const sentences = data.sentences.map((s) => ({ ko: s.ko || '', en: s.en || '' }))
+    const sentences = data.sentences.map((s) => ({
+      ko: s.ko || '',
+      en: s.en || '',
+      phrases: Array.isArray(s.phrases) ? s.phrases : [],
+    }))
     return withAll({ sentences }, 'translate')
   }
 

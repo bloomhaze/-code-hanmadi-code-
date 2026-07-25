@@ -13,15 +13,20 @@ export const PHRASES = [
 ]
 
 // Tokenize an English sentence into tappable tokens, grouping known phrases.
-// Returns [{ t, term, isPhrase }] where t keeps original spacing/punctuation.
-export function mkWords(en) {
+// `extra` is a list of surface-form phrases (구동사/관용표현) for THIS sentence,
+// e.g. from the AI translation — merged with the built-in list so any phrasal
+// verb gets grabbed as one unit. Returns [{ t, term, isPhrase }].
+export function mkWords(en, extra = []) {
   const sentence = String(en || '')
   const toks = sentence.split(/\s+/).filter(Boolean)
   const clean = (s) => s.replace(/^[^A-Za-z'’-]+|[^A-Za-z'’-]+$/g, '')
+  // 문장별 표현 + 기본 목록. 여러 단어짜리만, 길이 긴 것 우선(그리디).
+  const phrases = [...new Set([...extra, ...PHRASES].map((p) => String(p || '').trim().toLowerCase()))]
+    .filter((p) => p.split(/\s+/).length >= 2)
   const out = []
   for (let i = 0; i < toks.length; i++) {
     let matched = null
-    for (const p of PHRASES) {
+    for (const p of phrases) {
       const words = p.split(' ')
       if (i + words.length > toks.length) continue
       let ok = true

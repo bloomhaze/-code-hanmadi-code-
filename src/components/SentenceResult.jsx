@@ -213,7 +213,7 @@ export default function SentenceResult({
                   </>
                 ) : (
                   <span className="font-inter text-[16px] font-normal text-ink-2" style={{ lineHeight: '26px', letterSpacing: '-.2px' }}>
-                    {mkWords(s.en).map((w, wi) => {
+                    {mkWords(s.en, s.phrases).map((w, wi) => {
                       const wid = `${i}-${wi}`
                       return (
                         <span key={wi}>
