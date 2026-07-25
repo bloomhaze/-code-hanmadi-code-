@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
 
     if (geminiKey) {
       const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
         {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
@@ -57,8 +57,16 @@ Deno.serve(async (req) => {
           }),
         },
       )
-      const j = await r.json()
+      const j = await r.json().catch(() => ({}))
+      // Gemini 오류를 화면 피드백에 그대로 노출해서 원인을 바로 확인한다.
+      if (!r.ok) {
+        const msg = j?.error?.message || JSON.stringify(j).slice(0, 300)
+        return json({ ok: false, feedback: `AI 오류(${r.status}): ${msg}` })
+      }
       content = j?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+      if (!content) {
+        return json({ ok: false, feedback: 'AI 응답이 비었어요: ' + JSON.stringify(j).slice(0, 300) })
+      }
     } else if (anthropicKey) {
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
