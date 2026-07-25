@@ -25,7 +25,7 @@ export default function Toast({ toast, onClose }) {
         WebkitBackdropFilter: 'blur(20px)',
         boxShadow: '0 0 24px 0 rgba(0,0,0,.22)',
         background: 'rgba(28,28,30,.6)',
-        animation: 'promptFade .34s ease',
+        animation: 'toastDown .34s cubic-bezier(.22,1,.36,1)',
       }}
     >
       {toast.check && (
