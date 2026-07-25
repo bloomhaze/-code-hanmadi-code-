@@ -143,7 +143,7 @@ export default function WriteScreen({ mode = 'ko', userName = '현진', onBack, 
             <div className="px-5 pt-4">
               {/* 작성 주제 — 새로고침으로 랜덤, X로 닫기 */}
               {topicOn && (
-                <div className="mb-3.5 flex items-start gap-2 rounded-2xl bg-[#f5f8ff] px-4 py-3">
+                <div className="mb-3.5 flex items-center gap-2 rounded-2xl bg-accent-soft px-4 py-3">
                   <span
                     className="flex-1 font-sans text-[15px] font-medium"
                     style={{ color: '#0066ff', lineHeight: '22px', letterSpacing: '-.2px' }}
@@ -155,7 +155,7 @@ export default function WriteScreen({ mode = 'ko', userName = '현진', onBack, 
                       type="button"
                       onClick={shuffleTopic}
                       aria-label="다른 주제"
-                      className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#e6eeff]"
+                      className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#c4dcff]"
                     >
                       <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                         <path
@@ -171,10 +171,10 @@ export default function WriteScreen({ mode = 'ko', userName = '현진', onBack, 
                       type="button"
                       onClick={() => setTopicOn(false)}
                       aria-label="주제 닫기"
-                      className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#e6eeff]"
+                      className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#c4dcff]"
                     >
                       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M2 2l10 10M12 2L2 12" stroke="#9db8dd" strokeWidth="1.7" strokeLinecap="round" />
+                        <path d="M2 2l10 10M12 2L2 12" stroke="#0066ff" strokeWidth="1.7" strokeLinecap="round" />
                       </svg>
                     </button>
                   </div>
