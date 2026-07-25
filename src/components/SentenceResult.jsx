@@ -215,19 +215,13 @@ export default function SentenceResult({
                   <span className="font-inter text-[16px] font-normal text-ink-2" style={{ lineHeight: '26px', letterSpacing: '-.2px' }}>
                     {mkWords(s.en, s.phrases).map((w, wi) => {
                       const wid = `${i}-${wi}`
+                      if (!w.term) return <span key={wi}>{w.t} </span>
                       return (
                         <span key={wi}>
                           <span
-                            onClick={() => w.term && onTapWord?.(wid, w.term, s.en)}
-                            style={{
-                              cursor: 'pointer',
-                              borderRadius: 6,
-                              padding: '1px 3px',
-                              margin: '0 -1px',
-                              fontWeight: 400,
-                              background: activeWord === wid ? '#ededed' : 'transparent',
-                              transition: 'background .15s ease',
-                            }}
+                            onClick={() => onTapWord?.(wid, w.term, s.en)}
+                            className={`tap-word${activeWord === wid ? ' is-active' : ''}`}
+                            style={{ padding: '1px 3px', margin: '0 -1px', fontWeight: 400 }}
                           >
                             {w.t}
                           </span>{' '}
