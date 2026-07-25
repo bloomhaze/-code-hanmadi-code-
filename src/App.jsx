@@ -142,13 +142,14 @@ export default function App() {
   const showTabBar = !overlay && !showOnboarding && !quiz
 
   return (
-    <div className="flex min-h-[100dvh] w-full justify-center bg-white">
+    <div className="flex h-[100dvh] w-full flex-col items-center overflow-hidden bg-white">
+      {/* brand bar spans the full width (max 1440), logo aligned left */}
+      {showTabBar && <TopBar />}
+
       <div
-        className="relative flex h-[100dvh] w-full max-w-[500px] flex-col overflow-hidden bg-white"
+        className="relative flex w-full min-h-0 max-w-[500px] flex-1 flex-col overflow-hidden bg-white"
         style={{ fontFamily: "'Pretendard Variable', 'Pretendard', -apple-system, sans-serif" }}
       >
-        {showTabBar && <TopBar />}
-
         {/* ---- tab screens (fill the region between the bars) ---- */}
         <div className="relative min-h-0 flex-1">
           {tab === 'home' && (
