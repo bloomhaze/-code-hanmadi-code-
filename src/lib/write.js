@@ -10,8 +10,15 @@ export async function translateOrCorrect(text, mode) {
   const { data, error } = await supabase.functions.invoke('smooth-worker', {
     body: { action, text },
   })
-  if (error || !data || !Array.isArray(data.sentences) || data.sentences.length === 0) {
-    throw error || new Error('bad write response')
+  if (error) throw new Error(error.message || 'invoke error')
+  if (data?.error) throw new Error(data.error)
+  if (!Array.isArray(data?.sentences) || data.sentences.length === 0) {
+    // 함수가 아직 번역/교정을 지원 안 하면 채점 형식({ok,feedback})이 돌아온다.
+    throw new Error(
+      data && 'ok' in data
+        ? '함수가 아직 번역/교정 버전이 아니에요. smooth-worker를 새 코드로 재배포해주세요.'
+        : '결과 형식 오류',
+    )
   }
 
   if (action === 'translate') {

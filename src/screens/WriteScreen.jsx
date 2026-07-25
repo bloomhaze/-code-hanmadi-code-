@@ -55,10 +55,10 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
       const result = await translateOrCorrect(body, mode)
       setData(result)
       setStep('result')
-    } catch {
-      // AI 함수 미배포/오류 시 데모용 mock으로 폴백
-      setData(isEn ? MOCK_EN_RESULT : MOCK_KO_RESULT)
-      setStep('result')
+    } catch (e) {
+      // 원인을 화면에 노출하고 편집 화면으로 복귀 (조용한 mock 폴백 제거)
+      onToast?.((isEn ? '교정 실패: ' : '번역 실패: ') + (e?.message || '알 수 없는 오류'))
+      setStep('edit')
     }
   }
 
