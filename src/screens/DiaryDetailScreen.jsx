@@ -39,7 +39,7 @@ export default function DiaryDetailScreen({ id, onBack, onDelete, onToast, onTap
   return (
     <div className="absolute inset-0 z-40 flex flex-col bg-white">
       {/* top bar */}
-      <div className="relative flex h-12 shrink-0 items-center justify-between bg-white px-5">
+      <div className="relative flex h-12 shrink-0 items-center justify-between bg-white px-5 pt-4">
         <button type="button" onClick={onBack} className="relative z-[2] flex h-6 w-6 items-center justify-center">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path

@@ -8,7 +8,7 @@ export default function NotifScreen({ onClose }) {
   return (
     <div className="absolute inset-0 z-40 flex flex-col bg-white">
       {/* top bar */}
-      <div className="relative flex h-12 shrink-0 items-center px-3">
+      <div className="relative flex h-12 shrink-0 items-center px-3 pt-4">
         <button type="button" onClick={onClose} className="flex h-11 w-11 items-center justify-center">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M15 5l-7 7 7 7" stroke="#121212" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
