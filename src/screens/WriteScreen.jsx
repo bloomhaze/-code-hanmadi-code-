@@ -3,11 +3,12 @@ import SentenceResult from '../components/SentenceResult.jsx'
 import WordSearchSheet from '../components/WordSearchSheet.jsx'
 import { speak, stopSpeak } from '../lib/speak.js'
 import { MOCK_KO_RESULT, MOCK_EN_RESULT } from '../data/lookups.js'
+import { PROMPTS } from '../data/diary.js'
 
 const KO_RE = /[ᄀ-ᇿ㄰-㆏가-힣]/g
 
 // 일기 작성 플로우: edit → loading → result (번역/교정).
-export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTapWord, onTapFix, activeWord }) {
+export default function WriteScreen({ mode = 'ko', userName = '현진', onBack, onSave, onToast, onTapWord, onTapFix, activeWord }) {
   const [step, setStep] = useState('edit') // edit | loading | result
   const [body, setBody] = useState('')
   const [data, setData] = useState(null)
@@ -17,6 +18,18 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
   const [playing, setPlaying] = useState(false)
   const [wordSheet, setWordSheet] = useState(false)
   const timer = useRef(null)
+
+  // 작성 주제 — 홈과 같은 프롬프트. 새로고침으로 랜덤 변경 / X로 닫기.
+  const prompts = PROMPTS(userName)
+  const [topicOn, setTopicOn] = useState(true)
+  const [topicIdx, setTopicIdx] = useState(() => Math.floor(Math.random() * prompts.length))
+  const shuffleTopic = () =>
+    setTopicIdx((i) => {
+      if (prompts.length < 2) return i
+      let n = i
+      while (n === i) n = Math.floor(Math.random() * prompts.length)
+      return n
+    })
 
   const isEn = mode === 'en'
   const ctaActive = body.trim().length > 0
@@ -128,12 +141,51 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
         <>
           <div className="no-scrollbar absolute inset-0 overflow-y-auto bg-white">
             <div className="px-5 pt-4">
+              {/* 작성 주제 — 새로고침으로 랜덤, X로 닫기 */}
+              {topicOn && (
+                <div className="mb-3.5 flex items-start gap-2 rounded-2xl bg-[#f5f8ff] px-4 py-3">
+                  <span
+                    className="flex-1 font-sans text-[15px] font-medium"
+                    style={{ color: '#0066ff', lineHeight: '22px', letterSpacing: '-.2px' }}
+                  >
+                    {prompts[topicIdx]}
+                  </span>
+                  <div className="flex shrink-0 items-center gap-0.5">
+                    <button
+                      type="button"
+                      onClick={shuffleTopic}
+                      aria-label="다른 주제"
+                      className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#e6eeff]"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                        <path
+                          d="M15.5 5.5A6.5 6.5 0 1 0 16.9 12"
+                          stroke="#0066ff"
+                          strokeWidth="1.7"
+                          strokeLinecap="round"
+                        />
+                        <path d="M16.5 3.2V6.2H13.5" stroke="#0066ff" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTopicOn(false)}
+                      aria-label="주제 닫기"
+                      className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#e6eeff]"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M2 2l10 10M12 2L2 12" stroke="#9db8dd" strokeWidth="1.7" strokeLinecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
               <textarea
                 value={body}
                 onChange={onBodyChange}
                 placeholder={isEn ? 'Write freely.' : '자유롭게 작성해주세요'}
                 autoFocus
-                className="min-h-[520px] w-full resize-none border-none bg-transparent font-inter text-[16px] text-ink outline-none placeholder:text-[#BFBFBF]"
+                className="min-h-[480px] w-full resize-none border-none bg-transparent font-inter text-[16px] text-ink outline-none placeholder:text-[#BFBFBF]"
                 style={{ lineHeight: '30px', letterSpacing: '-.2px' }}
               />
             </div>

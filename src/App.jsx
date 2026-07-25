@@ -204,6 +204,7 @@ export default function App() {
         {overlay?.type === 'write' && (
         <WriteScreen
           mode={overlay.mode}
+          userName={userName}
           onBack={closeOverlay}
           onSave={saveWrite}
           onToast={showToast}
