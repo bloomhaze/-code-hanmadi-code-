@@ -22,35 +22,34 @@ export default function WordSearchSheet({ onClose, onToast }) {
   }
 
   return (
-    <>
-      <div className="fixed inset-0 z-[56] bg-black/40" onClick={onClose} />
-      <button
-        type="button"
-        onClick={onClose}
-        className="absolute right-4 top-[58px] z-[58] flex h-8 w-8 items-center justify-center rounded-full"
-        style={{ background: 'rgba(60,60,67,.75)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
-      >
-        <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-          <path d="M1.5 1.5 12.5 12.5M12.5 1.5 1.5 12.5" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" />
-        </svg>
-      </button>
-
+    <div className="fixed inset-0 z-[56] flex items-center justify-center bg-black/40 px-5" onClick={onClose}>
       <div
-        className="absolute inset-x-0 bottom-0 top-[92px] z-[57] w-full rounded-t-[22px] bg-white px-5 pt-2.5"
-        style={{ animation: 'sheetUp .28s cubic-bezier(.22,1,.36,1)' }}
+        className="flex max-h-[85vh] w-full max-w-[440px] flex-col rounded-[22px] bg-white px-5 pb-4 pt-5"
+        style={{ animation: 'scaleIn .24s cubic-bezier(.22,1,.36,1)' }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mb-[18px] h-1 w-9 rounded-full bg-[#dcdcdc]" />
-        <span className="font-sans text-[20px] font-semibold text-ink" style={{ letterSpacing: '-.4px' }}>
-          단어 검색
-        </span>
-        <div className="mt-2">
-          <span className="font-sans text-[14px]" style={{ color: '#b0b0b0' }}>
-            모르는 단어를 검색해서 일기를 작성해보세요
-          </span>
+        <div className="flex shrink-0 items-start justify-between">
+          <div className="flex flex-col gap-1.5">
+            <span className="font-sans text-[20px] font-semibold text-ink" style={{ letterSpacing: '-.4px' }}>
+              단어 검색
+            </span>
+            <span className="font-sans text-[14px]" style={{ color: '#b0b0b0' }}>
+              모르는 단어를 검색해서 일기를 작성해보세요
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f1f1f2]"
+          >
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+              <path d="M1.5 1.5 12.5 12.5M12.5 1.5 1.5 12.5" stroke="#666" strokeWidth="1.7" strokeLinecap="round" />
+            </svg>
+          </button>
         </div>
 
         <div
-          className="mt-4 flex h-12 items-center gap-2 rounded-2xl bg-white pl-4 pr-2"
+          className="mt-4 flex h-12 shrink-0 items-center gap-2 rounded-2xl bg-white pl-4 pr-2"
           style={{ boxShadow: 'inset 0 0 0 1px #ededed' }}
         >
           <input
@@ -92,14 +91,14 @@ export default function WordSearchSheet({ onClose, onToast }) {
         )}
 
         {status === 'results' && (
-          <div className="no-scrollbar mt-5 flex max-h-[540px] flex-col gap-3 overflow-y-auto pb-6">
+          <div className="no-scrollbar mt-5 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-2">
             {results.map((w, i) => (
               <ResultCard key={i} w={w} onToast={onToast} />
             ))}
           </div>
         )}
       </div>
-    </>
+    </div>
   )
 }
 

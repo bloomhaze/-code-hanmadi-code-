@@ -9,13 +9,12 @@ export default function WordPopup({ state, onClose, onToast }) {
   const segs = hlSegs(ex || '', term)
 
   return (
-    <>
-      <div className="fixed inset-0 z-[60] bg-black/35" onClick={onClose} />
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/35 px-5" onClick={onClose}>
       <div
-        className="absolute inset-x-0 bottom-0 z-[61] rounded-t-[20px] bg-white px-5 pb-[34px] pt-3"
-        style={{ animation: 'sheetUp .3s cubic-bezier(.22,1,.36,1)' }}
+        className="w-full max-w-[440px] rounded-[20px] bg-white px-5 pb-6 pt-6"
+        style={{ animation: 'scaleIn .24s cubic-bezier(.22,1,.36,1)' }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mb-6 h-1 w-9 rounded-full bg-[#dcdcdc]" />
         <div className="flex min-h-8 items-center justify-between">
           <span
             className="font-inter text-[22px] font-semibold text-ink-2"
@@ -73,6 +72,6 @@ export default function WordPopup({ state, onClose, onToast }) {
           </>
         )}
       </div>
-    </>
+    </div>
   )
 }

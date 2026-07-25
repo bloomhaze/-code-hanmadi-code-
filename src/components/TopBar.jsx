@@ -7,7 +7,7 @@ export default function TopBar({ onLogoClick }) {
       <button
         type="button"
         onClick={onLogoClick}
-        className="flex items-center gap-2 outline-none"
+        className="tab-item flex items-center gap-2 outline-none"
         aria-label="홈으로"
       >
       <svg width="22" height="23" viewBox="26 0 55 58" fill="none" aria-hidden="true">

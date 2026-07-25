@@ -4,13 +4,12 @@ export default function FixPopup({ state, onClose }) {
   const { loading, reason } = state
 
   return (
-    <>
-      <div className="fixed inset-0 z-[60] bg-black/35" onClick={onClose} />
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/35 px-5" onClick={onClose}>
       <div
-        className="absolute inset-x-0 bottom-0 z-[61] rounded-t-[22px] bg-white px-5 pb-[34px] pt-2.5"
-        style={{ animation: 'sheetUp .3s cubic-bezier(.22,1,.36,1)' }}
+        className="w-full max-w-[440px] rounded-[22px] bg-white p-2.5"
+        style={{ animation: 'scaleIn .24s cubic-bezier(.22,1,.36,1)' }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mb-[18px] h-1 w-9 rounded-full bg-[#dcdcdc]" />
         <div className="flex flex-col gap-2.5 rounded-2xl bg-[#f7f7f8] px-[18px] py-4">
           <div className="flex items-center gap-[3px]">
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
@@ -48,6 +47,6 @@ export default function FixPopup({ state, onClose }) {
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }

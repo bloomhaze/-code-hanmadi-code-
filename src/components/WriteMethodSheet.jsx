@@ -7,13 +7,12 @@ export default function WriteMethodSheet({ onChoose, onClose, enLocked = false }
   )
 
   return (
-    <>
-      <div className="fixed inset-0 z-[54] bg-black/35" onClick={onClose} />
+    <div className="fixed inset-0 z-[54] flex items-center justify-center bg-black/35 px-5" onClick={onClose}>
       <div
-        className="absolute inset-x-0 bottom-0 z-[55] rounded-t-3xl bg-white px-4 pb-10 pt-3"
-        style={{ animation: 'sheetUp .28s cubic-bezier(.22,1,.36,1)' }}
+        className="w-full max-w-[440px] rounded-3xl bg-white px-4 pb-5 pt-5"
+        style={{ animation: 'scaleIn .24s cubic-bezier(.22,1,.36,1)' }}
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mb-5 h-[5px] w-9 rounded-full bg-[#e0e0e0]" />
         <div className="flex flex-col gap-4">
           <button
             type="button"
@@ -69,6 +68,6 @@ export default function WriteMethodSheet({ onChoose, onClose, enLocked = false }
           </button>
         </div>
       </div>
-    </>
+    </div>
   )
 }
