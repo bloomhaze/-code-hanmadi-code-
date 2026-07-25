@@ -28,6 +28,7 @@ export default function App() {
   const [authReady, setAuthReady] = useState(false)
   const [guestMode, setGuestMode] = useState(false) // "먼저 둘러볼래요"
   const [tab, setTab] = useState('home')
+  const [homeKey, setHomeKey] = useState(0) // bump to remount Home (logo "refresh")
   const [overlay, setOverlay] = useState(null) // {type:'write', mode} | {type:'detail', id}
   const [writeSheet, setWriteSheet] = useState(false)
   const [quizSheet, setQuizSheet] = useState(false)
@@ -139,12 +140,26 @@ export default function App() {
     showToast(kind === 'withdraw' ? '탈퇴가 완료되었어요' : '로그아웃되었어요')
   }
 
+  // Logo click → fresh Home: close everything and remount the Home screen.
+  const goHome = () => {
+    setOverlay(null)
+    setWriteSheet(false)
+    setQuizSheet(false)
+    setQuiz(null)
+    setDialog(null)
+    setWordPop({ open: false })
+    setFixPop({ open: false })
+    setActiveWord(null)
+    setTab('home')
+    setHomeKey((k) => k + 1)
+  }
+
   const showTabBar = !overlay && !showOnboarding && !quiz
 
   return (
     <div className="flex h-[100dvh] w-full flex-col items-center overflow-hidden bg-white">
       {/* brand bar spans the full width (max 1440), logo aligned left */}
-      {showTabBar && <TopBar />}
+      {showTabBar && <TopBar onLogoClick={goHome} />}
 
       <div
         className="relative flex w-full min-h-0 max-w-[500px] flex-1 flex-col overflow-hidden bg-white"
@@ -154,6 +169,7 @@ export default function App() {
         <div className="relative min-h-0 flex-1">
           {tab === 'home' && (
             <HomeScreen
+              key={homeKey}
               userName={userName}
               onWrite={openWriteSheet}
               onToast={showToast}
