@@ -8,6 +8,20 @@ export function diffSegs(original, corrected) {
   const a = (original || '').trim().split(/\s+/).filter(Boolean)
   const b = (corrected || '').trim().split(/\s+/).filter(Boolean)
   const { aChanged, bChanged } = wordDiff(a, b)
+
+  // 문장이 전반적으로 틀린 경우(공통 단어 비율이 낮으면) 부분 하이라이트가
+  // 조각조각 흩어져 지저분하다. 이럴 땐 원문 전체를 빨강, 교정문 전체를
+  // 파랑으로 통째로 표시한다.
+  const matched = aChanged.filter((c) => !c).length // = LCS 길이(그대로 남은 단어 수)
+  const maxLen = Math.max(a.length, b.length) || 1
+  const changedAny = aChanged.some(Boolean) || bChanged.some(Boolean)
+  if (changedAny && maxLen >= 4 && matched / maxLen < 0.6) {
+    return {
+      enSegs: a.length ? [seg(a.join(' '), 'w')] : [],
+      fixSegs: b.length ? [seg(b.join(' '), 'f')] : [],
+    }
+  }
+
   return {
     enSegs: buildSegs(a, aChanged, 'w'),
     fixSegs: buildSegs(b, bChanged, 'f'),
