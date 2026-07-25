@@ -45,19 +45,21 @@ function wordDiff(a, b) {
   return { aChanged, bChanged }
 }
 
-// 같은 상태(정상/변경)인 단어들을 하나의 세그먼트로 묶는다. (단어 사이 공백 유지)
+// 같은 상태(정상/변경)인 단어들을 하나의 세그먼트로 묶는다.
+// 단어 사이 공백은 '양쪽 모두 변경'일 때만 하이라이트에 포함하고,
+// 그 외(정상↔변경 경계 등)에는 정상(n)으로 두어 하이라이트 배경이
+// 단어 앞뒤로 삐져나오지 않게 한다.
 function buildSegs(words, changed, changedKind) {
   const out = []
-  let cur = null
-  for (let k = 0; k < words.length; k++) {
-    const kind = changed[k] ? changedKind : 'n'
-    const piece = (k === 0 ? '' : ' ') + words[k]
-    if (cur && cur.kind === kind) cur.t += piece
-    else {
-      if (cur) out.push(cur)
-      cur = { kind, t: piece }
-    }
+  const push = (kind, t) => {
+    if (!t) return
+    const last = out[out.length - 1]
+    if (last && last.kind === kind) last.t += t
+    else out.push({ kind, t })
   }
-  if (cur) out.push(cur)
+  for (let k = 0; k < words.length; k++) {
+    if (k > 0) push(changed[k] && changed[k - 1] ? changedKind : 'n', ' ')
+    push(changed[k] ? changedKind : 'n', words[k])
+  }
   return out.map((s) => seg(s.t, s.kind))
 }
