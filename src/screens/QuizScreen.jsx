@@ -156,7 +156,7 @@ export default function QuizScreen({ type = 'flash', onClose, onToast }) {
 
   // ---- shared header ----
   const Header = () => (
-    <div className="absolute left-0 top-12 z-[2] flex h-[60px] w-full items-center gap-3.5 px-5">
+    <div className="flex h-[60px] w-full shrink-0 items-center gap-3.5 px-5 pt-3">
       <button type="button" onClick={onClose} className="flex h-7 w-7 shrink-0 items-center justify-center">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
           <path d="M6 6l12 12M18 6L6 18" stroke="#121212" strokeWidth="2" strokeLinecap="round" />
@@ -176,8 +176,8 @@ export default function QuizScreen({ type = 'flash', onClose, onToast }) {
 
   return (
     <div className="no-scrollbar absolute inset-0 z-40 overflow-y-auto bg-white">
-      {/* fixed mobile canvas centered in the column (quiz layout is pixel-tuned) */}
-      <div className="relative mx-auto h-[812px] w-full max-w-[500px]">
+      {/* max-w-500 centered; grows vertically to fill the viewport */}
+      <div className="mx-auto flex h-full min-h-[620px] w-full max-w-[500px] flex-col">
         <Header />
         {type === 'flash' && <Flashcard {...{ cur, side, setSide, revealed, setRevealed, mark, right, wrong, qi, applyMark, next, prev }} />}
         {type === 'blank' && (
@@ -217,9 +217,9 @@ function Flashcard({ cur, side, setSide, revealed, setRevealed, mark, right, wro
   const marked = mark === 'right' || mark === 'wrong'
 
   return (
-    <>
+    <div className="flex min-h-0 flex-1 flex-col">
       {/* side toggle */}
-      <div className="absolute left-0 top-24 flex h-[60px] w-full items-center justify-center px-5 pb-2.5 pt-3.5">
+      <div className="flex h-[60px] w-full shrink-0 items-center justify-center px-5 pb-2.5 pt-3.5">
         <div className="box-border flex w-[132px] gap-0.5 rounded-full p-[3px]" style={{ background: 'rgba(112,115,124,.08)' }}>
           {[
             { k: 'kr', label: '한글 뜻' },
@@ -248,7 +248,7 @@ function Flashcard({ cur, side, setSide, revealed, setRevealed, mark, right, wro
 
       {/* card */}
       <div
-        className="absolute inset-x-5 top-[176px] box-border flex h-[506px] flex-col rounded-3xl p-7"
+        className="mx-5 box-border flex min-h-0 flex-1 flex-col rounded-3xl p-7"
         style={{
           background: revealed ? '#5f5f5f' : '#fff',
           border: revealed ? 'none' : '1px solid #eee',
@@ -281,7 +281,7 @@ function Flashcard({ cur, side, setSide, revealed, setRevealed, mark, right, wro
       </div>
 
       {/* bottom bar */}
-      <div className="absolute left-0 top-[698px] box-border flex h-[90px] w-full items-center gap-3 px-5 pb-5 pt-[18px]">
+      <div className="box-border flex h-[90px] w-full shrink-0 items-center gap-3 px-5 pb-5 pt-[18px]">
         <button
           type="button"
           onClick={prev}
@@ -336,7 +336,7 @@ function Flashcard({ cur, side, setSide, revealed, setRevealed, mark, right, wro
           </svg>
         </button>
       </div>
-    </>
+    </div>
   )
 }
 
@@ -367,8 +367,8 @@ function BlankQuiz({ cur, blank, setBlank, blankChecked, setBlankChecked, applyM
   const sizer = blank || ' ' // thin space keeps an empty pill minimal-width
 
   return (
-    <>
-      <div className="absolute inset-x-5 top-[120px] box-border flex h-[562px] flex-col items-center rounded-3xl border border-[#eee] bg-white px-[26px] pb-6 pt-7" style={{ boxShadow: '0 4px 20px rgba(17,17,26,.05)' }}>
+    <div className="flex min-h-0 flex-1 flex-col px-5 pb-[18px] pt-2">
+      <div className="box-border flex min-h-0 flex-1 flex-col items-center rounded-3xl border border-[#eee] bg-white px-[26px] pb-6 pt-7" style={{ boxShadow: '0 4px 20px rgba(17,17,26,.05)' }}>
         <div className="flex grow flex-col items-start justify-center gap-4 self-stretch">
           <span className="text-left font-sans text-[16px] font-normal" style={{ color: 'rgba(46,47,51,.6)', letterSpacing: '-.2px' }}>
             {ko}
@@ -454,19 +454,17 @@ function BlankQuiz({ cur, blank, setBlank, blankChecked, setBlankChecked, applyM
         )}
       </div>
 
-      <div className="absolute left-0 top-[709px] box-border w-full px-5 pb-[18px] pt-3.5" style={{ background: 'linear-gradient(180deg,rgba(255,255,255,0) 0%,#fff 18%)' }}>
-        <button
-          type="button"
-          onClick={btnAction}
-          className="flex h-12 w-full items-center justify-center rounded-[20px]"
-          style={{ background: ready ? '#121212' : '#efefef' }}
-        >
-          <span className="font-sans text-[15px] font-medium" style={{ color: ready ? '#fff' : '#bdbdbd', letterSpacing: '-.2px' }}>
-            {btnLabel}
-          </span>
-        </button>
-      </div>
-    </>
+      <button
+        type="button"
+        onClick={btnAction}
+        className="mt-3.5 flex h-12 w-full shrink-0 items-center justify-center rounded-[20px]"
+        style={{ background: ready ? '#121212' : '#efefef' }}
+      >
+        <span className="font-sans text-[15px] font-medium" style={{ color: ready ? '#fff' : '#bdbdbd', letterSpacing: '-.2px' }}>
+          {btnLabel}
+        </span>
+      </button>
+    </div>
   )
 }
 
@@ -494,15 +492,15 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
   const ready = grading || graded || writeText.trim()
 
   return (
-    <>
-      <div className="absolute inset-x-5 top-[120px] box-border flex flex-col gap-1.5 rounded-2xl bg-[#f5f5f6] px-5 py-[18px]">
+    <div className="flex min-h-0 flex-1 flex-col gap-2.5 px-5 pb-[18px] pt-2">
+      <div className="box-border flex shrink-0 flex-col gap-1.5 rounded-2xl bg-[#f5f5f6] px-5 py-[18px]">
         <span className="font-sans text-[14px] font-normal text-muted">이 문장을 영작해보세요</span>
         <span className="font-sans text-[16px] font-medium text-ink" style={{ lineHeight: '26px' }}>
           {ko}
         </span>
       </div>
 
-      <div className="absolute inset-x-5 top-[230px] flex min-h-[34px] items-center gap-2.5">
+      <div className="flex min-h-[34px] shrink-0 items-center gap-2.5">
         {!hint ? (
           <button type="button" onClick={() => setHint(true)} className="flex h-[34px] items-center rounded-xl bg-ink px-2.5">
             <span className="font-sans text-[12px] font-semibold text-white">힌트 보기</span>
@@ -520,7 +518,7 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
       </div>
 
       {!graded ? (
-        <div className="absolute inset-x-5 top-[282px] box-border h-[404px] rounded-[20px] bg-white p-[18px]" style={{ boxShadow: 'inset 0 0 0 1px #ececee' }}>
+        <div className="box-border min-h-0 flex-1 rounded-[20px] bg-white p-[18px]" style={{ boxShadow: 'inset 0 0 0 1px #ececee' }}>
           <textarea
             value={writeText}
             onChange={(e) => setWriteText(e.target.value)}
@@ -531,7 +529,7 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
           />
         </div>
       ) : (
-        <div className="no-scrollbar absolute inset-x-5 top-[282px] flex max-h-[404px] flex-col gap-3.5 overflow-y-auto">
+        <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto">
           {/* learner's answer */}
           <div
             className="flex flex-col gap-2.5 rounded-[20px] bg-white px-[18px] py-4"
@@ -602,7 +600,7 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
       <button
         type="button"
         onClick={btnAction}
-        className="absolute inset-x-5 top-[730px] flex h-[50px] items-center justify-center gap-2 rounded-[20px]"
+        className="mt-1 flex h-[50px] w-full shrink-0 items-center justify-center gap-2 rounded-[20px]"
         style={{ background: ready ? '#121212' : '#efefef' }}
       >
         {grading && (
@@ -615,6 +613,6 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
           {btnLabel}
         </span>
       </button>
-    </>
+    </div>
   )
 }
