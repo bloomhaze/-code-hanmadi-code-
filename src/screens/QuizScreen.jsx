@@ -358,8 +358,10 @@ function BlankQuiz({ cur, blank, setBlank, blankChecked, setBlankChecked, applyM
   const btnLabel = blankChecked ? (qi >= total - 1 ? '완료' : '다음') : '정답 확인'
   const ready = blankChecked || blank.trim()
 
-  const pillInk = !blankChecked ? '#121212' : correct ? '#00a836' : '#ff4242'
-  const pillBg = !blankChecked ? '#f1f5ff' : correct ? '#e7f7ec' : '#ffecec'
+  const pillInk = !blankChecked ? '#0066ff' : correct ? '#00a836' : '#ff4242'
+  const pillBg = !blankChecked ? '#eaf1ff' : correct ? '#e3f6ea' : '#ffe1e1'
+  const showCaret = !blankChecked && !blank.trim()
+  const sizer = blank || ' ' // thin space keeps an empty pill minimal-width
 
   return (
     <>
@@ -373,17 +375,36 @@ function BlankQuiz({ cur, blank, setBlank, blankChecked, setBlankChecked, applyM
               {pre}
             </span>
             <span
-              className="mx-0.5 inline-flex min-h-[32px] items-center rounded-[9px] px-2.5"
-              style={{ background: pillBg }}
+              className="relative mx-0.5 inline-block min-h-[32px] rounded-[9px]"
+              style={{ background: pillBg, cursor: 'text' }}
             >
+              {/* hidden sizer — pill hugs the typed text (empty ⇒ minimal width) */}
+              <span
+                className="invisible px-2.5 py-1 font-inter text-[22px] font-bold"
+                style={{ whiteSpace: 'pre', letterSpacing: '-.3px' }}
+              >
+                {sizer}
+              </span>
+              {/* visible text overlay */}
+              <span
+                className="absolute inset-0 flex items-center px-2.5 py-1 font-inter text-[22px] font-bold"
+                style={{ whiteSpace: 'pre', letterSpacing: '-.3px', color: pillInk }}
+              >
+                {blank}
+              </span>
+              {showCaret && (
+                <span
+                  className="absolute left-2.5 w-0.5 rounded-[1px]"
+                  style={{ top: '50%', height: 26, transform: 'translateY(-50%)', background: '#2f6bff', animation: 'blink 1.05s steps(1) infinite' }}
+                />
+              )}
               <input
                 value={blank}
                 onChange={(e) => setBlank(e.target.value)}
                 disabled={blankChecked}
-                size={Math.max(blank.length || answer.length, 4)}
                 autoFocus
-                className="border-none bg-transparent text-left font-inter text-[22px] font-bold outline-none"
-                style={{ letterSpacing: '-.3px', color: pillInk, caretColor: '#2f6bff', width: `${Math.max(blank.length, 4)}ch` }}
+                className="absolute inset-0 h-full w-full border-none bg-transparent px-2.5 py-1 text-left font-inter text-[22px] font-medium outline-none"
+                style={{ letterSpacing: '-.3px', color: 'transparent', caretColor: '#2f6bff' }}
               />
             </span>
             <span className="font-medium" style={{ whiteSpace: 'pre-wrap' }}>
