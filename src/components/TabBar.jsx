@@ -17,8 +17,8 @@ export default function TabBar({ active, onChange }) {
       className="z-20 w-full shrink-0"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      {/* 64px tab row — four 93.75px items centered (matches the 시안) */}
-      <div className="mx-auto flex h-16 w-full max-w-[375px] justify-center py-2.5">
+      {/* 64px tab row — items spread across the full column width (responsive) */}
+      <div className="flex h-16 w-full justify-around px-4 py-2.5">
         {TABS.map(({ key, label, Icon }) => {
           const isActive = active === key
           const color = isActive ? '#121212' : '#c4c4c4'
