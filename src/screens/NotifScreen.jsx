@@ -6,17 +6,21 @@ export default function NotifScreen({ onClose }) {
   const [time, setTime] = useState('18:30')
 
   return (
-    <div className="absolute inset-0 z-40 bg-white">
+    <div className="absolute inset-0 z-40 flex flex-col bg-white">
       {/* top bar */}
-      <div className="absolute left-0 top-12 box-border flex h-12 w-full items-center px-3">
+      <div className="relative flex h-12 shrink-0 items-center px-3">
         <button type="button" onClick={onClose} className="flex h-11 w-11 items-center justify-center">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M15 5l-7 7 7 7" stroke="#121212" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
+        <span className="font-sans text-[17px] font-semibold text-ink" style={{ letterSpacing: '-.3px' }}>
+          알림 설정
+        </span>
       </div>
 
-      <div className="absolute left-5 top-[108px] flex w-[335px] flex-col overflow-hidden rounded-2xl bg-[#f7f7f8]">
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-4">
+      <div className="flex w-full flex-col overflow-hidden rounded-2xl bg-[#f7f7f8]">
         <div className="flex h-14 items-center px-[18px]">
           <span className="flex-1 font-sans text-[15px] text-ink" style={{ letterSpacing: '-.3px' }}>
             일기 작성 리마인드
@@ -52,6 +56,7 @@ export default function NotifScreen({ onClose }) {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   )

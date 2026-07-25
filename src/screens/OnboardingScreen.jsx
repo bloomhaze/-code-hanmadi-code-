@@ -39,7 +39,8 @@ export default function OnboardingScreen({ onGoogle, onComplete, onToast }) {
 
   if (step === 'auth') {
     return (
-      <div className="absolute inset-0 z-40 bg-white">
+      <div className="no-scrollbar absolute inset-0 z-40 overflow-y-auto bg-white">
+        <div className="relative mx-auto h-[812px] w-[375px] max-w-full">
         <div className="absolute left-[135px] top-[244px] h-[120px] w-[105px]">
           <img src="/brand/hanmadi-logo.svg" width="105" height="120" alt="한마디" />
         </div>
@@ -99,13 +100,15 @@ export default function OnboardingScreen({ onGoogle, onComplete, onToast }) {
             동의하는 것으로 간주됩니다
           </span>
         </div>
+        </div>
       </div>
     )
   }
 
   const slide = SLIDES[step - 1]
   return (
-    <div className="absolute inset-0 z-40 bg-white">
+    <div className="no-scrollbar absolute inset-0 z-40 overflow-y-auto bg-white">
+      <div className="relative mx-auto h-[812px] w-[375px] max-w-full overflow-hidden">
       <img
         key={step}
         src={slide.img}
@@ -155,6 +158,7 @@ export default function OnboardingScreen({ onGoogle, onComplete, onToast }) {
           {step >= 4 ? '완료' : '다음'}
         </span>
       </button>
+      </div>
     </div>
   )
 }

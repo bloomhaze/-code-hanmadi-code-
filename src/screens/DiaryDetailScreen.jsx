@@ -37,9 +37,9 @@ export default function DiaryDetailScreen({ id, onBack, onDelete, onToast, onTap
   }
 
   return (
-    <div className="absolute inset-0 z-40 bg-white">
+    <div className="absolute inset-0 z-40 flex flex-col bg-white">
       {/* top bar */}
-      <div className="absolute left-0 top-12 z-20 flex h-12 w-full items-center justify-between bg-white px-5">
+      <div className="relative flex h-12 shrink-0 items-center justify-between bg-white px-5">
         <button type="button" onClick={onBack} className="relative z-[2] flex h-6 w-6 items-center justify-center">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path
@@ -62,7 +62,7 @@ export default function DiaryDetailScreen({ id, onBack, onDelete, onToast, onTap
       </div>
 
       {/* body */}
-      <div className="no-scrollbar absolute left-0 top-24 h-[716px] w-full overflow-y-auto bg-white">
+      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto bg-white">
         <div className="px-5 pb-16 pt-4">
           <SentenceResult
             data={entry}

@@ -144,7 +144,7 @@ export default function QuizScreen({ type = 'flash', onClose, onToast }) {
         <button
           type="button"
           onClick={hasWrong ? retryWrong : continueMore}
-          className="absolute bottom-9 left-5 z-[2] flex h-[50px] w-[335px] items-center justify-center rounded-[20px] bg-ink"
+          className="absolute bottom-9 left-1/2 z-[2] flex h-[50px] w-[335px] max-w-[calc(100%-40px)] -translate-x-1/2 items-center justify-center rounded-[20px] bg-ink"
         >
           <span className="font-sans text-[16px] font-medium text-white">
             {hasWrong ? `틀린 ${wrong}개, 다시 복습` : '이어서 더 복습하기'}
@@ -175,17 +175,20 @@ export default function QuizScreen({ type = 'flash', onClose, onToast }) {
   )
 
   return (
-    <div className="absolute inset-0 z-40 bg-white">
-      <Header />
-      {type === 'flash' && <Flashcard {...{ cur, side, setSide, revealed, setRevealed, mark, right, wrong, qi, applyMark, next, prev }} />}
-      {type === 'blank' && (
-        <BlankQuiz {...{ cur, blank, setBlank, blankChecked, setBlankChecked, applyMark, next, qi, total }} />
-      )}
-      {type === 'write' && (
-        <WriteQuiz
-          {...{ cur, writeText, setWriteText, hint, setHint, grading, setGrading, graded, setGraded, gradeTimer, applyMark, next, qi, total, onToast }}
-        />
-      )}
+    <div className="no-scrollbar absolute inset-0 z-40 overflow-y-auto bg-white">
+      {/* fixed mobile canvas centered in the column (quiz layout is pixel-tuned) */}
+      <div className="relative mx-auto h-[812px] w-[375px] max-w-full">
+        <Header />
+        {type === 'flash' && <Flashcard {...{ cur, side, setSide, revealed, setRevealed, mark, right, wrong, qi, applyMark, next, prev }} />}
+        {type === 'blank' && (
+          <BlankQuiz {...{ cur, blank, setBlank, blankChecked, setBlankChecked, applyMark, next, qi, total }} />
+        )}
+        {type === 'write' && (
+          <WriteQuiz
+            {...{ cur, writeText, setWriteText, hint, setHint, grading, setGrading, graded, setGraded, gradeTimer, applyMark, next, qi, total, onToast }}
+          />
+        )}
+      </div>
     </div>
   )
 }

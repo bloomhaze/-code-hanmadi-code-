@@ -27,7 +27,7 @@ export default function WordSearchSheet({ onClose, onToast }) {
       <button
         type="button"
         onClick={onClose}
-        className="absolute left-[327px] top-[58px] z-[58] flex h-8 w-8 items-center justify-center rounded-full"
+        className="absolute right-4 top-[58px] z-[58] flex h-8 w-8 items-center justify-center rounded-full"
         style={{ background: 'rgba(60,60,67,.75)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
       >
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
@@ -36,7 +36,7 @@ export default function WordSearchSheet({ onClose, onToast }) {
       </button>
 
       <div
-        className="absolute left-0 top-[106px] z-[57] h-[706px] w-full rounded-t-[22px] bg-white px-5 pt-2.5"
+        className="absolute inset-x-0 bottom-0 top-[92px] z-[57] w-full rounded-t-[22px] bg-white px-5 pt-2.5"
         style={{ animation: 'sheetUp .28s cubic-bezier(.22,1,.36,1)' }}
       >
         <div className="mx-auto mb-[18px] h-1 w-9 rounded-full bg-[#dcdcdc]" />

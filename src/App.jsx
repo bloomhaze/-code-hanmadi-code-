@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabase.js'
-import StatusBar from './components/StatusBar.jsx'
+import TopBar from './components/TopBar.jsx'
 import TabBar from './components/TabBar.jsx'
 import Toast from './components/Toast.jsx'
 import WriteMethodSheet from './components/WriteMethodSheet.jsx'
@@ -12,7 +12,6 @@ import VocabScreen from './screens/VocabScreen.jsx'
 import MyScreen from './screens/MyScreen.jsx'
 import WriteScreen from './screens/WriteScreen.jsx'
 import DiaryDetailScreen from './screens/DiaryDetailScreen.jsx'
-import PremiumScreen from './screens/PremiumScreen.jsx'
 import OnboardingScreen from './screens/OnboardingScreen.jsx'
 import QuizScreen from './screens/QuizScreen.jsx'
 import QuizTypeSheet from './components/QuizTypeSheet.jsx'
@@ -143,50 +142,46 @@ export default function App() {
   const showTabBar = !overlay && !showOnboarding && !quiz
 
   return (
-    <div
-      className="relative overflow-hidden bg-white"
-      style={{
-        width: 375,
-        height: 812,
-        borderRadius: 44,
-        boxShadow: '0 24px 70px rgba(30,34,50,.28)',
-        fontFamily: "'Pretendard Variable', 'Pretendard', -apple-system, sans-serif",
-      }}
-    >
-      <StatusBar />
+    <div className="flex min-h-[100dvh] w-full justify-center bg-white">
+      <div
+        className="relative flex h-[100dvh] w-full max-w-[500px] flex-col overflow-hidden bg-white"
+        style={{ fontFamily: "'Pretendard Variable', 'Pretendard', -apple-system, sans-serif" }}
+      >
+        {showTabBar && <TopBar />}
 
-      {/* ---- tab screens ---- */}
-      {tab === 'home' && (
-        <HomeScreen
-          userName={userName}
-          onWrite={openWriteSheet}
-          onToast={showToast}
-          onOpenEntry={openEntryByKo}
-        />
-      )}
-      {tab === 'diary' && (
-        <DiaryScreen onWrite={openWriteSheet} onOpen={openDetail} deletedIds={deletedIds} />
-      )}
-      {tab === 'vocab' && (
-        <VocabScreen onWrite={openWriteSheet} onToast={showToast} onStartQuiz={openQuizSheet} />
-      )}
-      {tab === 'my' && (
-        <MyScreen
-          userName={userName}
-          email={userEmail}
-          isGuest={!authed}
-          onPremium={() => setOverlay({ type: 'premium' })}
-          onNotif={() => setOverlay({ type: 'notif' })}
-          onLogout={() => setDialog({ kind: 'logout' })}
-          onWithdraw={() => setDialog({ kind: 'withdraw' })}
-          onToast={showToast}
-        />
-      )}
+        {/* ---- tab screens (fill the region between the bars) ---- */}
+        <div className="relative min-h-0 flex-1">
+          {tab === 'home' && (
+            <HomeScreen
+              userName={userName}
+              onWrite={openWriteSheet}
+              onToast={showToast}
+              onOpenEntry={openEntryByKo}
+            />
+          )}
+          {tab === 'diary' && (
+            <DiaryScreen onWrite={openWriteSheet} onOpen={openDetail} deletedIds={deletedIds} />
+          )}
+          {tab === 'vocab' && (
+            <VocabScreen onWrite={openWriteSheet} onToast={showToast} onStartQuiz={openQuizSheet} />
+          )}
+          {tab === 'my' && (
+            <MyScreen
+              userName={userName}
+              email={userEmail}
+              isGuest={!authed}
+              onNotif={() => setOverlay({ type: 'notif' })}
+              onLogout={() => setDialog({ kind: 'logout' })}
+              onWithdraw={() => setDialog({ kind: 'withdraw' })}
+              onToast={showToast}
+            />
+          )}
+        </div>
 
-      {showTabBar && <TabBar active={tab} onChange={setTab} />}
+        {showTabBar && <TabBar active={tab} onChange={setTab} />}
 
-      {/* ---- full-screen overlays ---- */}
-      {overlay?.type === 'write' && (
+        {/* ---- full-screen overlays ---- */}
+        {overlay?.type === 'write' && (
         <WriteScreen
           mode={overlay.mode}
           onBack={closeOverlay}
@@ -209,33 +204,31 @@ export default function App() {
         />
       )}
 
-      {overlay?.type === 'premium' && (
-        <PremiumScreen onClose={closeOverlay} onToast={showToast} />
-      )}
-      {overlay?.type === 'notif' && <NotifScreen onClose={closeOverlay} />}
+        {overlay?.type === 'notif' && <NotifScreen onClose={closeOverlay} />}
 
-      {quiz && <QuizScreen type={quiz.type} onClose={() => setQuiz(null)} onToast={showToast} />}
+        {quiz && <QuizScreen type={quiz.type} onClose={() => setQuiz(null)} onToast={showToast} />}
 
-      {showOnboarding && (
-        <OnboardingScreen
-          onGoogle={loginWithGoogle}
-          onComplete={() => setGuestMode(true)}
-          onToast={showToast}
-        />
-      )}
+        {showOnboarding && (
+          <OnboardingScreen
+            onGoogle={loginWithGoogle}
+            onComplete={() => setGuestMode(true)}
+            onToast={showToast}
+          />
+        )}
 
-      {/* ---- sheets & popups ---- */}
-      {writeSheet && <WriteMethodSheet onChoose={chooseWrite} onClose={() => setWriteSheet(false)} />}
-      {quizSheet && <QuizTypeSheet onStart={startQuiz} onClose={() => setQuizSheet(false)} />}
-      <WordPopup state={wordPop} onClose={closeWordPop} onToast={showToast} />
-      <FixPopup state={fixPop} onClose={closeFixPop} />
+        {/* ---- sheets & popups ---- */}
+        {writeSheet && <WriteMethodSheet onChoose={chooseWrite} onClose={() => setWriteSheet(false)} />}
+        {quizSheet && <QuizTypeSheet onStart={startQuiz} onClose={() => setQuizSheet(false)} />}
+        <WordPopup state={wordPop} onClose={closeWordPop} onToast={showToast} />
+        <FixPopup state={fixPop} onClose={closeFixPop} />
 
-      {dialog?.kind === 'delete' && <DeleteDialog onConfirm={confirmDelete} onClose={() => setDialog(null)} />}
-      {(dialog?.kind === 'logout' || dialog?.kind === 'withdraw') && (
-        <ConfirmDialog kind={dialog.kind} onYes={confirmDialog} onClose={() => setDialog(null)} />
-      )}
+        {dialog?.kind === 'delete' && <DeleteDialog onConfirm={confirmDelete} onClose={() => setDialog(null)} />}
+        {(dialog?.kind === 'logout' || dialog?.kind === 'withdraw') && (
+          <ConfirmDialog kind={dialog.kind} onYes={confirmDialog} onClose={() => setDialog(null)} />
+        )}
 
-      <Toast toast={toast} onClose={() => setToast(null)} />
+        <Toast toast={toast} onClose={() => setToast(null)} />
+      </div>
     </div>
   )
 }

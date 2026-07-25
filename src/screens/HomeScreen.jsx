@@ -71,9 +71,9 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
   }
 
   return (
-    <>
+    <div className="relative flex h-full flex-col bg-white">
       {/* ===== HEADER : date row + week strip ===== */}
-      <div className="absolute left-0 top-[54px] z-20 w-full bg-white">
+      <div className="shrink-0 bg-white">
         {/* date row */}
         <div className="flex h-9 items-center justify-between px-4 py-0.5">
           <button
@@ -156,7 +156,7 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
       {/* ===== CONTENT ===== */}
       <div
         ref={scrollRef}
-        className="no-scrollbar absolute left-0 top-[198px] h-[526px] w-full overflow-y-auto bg-white"
+        className="no-scrollbar min-h-0 flex-1 overflow-y-auto bg-white"
       >
         <div className="px-5 pb-6 pt-7">
           {/* section header */}
@@ -322,7 +322,7 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
       <button
         type="button"
         onClick={onWrite}
-        className="absolute left-[299px] top-[643px] z-[25] flex h-14 w-14 items-center justify-center rounded-full"
+        className="absolute bottom-5 right-5 z-[25] flex h-14 w-14 items-center justify-center rounded-full"
         style={{ background: ACCENT, boxShadow: '0 8px 24px rgba(42,56,89,.25)' }}
       >
         <PencilIcon size={26} />
@@ -340,6 +340,6 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
           onToast={onToast}
         />
       )}
-    </>
+    </div>
   )
 }

@@ -9,7 +9,6 @@ export default function MyScreen({
   userName = '현진',
   email,
   isGuest = false,
-  onPremium,
   onNotif,
   onLogout,
   onWithdraw,
@@ -47,16 +46,16 @@ export default function MyScreen({
   )
 
   return (
-    <>
+    <div className="flex h-full flex-col bg-white">
       {/* header */}
-      <div className="absolute left-0 top-12 z-20 flex h-12 w-full items-center bg-white px-5">
+      <div className="flex h-12 shrink-0 items-center bg-white px-5">
         <span className="font-sans text-[20px] font-semibold text-ink" style={{ letterSpacing: '-.4px' }}>
           마이페이지
         </span>
       </div>
 
       {/* content */}
-      <div className="no-scrollbar absolute left-0 top-24 h-[628px] w-full overflow-y-auto bg-white">
+      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto bg-white">
         <div className="flex flex-col gap-6 px-5 pb-10 pt-3">
           {/* profile + stats */}
           <div className="flex flex-col gap-2">
@@ -112,22 +111,6 @@ export default function MyScreen({
 
           {/* menu sections */}
           <div className="flex flex-col gap-5">
-            {/* 프리미엄 */}
-            <div className="flex flex-col gap-2.5">
-              <SectionLabel>프리미엄</SectionLabel>
-              <button
-                type="button"
-                onClick={onPremium}
-                className="flex h-[51px] items-center rounded-2xl px-[18px]"
-                style={{ background: 'linear-gradient(90deg,#0066ff 0%,#21aaff 100%)' }}
-              >
-                <span className="flex-1 text-left font-sans text-[15px] text-white" style={{ letterSpacing: '-.3px' }}>
-                  연간 / 월간 결제
-                </span>
-                <ChevronRightSmall color="#fff" />
-              </button>
-            </div>
-
             {/* 설정 */}
             <div className="flex flex-col gap-2.5">
               <SectionLabel>설정</SectionLabel>
@@ -182,6 +165,6 @@ export default function MyScreen({
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }

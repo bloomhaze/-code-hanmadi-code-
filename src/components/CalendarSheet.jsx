@@ -25,7 +25,7 @@ export default function CalendarSheet({ selOff, onSelect, onClose, onToast }) {
       <button
         type="button"
         onClick={onClose}
-        className="absolute left-[327px] top-[58px] z-[47] flex h-8 w-8 items-center justify-center rounded-full"
+        className="absolute right-4 top-4 z-[47] flex h-8 w-8 items-center justify-center rounded-full"
         style={{ background: 'rgba(60,60,67,.75)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
       >
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
@@ -34,7 +34,7 @@ export default function CalendarSheet({ selOff, onSelect, onClose, onToast }) {
       </button>
 
       {/* sheet */}
-      <div className="absolute left-0 top-[106px] z-[46] flex h-[706px] w-full flex-col overflow-hidden rounded-t-[24px] bg-white">
+      <div className="absolute inset-x-0 bottom-0 top-3 z-[46] flex w-full flex-col overflow-hidden rounded-t-[24px] bg-white">
         {/* weekday header */}
         <div className="flex h-[54px] flex-shrink-0 border-b border-[#eee] px-3 pb-3.5 pt-[22px]">
           {DOW.map((d) => (

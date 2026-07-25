@@ -3,7 +3,6 @@ import {
   SearchIcon,
   SpeakerSmall,
   BookmarkSmall,
-  LockIcon,
   PlayIcon,
   PencilIcon,
 } from '../components/icons.jsx'
@@ -19,7 +18,7 @@ const TABS = [
 ]
 
 // 단어장 탭 — Quick Quiz card, filter chips, and saved word/phrase/sentence cards.
-export default function VocabScreen({ onWrite, onToast, onStartQuiz, locked = false }) {
+export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
   const [tab, setTab] = useState('word')
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -70,9 +69,9 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz, locked = fa
   }
 
   return (
-    <>
+    <div className="flex h-full flex-col bg-white">
       {/* header */}
-      <div className="absolute left-0 top-12 z-20 flex h-12 w-full items-center justify-between bg-white px-5">
+      <div className="flex h-12 shrink-0 items-center justify-between bg-white px-5">
         <span className="font-sans text-[20px] font-semibold text-ink" style={{ letterSpacing: '-.4px' }}>
           단어장
         </span>
@@ -89,8 +88,8 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz, locked = fa
       </div>
 
       {/* content */}
-      <div className="no-scrollbar absolute left-0 top-24 h-[628px] w-full overflow-y-auto bg-white">
-        <div className="flex flex-col px-5 pb-[120px] pt-3">
+      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto bg-white">
+        <div className="flex flex-col px-5 pb-8 pt-3">
           {searchOpen && (
             <div
               className="-mt-1.5 mb-6 flex h-12 items-center rounded-2xl px-3.5"
@@ -146,15 +145,11 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz, locked = fa
                 </span>
                 <button
                   type="button"
-                  onClick={() =>
-                    locked ? onToast?.('프리미엄에서 무제한으로 복습할 수 있어요') : onStartQuiz?.()
-                  }
+                  onClick={() => onStartQuiz?.()}
                   className="mt-2 flex h-[50px] items-center justify-center gap-2 rounded-[20px] bg-ink"
                 >
-                  {locked ? <LockIcon /> : <PlayIcon />}
-                  <span className="font-sans text-[15px] font-medium text-white">
-                    {locked ? '프리미엄 구독하기' : '퀴즈 시작'}
-                  </span>
+                  <PlayIcon />
+                  <span className="font-sans text-[15px] font-medium text-white">퀴즈 시작</span>
                 </button>
               </>
             ) : (
@@ -344,6 +339,6 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz, locked = fa
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }

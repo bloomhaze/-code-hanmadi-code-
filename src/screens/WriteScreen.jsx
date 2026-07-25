@@ -72,9 +72,9 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
   }
 
   return (
-    <div className="absolute inset-0 z-40 bg-white">
+    <div className="absolute inset-0 z-40 flex flex-col bg-white">
       {/* top bar */}
-      <div className="absolute left-0 top-12 z-20 flex h-12 w-full items-center justify-between bg-white px-5">
+      <div className="relative flex h-12 shrink-0 items-center justify-between bg-white px-5">
         <button
           type="button"
           onClick={onBack}
@@ -122,10 +122,11 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
 
       {wordSheet && <WordSearchSheet onClose={() => setWordSheet(false)} onToast={onToast} />}
 
+      <div className="relative min-h-0 flex-1">
       {/* EDIT */}
       {step === 'edit' && (
         <>
-          <div className="no-scrollbar absolute left-0 top-24 h-[560px] w-full overflow-y-auto bg-white">
+          <div className="no-scrollbar absolute inset-0 overflow-y-auto bg-white">
             <div className="px-5 pt-4">
               <textarea
                 value={body}
@@ -160,7 +161,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
 
       {/* LOADING */}
       {step === 'loading' && (
-        <div className="absolute left-0 top-24 flex h-[716px] w-full flex-col items-center justify-center gap-[18px] bg-white">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-[18px] bg-white">
           <div
             className="h-10 w-10 rounded-full border-[3px] border-[#dcebff]"
             style={{ borderTopColor: '#0066ff', animation: 'spin .8s linear infinite' }}
@@ -176,7 +177,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
 
       {/* RESULT */}
       {step === 'result' && data && (
-        <div className="no-scrollbar absolute left-0 top-24 h-[716px] w-full overflow-y-auto bg-white">
+        <div className="no-scrollbar absolute inset-0 overflow-y-auto bg-white">
           <div className="px-5 pb-16 pt-4">
             <SentenceResult
               data={data}
@@ -197,6 +198,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }
