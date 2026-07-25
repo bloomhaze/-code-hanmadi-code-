@@ -254,9 +254,9 @@ body {
 }
 @media (hover: hover) {
   .tap-word:hover {
-    background: #f0f0f0;
+    background: #e4e4e4;
   }
 }
 .tap-word.is-active {
-  background: #ededed;
+  background: #d9d9d9;
 }
