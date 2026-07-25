@@ -573,9 +573,6 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
               <span className="font-inter text-[16px] font-medium text-ink" style={{ lineHeight: '24px' }}>
                 {graded.better}
               </span>
-              <span className="font-sans text-[13px] font-medium" style={{ color: '#2fa84f', lineHeight: '20px' }}>
-                {graded.feedback}
-              </span>
             </div>
           )}
 
