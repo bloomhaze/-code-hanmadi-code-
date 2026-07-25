@@ -1,8 +1,9 @@
 // Supabase Edge Function: smooth-worker (Groq 무료 AI)
-// action 으로 세 가지를 처리한다:
-//   'grade'     — 작문 퀴즈 채점        body: { action, ko, answer, model } → { ok, feedback }
-//   'translate' — 일기 한글→영어 번역   body: { action, text }              → { sentences: [{ ko, en }] }
-//   'correct'   — 영어 일기 교정        body: { action, text }              → { sentences: [{ ko, original, corrected }] }
+// action 으로 네 가지를 처리한다:
+//   'grade'     — 작문 퀴즈 채점        body: { action, ko, answer, model }          → { ok, feedback }
+//   'translate' — 일기 한글→영어 번역   body: { action, text }                       → { sentences: [{ ko, en }] }
+//   'correct'   — 영어 일기 교정        body: { action, text }                       → { sentences: [{ ko, original, corrected }] }
+//   'explain'   — 교정 사유 설명        body: { action, original, corrected, phrase } → { reason }
 //
 // 키 설정(Secrets): GROQ_API_KEY  (console.groq.com, 무료, 카드 불필요)
 
@@ -77,6 +78,22 @@ function correctPrompt(text: string) {
   )
 }
 
+function explainPrompt(original: string, corrected: string, phrase: string) {
+  return (
+    '너는 영어를 갓 배우기 시작한 학습자를 가르치는 친절한 영어 선생님이야.\n' +
+    '학습자가 쓴 영어 문장을 네가 고쳐줬는데, 학습자가 특정 부분을 왜 고쳤는지 궁금해해.\n' +
+    '학습자가 쓴 원문: ' + original + '\n' +
+    '고쳐준 교정문: ' + corrected + '\n' +
+    '학습자가 클릭한(고쳐진) 부분: "' + phrase + '"\n' +
+    '요구사항:\n' +
+    '- 그 부분이 문법이나 표현상 왜 어색/틀렸는지, 그리고 어떻게 고쳤는지 한국어로 설명해.\n' +
+    '- 2~3문장으로 짧고 쉽게. 어려운 문법 용어는 최대한 풀어서 초보자도 이해할 수 있게.\n' +
+    '- 딱딱하지 않고 다정하고 친근한 말투(~예요/~어요)로.\n' +
+    '- 가능하면 바뀐 표현(예: goed → went)을 구체적으로 언급해.\n' +
+    '반드시 이 JSON만 반환: {"reason": "한국어 설명"}'
+  )
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   const json = (body: unknown, status = 200) =>
@@ -94,6 +111,16 @@ Deno.serve(async (req) => {
       const { data, error } = await callGroq(key, gradePrompt(body.ko || '', answer, body.model || ''))
       if (error) return json({ ok: false, feedback: error })
       return json({ ok: !!data.ok, feedback: data.feedback || '' })
+    }
+
+    if (action === 'explain') {
+      const phrase = (body.phrase || '').trim()
+      const original = (body.original || '').trim()
+      const corrected = (body.corrected || '').trim()
+      if (!phrase || !original) return json({ error: '설명할 내용이 부족해요.' })
+      const { data, error } = await callGroq(key, explainPrompt(original, corrected, phrase))
+      if (error) return json({ error })
+      return json({ reason: data.reason || '' })
     }
 
     const text = (body.text || '').trim()

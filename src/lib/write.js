@@ -36,6 +36,17 @@ export async function translateOrCorrect(text, mode) {
   return withAll({ sentences }, 'correct')
 }
 
+// 교정 사유 설명 — 빨간(고쳐진) 부분을 탭하면 왜 그렇게 고쳤는지 AI가 설명한다.
+// original/corrected 문장 전체와 탭한 부분(phrase)을 넘겨 문맥에 맞는 설명을 받는다.
+export async function explainFix(phrase, original, corrected) {
+  const { data, error } = await supabase.functions.invoke('smooth-worker', {
+    body: { action: 'explain', phrase, original, corrected },
+  })
+  if (error) throw new Error(error.message || 'invoke error')
+  if (data?.error) throw new Error(data.error)
+  return (data?.reason || '').trim()
+}
+
 function withAll(result, mode) {
   const segText = (segs) => segs.map((g) => g.t).join('')
   result.allKo = result.sentences.map((s) => s.ko).join(' ')

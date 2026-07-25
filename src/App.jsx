@@ -20,6 +20,7 @@ import DeleteDialog from './components/DeleteDialog.jsx'
 import ConfirmDialog from './components/ConfirmDialog.jsx'
 import { findEntryByKo } from './data/diary.js'
 import { lookupWord, lookupFix } from './data/lookups.js'
+import { explainFix } from './lib/write.js'
 
 const USER_NAME = '현진'
 
@@ -104,9 +105,20 @@ export default function App() {
     setWordPop({ open: false })
     setActiveWord(null)
   }
-  const tapFix = (word) => {
+  const tapFix = async (word, original, corrected) => {
     setFixPop({ open: true, loading: true })
     clearTimeout(lookTimer.current)
+    // 문장 문맥(원문/교정문)이 있으면 AI에게 실제 교정 사유를 물어본다.
+    // 실패하거나 문맥이 없으면 로컬 사유(mock)로 폴백.
+    if (original && corrected) {
+      try {
+        const reason = await explainFix(word, original, corrected)
+        setFixPop({ open: true, loading: false, reason: reason || lookupFix(word) })
+      } catch {
+        setFixPop({ open: true, loading: false, reason: lookupFix(word) })
+      }
+      return
+    }
     lookTimer.current = setTimeout(() => {
       setFixPop({ open: true, loading: false, reason: lookupFix(word) })
     }, 450)
