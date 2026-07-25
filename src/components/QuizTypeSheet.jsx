@@ -11,9 +11,9 @@ export default function QuizTypeSheet({ onStart, onClose }) {
   const [type, setType] = useState('flash')
 
   return (
-    <div className="absolute inset-0 z-[55] flex items-end bg-black/35" onClick={onClose}>
+    <div className="fixed inset-0 z-[55] flex items-end justify-center bg-black/35" onClick={onClose}>
       <div
-        className="box-border flex w-full flex-col rounded-t-3xl bg-white px-5 pb-8 pt-2.5"
+        className="box-border flex w-full max-w-[500px] flex-col rounded-t-3xl bg-white px-5 pb-8 pt-2.5"
         style={{ animation: 'rollUp .28s cubic-bezier(.22,1,.36,1)' }}
         onClick={(e) => e.stopPropagation()}
       >

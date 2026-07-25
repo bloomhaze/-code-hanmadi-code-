@@ -14,9 +14,9 @@ export default function ConfirmDialog({ kind = 'logout', onYes, onClose }) {
   const { title, desc } = COPY[kind] || COPY.logout
 
   return (
-    <div className="absolute inset-0 z-[56] flex items-center justify-center bg-black/35 px-10" onClick={onClose}>
+    <div className="fixed inset-0 z-[56] flex items-center justify-center bg-black/35 px-10" onClick={onClose}>
       <div
-        className="flex w-full flex-col items-center rounded-3xl bg-white px-5 pb-5 pt-7"
+        className="flex w-full max-w-[320px] flex-col items-center rounded-3xl bg-white px-5 pb-5 pt-7"
         style={{ animation: 'scaleIn .24s cubic-bezier(.22,1,.36,1)' }}
         onClick={(e) => e.stopPropagation()}
       >

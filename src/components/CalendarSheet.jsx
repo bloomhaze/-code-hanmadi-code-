@@ -19,7 +19,7 @@ export default function CalendarSheet({ selOff, onSelect, onClose, onToast }) {
   return (
     <>
       {/* dim backdrop */}
-      <div className="absolute inset-0 z-[45] bg-black/35" onClick={onClose} />
+      <div className="fixed inset-0 z-[45] bg-black/35" onClick={onClose} />
 
       {/* close button */}
       <button

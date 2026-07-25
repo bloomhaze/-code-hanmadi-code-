@@ -23,7 +23,7 @@ export default function WordSearchSheet({ onClose, onToast }) {
 
   return (
     <>
-      <div className="absolute inset-0 z-[56] bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-[56] bg-black/40" onClick={onClose} />
       <button
         type="button"
         onClick={onClose}

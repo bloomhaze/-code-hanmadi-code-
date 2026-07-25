@@ -1,9 +1,9 @@
 // 일기 삭제 확인 다이얼로그.
 export default function DeleteDialog({ onConfirm, onClose }) {
   return (
-    <div className="absolute inset-0 z-[51] flex items-center justify-center bg-black/35 px-6" onClick={onClose}>
+    <div className="fixed inset-0 z-[51] flex items-center justify-center bg-black/35 px-6" onClick={onClose}>
       <div
-        className="flex w-full flex-col items-center rounded-[20px] bg-white px-4 pb-4 pt-6"
+        className="flex w-full max-w-[320px] flex-col items-center rounded-[20px] bg-white px-4 pb-4 pt-6"
         onClick={(e) => e.stopPropagation()}
       >
         <span className="mb-2 font-sans text-[18px] font-medium text-ink">일기를 삭제하시겠어요?</span>

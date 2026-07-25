@@ -48,7 +48,7 @@ export default function MyScreen({
   return (
     <div className="flex h-full flex-col bg-white">
       {/* header */}
-      <div className="flex h-12 shrink-0 items-center bg-white px-5">
+      <div className="flex h-12 shrink-0 items-center bg-white px-5 pt-4">
         <span className="font-sans text-[20px] font-semibold text-ink" style={{ letterSpacing: '-.4px' }}>
           마이페이지
         </span>

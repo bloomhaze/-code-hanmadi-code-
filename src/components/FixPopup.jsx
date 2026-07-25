@@ -5,7 +5,7 @@ export default function FixPopup({ state, onClose }) {
 
   return (
     <>
-      <div className="absolute inset-0 z-[60] bg-black/35" onClick={onClose} />
+      <div className="fixed inset-0 z-[60] bg-black/35" onClick={onClose} />
       <div
         className="absolute inset-x-0 bottom-0 z-[61] rounded-t-[22px] bg-white px-5 pb-[34px] pt-2.5"
         style={{ animation: 'sheetUp .3s cubic-bezier(.22,1,.36,1)' }}
