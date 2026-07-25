@@ -21,8 +21,12 @@ export default function CalendarSheet({ selOff, onSelect, onClose, onToast }) {
       {/* full-viewport dim */}
       <div className="fixed inset-0 z-[45] bg-black/35" onClick={onClose} />
 
-      {/* floating rounded card — rounded top & bottom, dim covers the rest */}
-      <div className="absolute inset-x-0 bottom-2 top-2 z-[46] mx-auto flex w-full max-w-[500px] flex-col overflow-hidden rounded-[24px] bg-white">
+      {/* floating rounded card — rounded top & bottom, dim covers the rest.
+          팝업(WordPopup 등)과 동일한 scaleIn 인터랙션으로 등장. */}
+      <div
+        className="absolute inset-x-0 bottom-2 top-2 z-[46] mx-auto flex w-full max-w-[500px] flex-col overflow-hidden rounded-[24px] bg-white"
+        style={{ animation: 'scaleIn .24s cubic-bezier(.22,1,.36,1)' }}
+      >
         {/* header with close button (top-right) */}
         <div className="flex h-12 shrink-0 items-center justify-end px-3">
           <button
