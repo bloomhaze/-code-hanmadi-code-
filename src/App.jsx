@@ -35,13 +35,13 @@ export default function App() {
   const [quiz, setQuiz] = useState(null) // { type }
   const [dialog, setDialog] = useState(null) // { kind:'delete', id } | { kind:'logout'|'withdraw' }
   const [deletedIds, setDeletedIds] = useState(() => new Set())
-  const [toast, setToast] = useState('')
+  const [toast, setToast] = useState(null) // { message, undo, check } | null
   const [wordPop, setWordPop] = useState({ open: false })
   const [fixPop, setFixPop] = useState({ open: false })
   const [activeWord, setActiveWord] = useState(null)
   const lookTimer = useRef(null)
 
-  const showToast = (msg) => setToast(msg)
+  const showToast = (message, undo, check) => setToast({ message, undo, check })
 
   // ---- auth (Supabase) ----
   useEffect(() => {
@@ -235,7 +235,7 @@ export default function App() {
         <ConfirmDialog kind={dialog.kind} onYes={confirmDialog} onClose={() => setDialog(null)} />
       )}
 
-      <Toast message={toast} onDone={() => setToast('')} />
+      <Toast toast={toast} onClose={() => setToast(null)} />
     </div>
   )
 }

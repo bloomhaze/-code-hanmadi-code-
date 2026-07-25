@@ -156,7 +156,7 @@ export default function QuizScreen({ type = 'flash', onClose, onToast }) {
 
   // ---- shared header ----
   const Header = () => (
-    <div className="absolute left-0 top-12 z-[2] flex h-[60px] items-center gap-3.5 px-5">
+    <div className="absolute left-0 top-12 z-[2] flex h-[60px] w-full items-center gap-3.5 px-5">
       <button type="button" onClick={onClose} className="flex h-7 w-7 shrink-0 items-center justify-center">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
           <path d="M6 6l12 12M18 6L6 18" stroke="#121212" strokeWidth="2" strokeLinecap="round" />
@@ -210,6 +210,8 @@ function Flashcard({ cur, side, setSide, revealed, setRevealed, mark, right, wro
   const wrongInk = mark === 'wrong' ? '#fff' : '#ff4242'
   const rightBg = mark === 'right' ? '#00a836' : '#f4f4f5'
   const rightInk = mark === 'right' ? '#fff' : '#00a836'
+  // Next is enabled only after the card is graded (X or ✓ picked).
+  const marked = mark === 'right' || mark === 'wrong'
 
   return (
     <>
@@ -315,11 +317,19 @@ function Flashcard({ cur, side, setSide, revealed, setRevealed, mark, right, wro
         </button>
         <button
           type="button"
-          onClick={next}
-          className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full bg-ink"
+          onClick={() => marked && next()}
+          disabled={!marked}
+          className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full"
+          style={{ background: marked ? '#121212' : '#f4f4f5', cursor: marked ? 'pointer' : 'default' }}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M9 5l7 7-7 7"
+              stroke={marked ? '#fff' : '#c4c4c4'}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </button>
       </div>

@@ -64,7 +64,10 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
   const toggleBookmark = (i) => {
     const was = bookmark[i]
     setBookmark((s) => ({ ...s, [i]: !s[i] }))
-    onToast?.(was ? '저장을 취소했어요' : '표현을 저장했어요')
+    onToast?.(
+      was ? '저장을 취소했어요' : '표현을 저장했어요',
+      was ? () => setBookmark((s) => ({ ...s, [i]: true })) : undefined,
+    )
   }
 
   return (

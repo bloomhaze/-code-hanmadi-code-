@@ -66,7 +66,7 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz, locked = fa
   const toggleBookmark = (key) => {
     const cur = isSaved(key)
     setBookmark((s) => ({ ...s, [key]: !cur }))
-    if (cur) onToast?.('저장을 취소했어요')
+    if (cur) onToast?.('저장을 취소했어요', () => setBookmark((s) => ({ ...s, [key]: true })))
   }
 
   return (

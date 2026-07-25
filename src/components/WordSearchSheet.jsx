@@ -124,7 +124,10 @@ function ResultCard({ w, onToast }) {
             type="button"
             onClick={() => {
               setSaved((s) => !s)
-              onToast?.(saved ? '저장을 취소했어요' : '단어를 저장했어요')
+              onToast?.(
+                saved ? '저장을 취소했어요' : '단어를 저장했어요',
+                saved ? () => setSaved(true) : undefined,
+              )
             }}
             className="flex h-8 w-8 items-center justify-center rounded-full"
             style={{ background: saved ? '#0066ff' : '#eee' }}
