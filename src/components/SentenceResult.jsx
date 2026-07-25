@@ -1,4 +1,3 @@
-import SegmentText from './SegmentText.jsx'
 import { ListenIcon, BookmarkIcon } from './icons.jsx'
 import { mkWords } from '../lib/text.js'
 
@@ -111,8 +110,8 @@ export default function SentenceResult({
         <HandIcon />
         {hint === 'correction' ? (
           <div className="flex items-center gap-1.5">
-            <div className="flex items-center rounded bg-[#ffe1e1] px-1.5 py-[3px]">
-              <span className="font-inter text-[12px] font-medium leading-none text-[#ff4242]">빨간 영역</span>
+            <div className="flex items-center rounded bg-[#dcebff] px-1.5 py-[3px]">
+              <span className="font-inter text-[12px] font-medium leading-none text-[#0066ff]">파란 영역</span>
             </div>
             <span className="font-sans text-[13px] text-muted">클릭하고 교정 이유 확인</span>
           </div>
@@ -140,13 +139,12 @@ export default function SentenceResult({
 
                 {isCorrection ? (
                   <>
-                    {/* original with tappable red segments */}
+                    {/* original — 바뀐(빨간) 부분은 취소선 표시(클릭 X) */}
                     <div className="font-inter text-[16px] text-ink" style={{ lineHeight: '28.8px' }}>
                       {s.enSegs.map((g, gi) =>
                         g.kind === 'w' ? (
                           <span
                             key={gi}
-                            onClick={() => onTapFix?.(g.t, origFull, fixedFull)}
                             style={{
                               background: '#ffe1e1',
                               color: '#ff4242',
@@ -154,7 +152,6 @@ export default function SentenceResult({
                               padding: '1px 3px',
                               textDecoration: 'line-through',
                               textDecorationColor: '#ff7a7a',
-                              cursor: 'pointer',
                             }}
                           >
                             {g.t}
@@ -171,11 +168,29 @@ export default function SentenceResult({
                     >
                       교정
                     </span>
-                    <SegmentText
-                      segments={s.fixSegs}
-                      className="mt-2 font-inter text-[16px] text-ink"
-                      style={{ lineHeight: '28.8px' }}
-                    />
+                    {/* corrected — 고쳐진(파란) 부분을 클릭하면 교정 이유 설명 */}
+                    <div className="mt-2 font-inter text-[16px] text-ink" style={{ lineHeight: '28.8px' }}>
+                      {s.fixSegs.map((g, gi) =>
+                        g.kind === 'f' ? (
+                          <span
+                            key={gi}
+                            onClick={() => onTapFix?.(g.t, origFull, fixedFull)}
+                            style={{
+                              background: '#dcebff',
+                              color: '#0066ff',
+                              borderRadius: 5,
+                              padding: '1px 3px',
+                              fontWeight: 500,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {g.t}
+                          </span>
+                        ) : (
+                          <span key={gi}>{g.t}</span>
+                        ),
+                      )}
+                    </div>
                   </>
                 ) : (
                   <span className="font-inter text-[16px] font-normal text-ink-2" style={{ lineHeight: '26px', letterSpacing: '-.2px' }}>
