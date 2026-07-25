@@ -5,8 +5,33 @@
 //   'correct'   — 영어 일기 교정        body: { action, text }                       → { sentences: [{ ko, original, corrected }] }
 //   'explain'   — 교정 사유 설명        body: { action, original, corrected, phrase } → { reason }
 //   'word'      — 단어 뜻/예문          body: { action, word, sentence }             → { kr, ex, exKr }
+//   'tts'       — 음성 합성(원어민)      body: { action, text, voice }                → { audio(base64), mime }
 //
 // 키 설정(Secrets): GROQ_API_KEY  (console.groq.com, 무료, 카드 불필요)
+// ※ PlayAI TTS 모델은 Groq 콘솔에서 최초 1회 약관 동의가 필요할 수 있어요.
+
+const TTS_MODEL = 'playai-tts'
+const TTS_VOICE = 'Celeste-PlayAI' // 자연스러운 여성 원어민 음성
+
+// Groq PlayAI TTS — 텍스트를 wav 오디오로. 바이너리라 base64로 감싸 반환한다.
+async function groqTTS(key: string, text: string, voice: string): Promise<{ audio?: string; mime?: string; error?: string }> {
+  const r = await fetch('https://api.groq.com/openai/v1/audio/speech', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${key}` },
+    body: JSON.stringify({ model: TTS_MODEL, voice: voice || TTS_VOICE, input: text, response_format: 'wav' }),
+  })
+  if (!r.ok) {
+    const j = await r.json().catch(() => ({}))
+    return { error: `TTS 오류(${r.status}): ${j?.error?.message || JSON.stringify(j).slice(0, 160)}` }
+  }
+  const buf = new Uint8Array(await r.arrayBuffer())
+  let bin = ''
+  const chunk = 0x8000
+  for (let i = 0; i < buf.length; i += chunk) {
+    bin += String.fromCharCode.apply(null, Array.from(buf.subarray(i, i + chunk)))
+  }
+  return { audio: btoa(bin), mime: 'audio/wav' }
+}
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -150,6 +175,14 @@ Deno.serve(async (req) => {
       const { data, error } = await callGroq(key, wordPrompt(word, (body.sentence || '').trim()))
       if (error) return json({ error })
       return json({ kr: data.kr || '', ex: data.ex || '', exKr: data.exKr || '' })
+    }
+
+    if (action === 'tts') {
+      const t = (body.text || '').trim()
+      if (!t) return json({ error: '읽을 내용이 없어요.' })
+      const res = await groqTTS(key, t, body.voice || '')
+      if (res.error) return json({ error: res.error })
+      return json({ audio: res.audio, mime: res.mime })
     }
 
     const text = (body.text || '').trim()
