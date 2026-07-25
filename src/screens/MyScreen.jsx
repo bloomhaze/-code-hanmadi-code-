@@ -33,7 +33,7 @@ export default function MyScreen({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-[52px] items-center px-[18px]"
+      className="flex h-[52px] w-full items-center px-[18px]"
       style={{
         borderBottom: last || single ? 'none' : '1px solid #eee',
         borderRadius: single ? 16 : first ? '16px 16px 0 0' : last ? '0 0 16px 16px' : 0,
