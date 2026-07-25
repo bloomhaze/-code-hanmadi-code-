@@ -4,7 +4,7 @@ import { speak, stopSpeak } from '../lib/speak.js'
 import { getEntry } from '../data/diary.js'
 
 // 일기 상세 — 문장별 / 전체 보기 + 교정 사유. Reuses SentenceResult.
-export default function DiaryDetailScreen({ id, onBack, onDelete, onToast, onTapWord, onTapFix, activeWord }) {
+export default function DiaryDetailScreen({ id, onBack, onDelete, onToast, onTapWord, onTapFix, activeWord, activeFix }) {
   const entry = getEntry(id)
   const [dm, setDm] = useState('sentence')
   const [listen, setListen] = useState({})
@@ -71,6 +71,7 @@ export default function DiaryDetailScreen({ id, onBack, onDelete, onToast, onTap
             showToggle={!isCorrection}
             hint={isCorrection ? 'correction' : 'word'}
             activeWord={activeWord}
+            activeFix={activeFix}
             onTapWord={onTapWord}
             onTapFix={onTapFix}
             listen={listen}

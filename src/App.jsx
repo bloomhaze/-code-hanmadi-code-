@@ -41,6 +41,7 @@ export default function App() {
   const [fixPop, setFixPop] = useState({ open: false })
   const [activeWord, setActiveWord] = useState(null)
   const lookTimer = useRef(null)
+  const fixReq = useRef(0)
 
   const showToast = (message, undo, check) => setToast({ message, undo, check })
 
@@ -105,23 +106,30 @@ export default function App() {
     setWordPop({ open: false })
     setActiveWord(null)
   }
-  const tapFix = async (word, original, corrected) => {
-    setFixPop({ open: true, loading: true })
+  const tapFix = async (fixId, word, original, corrected) => {
+    // 같은 파란 영역을 다시 누르면 닫는다 (토글).
+    if (fixPop.open && fixPop.id === fixId) {
+      setFixPop({ open: false })
+      return
+    }
+    const token = ++fixReq.current
     clearTimeout(lookTimer.current)
+    setFixPop({ open: true, id: fixId, loading: true })
+    // 뒤늦게 도착한 응답이 다른 영역을 덮어쓰지 않도록 토큰으로 가드.
+    const finish = (reason) => {
+      if (fixReq.current === token) setFixPop({ open: true, id: fixId, loading: false, reason })
+    }
     // 문장 문맥(원문/교정문)이 있으면 AI에게 실제 교정 사유를 물어본다.
     // 실패하거나 문맥이 없으면 로컬 사유(mock)로 폴백.
     if (original && corrected) {
       try {
-        const reason = await explainFix(word, original, corrected)
-        setFixPop({ open: true, loading: false, reason: reason || lookupFix(word) })
+        finish((await explainFix(word, original, corrected)) || lookupFix(word))
       } catch {
-        setFixPop({ open: true, loading: false, reason: lookupFix(word) })
+        finish(lookupFix(word))
       }
       return
     }
-    lookTimer.current = setTimeout(() => {
-      setFixPop({ open: true, loading: false, reason: lookupFix(word) })
-    }, 450)
+    lookTimer.current = setTimeout(() => finish(lookupFix(word)), 450)
   }
   const closeFixPop = () => setFixPop({ open: false })
 
@@ -171,13 +179,18 @@ export default function App() {
   // only the full-screen onboarding hides it.
   const showTopBar = !showOnboarding
 
+  // 교정 사유 패널이 열리면(데스크탑/태블릿) 본문 컬럼을 왼쪽으로 밀어
+  // 우측에 패널 공간을 만든다. 모바일(<lg)에서는 밀지 않고 하단 바텀시트.
+  const shiftForFix = fixPop.open ? 'lg:mr-[420px]' : ''
+
   return (
     <div className="flex h-[100dvh] w-full flex-col items-center overflow-hidden bg-white">
       {/* brand bar spans the full width (max 1440), logo aligned left */}
       {showTopBar && <TopBar onLogoClick={goHome} />}
 
+      <div className="flex w-full min-h-0 flex-1 justify-center overflow-hidden">
       <div
-        className="relative flex w-full min-h-0 max-w-[500px] flex-1 flex-col overflow-hidden bg-white"
+        className={`relative flex w-full min-h-0 max-w-[500px] flex-col overflow-hidden bg-white transition-[margin] duration-300 ${shiftForFix}`}
         style={{ fontFamily: "'Pretendard Variable', 'Pretendard', -apple-system, sans-serif" }}
       >
         {/* ---- tab screens (fill the region between the bars) ---- */}
@@ -223,6 +236,7 @@ export default function App() {
           onTapWord={tapWord}
           onTapFix={tapFix}
           activeWord={activeWord}
+          activeFix={fixPop.open ? fixPop.id : null}
         />
       )}
       {overlay?.type === 'detail' && (
@@ -234,6 +248,7 @@ export default function App() {
           onTapWord={tapWord}
           onTapFix={tapFix}
           activeWord={activeWord}
+          activeFix={fixPop.open ? fixPop.id : null}
         />
       )}
 
@@ -253,7 +268,6 @@ export default function App() {
         {writeSheet && <WriteMethodSheet onChoose={chooseWrite} onClose={() => setWriteSheet(false)} />}
         {quizSheet && <QuizTypeSheet onStart={startQuiz} onClose={() => setQuizSheet(false)} />}
         <WordPopup state={wordPop} onClose={closeWordPop} onToast={showToast} />
-        <FixPopup state={fixPop} onClose={closeFixPop} />
 
         {dialog?.kind === 'delete' && <DeleteDialog onConfirm={confirmDelete} onClose={() => setDialog(null)} />}
         {(dialog?.kind === 'logout' || dialog?.kind === 'withdraw') && (
@@ -262,6 +276,11 @@ export default function App() {
 
         <Toast toast={toast} onClose={() => setToast(null)} />
       </div>
+      </div>
+
+      {/* 교정 사유 — 데스크탑/태블릿은 우측 패널, 모바일은 하단 바텀시트.
+          본문 컬럼 밖(변형되지 않는 위치)에 두어 뷰포트 기준으로 배치. */}
+      <FixPopup state={fixPop} onClose={closeFixPop} />
     </div>
   )
 }

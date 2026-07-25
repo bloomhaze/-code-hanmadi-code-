@@ -51,6 +51,7 @@ export default function SentenceResult({
   showToggle,
   hint = 'word', // 'word' | 'correction'
   activeWord,
+  activeFix,
   onTapWord,
   onTapFix,
   listen = {},
@@ -186,11 +187,13 @@ export default function SentenceResult({
                     </span>
                     {/* corrected — 고쳐진(파란) 부분을 클릭하면 교정 이유 설명 */}
                     <div className="mt-2 font-inter text-[16px] text-ink" style={{ lineHeight: '28.8px' }}>
-                      {s.fixSegs.map((g, gi) =>
-                        g.kind === 'f' ? (
+                      {s.fixSegs.map((g, gi) => {
+                        const fid = `${i}-${gi}`
+                        return g.kind === 'f' ? (
                           <span
                             key={gi}
-                            onClick={() => onTapFix?.(g.t, origFull, fixedFull)}
+                            className={activeFix === fid ? 'fix-active' : undefined}
+                            onClick={() => onTapFix?.(fid, g.t, origFull, fixedFull)}
                             style={{
                               background: '#dcebff',
                               color: '#0066ff',
@@ -204,8 +207,8 @@ export default function SentenceResult({
                           </span>
                         ) : (
                           <span key={gi}>{g.t}</span>
-                        ),
-                      )}
+                        )
+                      })}
                     </div>
                   </>
                 ) : (

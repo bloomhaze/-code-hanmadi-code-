@@ -9,7 +9,7 @@ import { translateOrCorrect } from '../lib/write.js'
 const KO_RE = /[ᄀ-ᇿ㄰-㆏가-힣]/g
 
 // 일기 작성 플로우: edit → loading → result (번역/교정).
-export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTapWord, onTapFix, activeWord }) {
+export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTapWord, onTapFix, activeWord, activeFix }) {
   const [step, setStep] = useState('edit') // edit | loading | result
   const [body, setBody] = useState('')
   const [data, setData] = useState(null)
@@ -238,6 +238,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
               showToggle={!isEn}
               hint={isEn ? 'correction' : 'word'}
               activeWord={activeWord}
+              activeFix={activeFix}
               onTapWord={onTapWord}
               onTapFix={onTapFix}
               listen={listen}
