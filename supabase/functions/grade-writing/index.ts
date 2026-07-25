@@ -203,6 +203,40 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json()
     const action = body.action || 'grade'
+
+    // TTS / 계정삭제는 GROQ 키가 필요 없으니 먼저 처리.
+    if (action === 'tts') {
+      const t = (body.text || '').trim()
+      if (!t) return json({ error: '읽을 내용이 없어요.' })
+      const res = await ttsCached(t, body.voice || AZURE_VOICE)
+      if (res.error) return json({ error: res.error })
+      return json(res.url ? { url: res.url } : { audio: res.audio, mime: res.mime })
+    }
+
+    // 회원 탈퇴 — 요청자의 JWT로 본인 확인 후, 관리자 권한(service role)으로 계정 삭제.
+    if (action === 'deleteAccount') {
+      const supaUrl = Deno.env.get('SUPABASE_URL')
+      const anonKey = Deno.env.get('SUPABASE_ANON_KEY')
+      const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+      const jwt = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '')
+      if (!supaUrl || !serviceKey || !jwt) return json({ error: '인증 정보가 없어요.' }, 401)
+      const ur = await fetch(`${supaUrl}/auth/v1/user`, {
+        headers: { apikey: anonKey || serviceKey, Authorization: `Bearer ${jwt}` },
+      })
+      if (!ur.ok) return json({ error: '인증 실패 (다시 로그인 후 시도해주세요)' }, 401)
+      const user = await ur.json().catch(() => null)
+      if (!user?.id) return json({ error: '사용자를 찾을 수 없어요.' }, 401)
+      const dr = await fetch(`${supaUrl}/auth/v1/admin/users/${user.id}`, {
+        method: 'DELETE',
+        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+      })
+      if (!dr.ok) {
+        const tx = await dr.text().catch(() => '')
+        return json({ error: `삭제 실패: ${tx.slice(0, 120)}` })
+      }
+      return json({ ok: true })
+    }
+
     const key = Deno.env.get('GROQ_API_KEY')
     if (!key) return json({ error: 'GROQ_API_KEY가 설정되지 않았어요.' })
 
@@ -230,14 +264,6 @@ Deno.serve(async (req) => {
       const { data, error } = await callGroq(key, wordPrompt(word, (body.sentence || '').trim()))
       if (error) return json({ error })
       return json({ kr: data.kr || '', ex: data.ex || '', exKr: data.exKr || '' })
-    }
-
-    if (action === 'tts') {
-      const t = (body.text || '').trim()
-      if (!t) return json({ error: '읽을 내용이 없어요.' })
-      const res = await ttsCached(t, body.voice || AZURE_VOICE)
-      if (res.error) return json({ error: res.error })
-      return json(res.url ? { url: res.url } : { audio: res.audio, mime: res.mime })
     }
 
     const text = (body.text || '').trim()
