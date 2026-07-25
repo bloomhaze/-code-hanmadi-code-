@@ -5,32 +5,87 @@
 //   'correct'   — 영어 일기 교정        body: { action, text }                       → { sentences: [{ ko, original, corrected }] }
 //   'explain'   — 교정 사유 설명        body: { action, original, corrected, phrase } → { reason }
 //   'word'      — 단어 뜻/예문          body: { action, word, sentence }             → { kr, ex, exKr }
-//   'tts'       — 음성 합성(원어민)      body: { action, text, voice }                → { audio(base64), mime }
+//   'tts'       — 음성 합성(원어민)+캐시  body: { action, text, voice }                → { url } (또는 { audio, mime })
 //
-// 키 설정(Secrets): GROQ_API_KEY  (console.groq.com, 무료, 카드 불필요)
-// ※ PlayAI TTS 모델은 Groq 콘솔에서 최초 1회 약관 동의가 필요할 수 있어요.
+// 키 설정(Secrets):
+//   GROQ_API_KEY          (console.groq.com — 채점/번역/교정/단어)
+//   AZURE_SPEECH_KEY      (Azure Speech 리소스 KEY 1 — 원어민 TTS)
+//   AZURE_SPEECH_REGION   (예: eastus)
+// 캐시 저장소: Supabase Storage에 public 버킷 'tts-cache' 를 미리 만들어 두세요.
+//   (같은 문장은 1번만 생성해 저장하고, 이후엔 저장된 mp3를 재생 → 비용 0)
 
-const TTS_MODEL = 'playai-tts'
-const TTS_VOICE = 'Celeste-PlayAI' // 자연스러운 여성 원어민 음성
+const AZURE_VOICE = 'en-US-JennyNeural' // 자연스러운 여성 원어민 (Aria/Emma 등으로 교체 가능)
+const TTS_BUCKET = 'tts-cache'
 
-// Groq PlayAI TTS — 텍스트를 wav 오디오로. 바이너리라 base64로 감싸 반환한다.
-async function groqTTS(key: string, text: string, voice: string): Promise<{ audio?: string; mime?: string; error?: string }> {
-  const r = await fetch('https://api.groq.com/openai/v1/audio/speech', {
+const xmlEscape = (s: string) =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
+
+async function sha256hex(s: string) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s))
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+// Azure Neural TTS — 텍스트를 mp3 바이트로.
+async function azureTTS(text: string, voice: string): Promise<{ audio?: Uint8Array; error?: string }> {
+  const key = Deno.env.get('AZURE_SPEECH_KEY')
+  const region = Deno.env.get('AZURE_SPEECH_REGION')
+  if (!key || !region) return { error: 'AZURE_SPEECH_KEY/REGION이 설정되지 않았어요.' }
+  const ssml =
+    `<speak version='1.0' xml:lang='en-US'><voice xml:lang='en-US' name='${voice}'>${xmlEscape(text)}</voice></speak>`
+  const r = await fetch(`https://${region}.tts.speech.microsoft.com/cognitiveservices/v1`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${key}` },
-    body: JSON.stringify({ model: TTS_MODEL, voice: voice || TTS_VOICE, input: text, response_format: 'wav' }),
+    headers: {
+      'Ocp-Apim-Subscription-Key': key,
+      'Content-Type': 'application/ssml+xml',
+      'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3',
+      'User-Agent': 'hanmadi',
+    },
+    body: ssml,
   })
   if (!r.ok) {
-    const j = await r.json().catch(() => ({}))
-    return { error: `TTS 오류(${r.status}): ${j?.error?.message || JSON.stringify(j).slice(0, 160)}` }
+    const tx = await r.text().catch(() => '')
+    return { error: `Azure TTS 오류(${r.status}): ${tx.slice(0, 160)}` }
   }
-  const buf = new Uint8Array(await r.arrayBuffer())
+  return { audio: new Uint8Array(await r.arrayBuffer()) }
+}
+
+function u8ToBase64(buf: Uint8Array) {
   let bin = ''
   const chunk = 0x8000
-  for (let i = 0; i < buf.length; i += chunk) {
-    bin += String.fromCharCode.apply(null, Array.from(buf.subarray(i, i + chunk)))
+  for (let i = 0; i < buf.length; i += chunk) bin += String.fromCharCode.apply(null, Array.from(buf.subarray(i, i + chunk)))
+  return btoa(bin)
+}
+
+// 캐시(Storage) 우선 → 없으면 Azure로 생성 후 저장. 저장 실패 시 base64로 즉시 재생.
+async function ttsCached(text: string, voice: string): Promise<{ url?: string; audio?: string; mime?: string; error?: string }> {
+  const supaUrl = Deno.env.get('SUPABASE_URL')
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  const path = `${await sha256hex(voice + '|' + text)}.mp3`
+  const publicUrl = supaUrl ? `${supaUrl}/storage/v1/object/public/${TTS_BUCKET}/${path}` : ''
+
+  // 1) 캐시 확인
+  if (publicUrl) {
+    try {
+      const head = await fetch(publicUrl, { method: 'HEAD' })
+      if (head.ok) return { url: publicUrl }
+    } catch { /* ignore */ }
   }
-  return { audio: btoa(bin), mime: 'audio/wav' }
+  // 2) 생성
+  const res = await azureTTS(text, voice)
+  if (res.error || !res.audio) return { error: res.error || 'TTS 실패' }
+  // 3) 저장(업서트)
+  if (supaUrl && serviceKey) {
+    try {
+      const up = await fetch(`${supaUrl}/storage/v1/object/${TTS_BUCKET}/${path}`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${serviceKey}`, 'content-type': 'audio/mpeg', 'x-upsert': 'true' },
+        body: res.audio,
+      })
+      if (up.ok) return { url: publicUrl }
+    } catch { /* ignore */ }
+  }
+  // 저장 못 하면(버킷 없음 등) 이번 오디오만 base64로 반환 → 재생은 됨
+  return { audio: u8ToBase64(res.audio), mime: 'audio/mpeg' }
 }
 
 const cors = {
@@ -180,9 +235,9 @@ Deno.serve(async (req) => {
     if (action === 'tts') {
       const t = (body.text || '').trim()
       if (!t) return json({ error: '읽을 내용이 없어요.' })
-      const res = await groqTTS(key, t, body.voice || '')
+      const res = await ttsCached(t, body.voice || AZURE_VOICE)
       if (res.error) return json({ error: res.error })
-      return json({ audio: res.audio, mime: res.mime })
+      return json(res.url ? { url: res.url } : { audio: res.audio, mime: res.mime })
     }
 
     const text = (body.text || '').trim()
