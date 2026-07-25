@@ -134,8 +134,10 @@ export default function MyScreen({
               <SectionLabel>인스타그램</SectionLabel>
               <div className="rounded-2xl bg-[#f7f7f8]">
                 <Row
-                  label={<span className="font-inter">Hanmadi.dairy</span>}
-                  onClick={() => onToast?.('인스타그램으로 이동해요')}
+                  label={<span className="font-inter">hanmadi.diary</span>}
+                  onClick={() =>
+                    window.open('https://www.instagram.com/hanmadi.diary/', '_blank', 'noopener,noreferrer')
+                  }
                   trailing={<ExternalArrow />}
                   single
                 />

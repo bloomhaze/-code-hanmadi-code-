@@ -158,7 +158,7 @@ export default function QuizScreen({ type = 'flash', onClose, onToast }) {
 
   // ---- shared header ----
   const Header = () => (
-    <div className="flex h-[60px] w-full shrink-0 items-center gap-3.5 px-5 pt-3">
+    <div className="flex h-[60px] w-full shrink-0 items-center gap-3.5 px-5 pt-4">
       <button type="button" onClick={onClose} className="flex h-7 w-7 shrink-0 items-center justify-center">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
           <path d="M6 6l12 12M18 6L6 18" stroke="#121212" strokeWidth="2" strokeLinecap="round" />

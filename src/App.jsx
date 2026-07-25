@@ -155,9 +155,9 @@ export default function App() {
   }
 
   const showTabBar = !overlay && !showOnboarding && !quiz
-  // Brand bar stays on the content overlays (write/detail/notif) too —
-  // only the full-screen onboarding & quiz hide it.
-  const showTopBar = !showOnboarding && !quiz
+  // Brand bar stays on all screens (tabs, write/detail/notif, quiz) —
+  // only the full-screen onboarding hides it.
+  const showTopBar = !showOnboarding
 
   return (
     <div className="flex h-[100dvh] w-full flex-col items-center overflow-hidden bg-white">
