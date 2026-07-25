@@ -65,13 +65,13 @@ export default function FixPopup({ state, onClose }) {
       <div
         className="fixed z-[60] hidden lg:block"
         style={{
-          top: 148,
+          top: 157,
           left: 'calc(50% + 40px)',
           width: 400,
           animation: 'fixPanelIn .28s cubic-bezier(.22,1,.36,1)',
         }}
       >
-        <div className="rounded-[20px] border-2 border-[#b3d1ff] bg-white px-5 py-[18px]">{Inner}</div>
+        <div className="rounded-[20px] border-2 border-[#0066ff] bg-white px-5 py-[18px]">{Inner}</div>
       </div>
     </>
   )
