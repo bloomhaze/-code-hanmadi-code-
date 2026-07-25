@@ -144,7 +144,7 @@ export default function QuizScreen({ type = 'flash', onClose, onToast }) {
         <button
           type="button"
           onClick={hasWrong ? retryWrong : continueMore}
-          className="absolute bottom-9 left-1/2 z-[2] flex h-[50px] w-[335px] max-w-[calc(100%-40px)] -translate-x-1/2 items-center justify-center rounded-[20px] bg-ink"
+          className="absolute inset-x-5 bottom-9 z-[2] flex h-[50px] items-center justify-center rounded-[20px] bg-ink"
         >
           <span className="font-sans text-[16px] font-medium text-white">
             {hasWrong ? `틀린 ${wrong}개, 다시 복습` : '이어서 더 복습하기'}
@@ -177,7 +177,7 @@ export default function QuizScreen({ type = 'flash', onClose, onToast }) {
   return (
     <div className="no-scrollbar absolute inset-0 z-40 overflow-y-auto bg-white">
       {/* fixed mobile canvas centered in the column (quiz layout is pixel-tuned) */}
-      <div className="relative mx-auto h-[812px] w-[375px] max-w-full">
+      <div className="relative mx-auto h-[812px] w-full max-w-[500px]">
         <Header />
         {type === 'flash' && <Flashcard {...{ cur, side, setSide, revealed, setRevealed, mark, right, wrong, qi, applyMark, next, prev }} />}
         {type === 'blank' && (
@@ -248,7 +248,7 @@ function Flashcard({ cur, side, setSide, revealed, setRevealed, mark, right, wro
 
       {/* card */}
       <div
-        className="absolute left-5 top-[176px] box-border flex h-[506px] w-[335px] flex-col rounded-3xl p-7"
+        className="absolute inset-x-5 top-[176px] box-border flex h-[506px] flex-col rounded-3xl p-7"
         style={{
           background: revealed ? '#5f5f5f' : '#fff',
           border: revealed ? 'none' : '1px solid #eee',
@@ -368,7 +368,7 @@ function BlankQuiz({ cur, blank, setBlank, blankChecked, setBlankChecked, applyM
 
   return (
     <>
-      <div className="absolute left-5 top-[120px] box-border flex h-[562px] w-[335px] flex-col items-center rounded-3xl border border-[#eee] bg-white px-[26px] pb-6 pt-7" style={{ boxShadow: '0 4px 20px rgba(17,17,26,.05)' }}>
+      <div className="absolute inset-x-5 top-[120px] box-border flex h-[562px] flex-col items-center rounded-3xl border border-[#eee] bg-white px-[26px] pb-6 pt-7" style={{ boxShadow: '0 4px 20px rgba(17,17,26,.05)' }}>
         <div className="flex grow flex-col items-start justify-center gap-4 self-stretch">
           <span className="text-left font-sans text-[16px] font-normal" style={{ color: 'rgba(46,47,51,.6)', letterSpacing: '-.2px' }}>
             {ko}
@@ -495,14 +495,14 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
 
   return (
     <>
-      <div className="absolute left-5 top-[120px] box-border flex w-[335px] flex-col gap-1.5 rounded-2xl bg-[#f5f5f6] px-5 py-[18px]">
+      <div className="absolute inset-x-5 top-[120px] box-border flex flex-col gap-1.5 rounded-2xl bg-[#f5f5f6] px-5 py-[18px]">
         <span className="font-sans text-[14px] font-normal text-muted">이 문장을 영작해보세요</span>
         <span className="font-sans text-[16px] font-medium text-ink" style={{ lineHeight: '26px' }}>
           {ko}
         </span>
       </div>
 
-      <div className="absolute left-5 top-[230px] flex min-h-[34px] w-[335px] items-center gap-2.5">
+      <div className="absolute inset-x-5 top-[230px] flex min-h-[34px] items-center gap-2.5">
         {!hint ? (
           <button type="button" onClick={() => setHint(true)} className="flex h-[34px] items-center rounded-xl bg-ink px-2.5">
             <span className="font-sans text-[12px] font-semibold text-white">힌트 보기</span>
@@ -520,7 +520,7 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
       </div>
 
       {!graded ? (
-        <div className="absolute left-5 top-[282px] box-border h-[404px] w-[335px] rounded-[20px] bg-white p-[18px]" style={{ boxShadow: 'inset 0 0 0 1px #ececee' }}>
+        <div className="absolute inset-x-5 top-[282px] box-border h-[404px] rounded-[20px] bg-white p-[18px]" style={{ boxShadow: 'inset 0 0 0 1px #ececee' }}>
           <textarea
             value={writeText}
             onChange={(e) => setWriteText(e.target.value)}
@@ -531,7 +531,7 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
           />
         </div>
       ) : (
-        <div className="no-scrollbar absolute left-5 top-[282px] flex max-h-[404px] w-[335px] flex-col gap-3.5 overflow-y-auto">
+        <div className="no-scrollbar absolute inset-x-5 top-[282px] flex max-h-[404px] flex-col gap-3.5 overflow-y-auto">
           {/* learner's answer */}
           <div
             className="flex flex-col gap-2.5 rounded-[20px] bg-white px-[18px] py-4"
@@ -602,7 +602,7 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
       <button
         type="button"
         onClick={btnAction}
-        className="absolute left-5 top-[730px] flex h-[50px] w-[335px] items-center justify-center gap-2 rounded-[20px]"
+        className="absolute inset-x-5 top-[730px] flex h-[50px] items-center justify-center gap-2 rounded-[20px]"
         style={{ background: ready ? '#121212' : '#efefef' }}
       >
         {grading && (
