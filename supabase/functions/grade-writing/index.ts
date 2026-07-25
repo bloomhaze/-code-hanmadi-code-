@@ -4,13 +4,11 @@
 //            문법/철자 오류가 하나라도 있으면 무조건 ok=false.
 //            (영어는 다양한 표현이 가능하므로 참고 정답과 표현이 달라도 위 조건을 만족하면 정답)
 //
-// 배포:
-//   supabase functions deploy grade-writing
-// 키 설정(아래 중 하나 — Gemini가 무료 티어라 추천):
-//   supabase secrets set GEMINI_API_KEY=AIza...        (Google AI Studio, 무료)
-//   supabase secrets set ANTHROPIC_API_KEY=sk-ant-...  (유료)
-//   supabase secrets set OPENAI_API_KEY=sk-...         (유료)
-import { serve } from 'https://deno.land/std@0.203.0/http/server.ts'
+// 배포: Supabase 대시보드 Edge Functions → Deploy via Editor, 함수명 grade-writing
+// 키 설정(아래 중 하나 — Gemini가 무료 티어라 추천): Secrets 에 등록
+//   GEMINI_API_KEY     (Google AI Studio, 무료)
+//   ANTHROPIC_API_KEY  (유료)
+//   OPENAI_API_KEY     (유료)
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -32,7 +30,7 @@ function buildPrompt(ko: string, answer: string, model: string) {
   )
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   const json = (body: unknown, status = 200) =>
     new Response(JSON.stringify(body), { status, headers: { ...cors, 'content-type': 'application/json' } })
