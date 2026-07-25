@@ -141,12 +141,12 @@ export function gradeWriting(cur, answer) {
   const mt = m.split(' ').filter(Boolean)
   const hit = mt.filter((w) => at.has(w)).length
   const ratio = mt.length ? hit / mt.length : 0
-  const ok = a === m || ratio >= 0.7
+  // Lenient: a reasonably-overlapping answer counts as OK (semantic/grammar
+  // judgement would need a real grader; the 시안 uses an AI call here).
+  const ok = a === m || ratio >= 0.5
   return {
     ok,
     better: model,
-    feedback: ok
-      ? '자연스럽게 잘 작성했어요!'
-      : '뜻은 통하지만, 모범 답안처럼 쓰면 더 자연스러워요.',
+    feedback: '뜻은 통하지만, 모범 답안처럼 쓰면 더 자연스러워요.',
   }
 }

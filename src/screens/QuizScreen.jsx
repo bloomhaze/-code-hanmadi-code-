@@ -471,6 +471,9 @@ function BlankQuiz({ cur, blank, setBlank, blankChecked, setBlankChecked, applyM
 function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGrading, graded, setGraded, gradeTimer, applyMark, next, qi, total }) {
   const ko = koOf(cur)
   const expr = writeHintFor(cur)
+  // When the answer is accepted, surface the DB-saved model as an alternative
+  // ("이렇게도 쓸 수 있어요") — but only if it differs from what the user wrote.
+  const showAlt = !!(graded && graded.ok && (graded.better || '').trim().toLowerCase() !== writeText.trim().toLowerCase())
 
   const doGrade = () => {
     if (!writeText.trim()) return
@@ -526,47 +529,70 @@ function WriteQuiz({ cur, writeText, setWriteText, hint, setHint, grading, setGr
         </div>
       ) : (
         <div className="no-scrollbar absolute left-5 top-[282px] flex max-h-[404px] w-[335px] flex-col gap-3.5 overflow-y-auto">
+          {/* learner's answer */}
           <div
             className="flex flex-col gap-2.5 rounded-[20px] bg-white px-[18px] py-4"
-            style={{ boxShadow: `inset 0 0 0 1.5px ${graded.ok ? '#bfe6cb' : '#ffd0d0'}` }}
+            style={{ boxShadow: `inset 0 0 0 1.5px ${graded.ok ? '#37b24d' : '#ff6b6b'}` }}
           >
             <div className="flex items-center gap-1.5">
               {graded.ok ? (
-                <svg width="20" height="20" viewBox="0 0 16 16" fill="none">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <circle cx="8" cy="8" r="7" stroke="#00a836" strokeWidth="1.5" />
                   <path d="M5 8l2 2 4-4" stroke="#00a836" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               ) : (
-                <svg width="20" height="20" viewBox="0 0 16 16" fill="none">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <circle cx="8" cy="8" r="7" stroke="#ff4242" strokeWidth="1.5" />
                   <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="#ff4242" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               )}
               <span className="font-sans text-[14px] font-medium" style={{ color: graded.ok ? '#00a836' : '#ff4242' }}>
-                {graded.ok ? '자연스러워요' : '조금 아쉬워요'}
+                {graded.ok ? '잘했어요!' : '아쉬워요'}
               </span>
             </div>
             <span className="font-inter text-[16px] text-ink" style={{ lineHeight: '24px' }}>
               {writeText}
             </span>
           </div>
-          <div className="flex flex-col gap-2 rounded-[20px] bg-[#eef8f0] px-[18px] py-4">
-            <div className="flex items-center gap-1.5">
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
-                <circle cx="8" cy="8" r="7" stroke="#00a836" strokeWidth="1.5" />
-                <path d="M5 8l2 2 4-4" stroke="#00a836" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="font-sans text-[14px] font-semibold" style={{ color: '#00a836' }}>
-                모범 답안
+
+          {/* wrong → 모범 답안 (교정 + 피드백) */}
+          {!graded.ok && (
+            <div className="flex flex-col gap-2 rounded-[20px] bg-[#eef8f0] px-[18px] py-4">
+              <div className="flex items-center gap-1.5">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="7" stroke="#00a836" strokeWidth="1.5" />
+                  <path d="M5 8l2 2 4-4" stroke="#00a836" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="font-sans text-[14px] font-semibold" style={{ color: '#00a836' }}>
+                  모범 답안
+                </span>
+              </div>
+              <span className="font-inter text-[16px] font-medium text-ink" style={{ lineHeight: '24px' }}>
+                {graded.better}
+              </span>
+              <span className="font-sans text-[13px] font-medium" style={{ color: '#2fa84f', lineHeight: '20px' }}>
+                {graded.feedback}
               </span>
             </div>
-            <span className="font-inter text-[16px] font-medium text-ink" style={{ lineHeight: '24px' }}>
-              {graded.better}
-            </span>
-            <span className="font-sans text-[13px] font-medium" style={{ color: '#2fa84f', lineHeight: '20px' }}>
-              {graded.feedback}
-            </span>
-          </div>
+          )}
+
+          {/* ok & DB 표현과 다르면 → 이렇게도 쓸 수 있어요 (DB 저장 표현) */}
+          {graded.ok && showAlt && (
+            <div className="flex flex-col gap-2 rounded-[20px] bg-[#eef8f0] px-[18px] py-4">
+              <div className="flex items-center gap-1.5">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="7" stroke="#00a836" strokeWidth="1.5" />
+                  <path d="M5 8l2 2 4-4" stroke="#00a836" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="font-sans text-[14px] font-medium" style={{ color: '#00a836' }}>
+                  이렇게도 쓸 수 있어요
+                </span>
+              </div>
+              <span className="font-inter text-[16px] text-ink" style={{ lineHeight: '24px' }}>
+                {graded.better}
+              </span>
+            </div>
+          )}
         </div>
       )}
 
