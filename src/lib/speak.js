@@ -1,75 +1,74 @@
-import { supabase } from './supabase.js'
-
 // 영어 문장을 소리내어 읽어준다 (듣기 버튼).
-// 1순위: Groq PlayAI TTS(원어민급) → smooth-worker의 tts 액션으로 오디오를 받아 재생.
-// 실패(네트워크/미배포 등) 시: 브라우저 내장 Web Speech로 폴백.
-let currentAudio = null
-const cache = new Map() // text -> objectURL (같은 문장 재요청 방지 + 즉시 재생)
+// 브라우저 내장 Web Speech를 쓰되, 기기에 있는 음성 중 가장 자연스러운
+// (Natural/Neural/Online 계열, en-US 우선) 음성을 골라 최대한 원어민처럼 들리게 한다.
+// ※ 크롬/엣지 최신 브라우저엔 무료 뉴럴 음성이 포함되어 있어 품질이 크게 좋아진다.
+let current = null
 
-function b64ToBlobUrl(b64, mime) {
-  const bin = atob(b64)
-  const bytes = new Uint8Array(bin.length)
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-  return URL.createObjectURL(new Blob([bytes], { type: mime || 'audio/wav' }))
+// 음성 목록은 비동기로 로드될 수 있어 한 번 기다렸다가 고른다.
+function getVoicesAsync() {
+  return new Promise((resolve) => {
+    const synth = window.speechSynthesis
+    if (!synth) return resolve([])
+    const v = synth.getVoices()
+    if (v && v.length) return resolve(v)
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      resolve(synth.getVoices() || [])
+    }
+    synth.onvoiceschanged = finish
+    setTimeout(finish, 600)
+  })
 }
 
-function playUrl(url) {
-  stopSpeak()
-  const a = new Audio(url)
-  currentAudio = a
-  a.play().catch(() => {})
+// en-US 우선, 이름에 자연스러운 엔진 키워드가 있으면 가점.
+function pickVoice(voices) {
+  const enUS = voices.filter((v) => /^en[-_]?US/i.test(v.lang))
+  const pool = enUS.length ? enUS : voices.filter((v) => /^en/i.test(v.lang))
+  if (!pool.length) return null
+  const score = (v) => {
+    const n = (v.name || '').toLowerCase()
+    let s = 0
+    if (/natural|neural|enhanced|premium/.test(n)) s += 100
+    if (/online/.test(n)) s += 60
+    if (v.localService === false) s += 30 // 온라인(서버) 음성이 대체로 더 자연스러움
+    if (/google/.test(n)) s += 40
+    if (/microsoft/.test(n)) s += 25
+    if (/samantha|aria|jenny|ava|allison|emma|zoe|siri|natasha/.test(n)) s += 20
+    return s
+  }
+  return [...pool].sort((a, b) => score(b) - score(a))[0]
 }
 
-// 브라우저 내장 음성 (폴백)
-function speakBrowser(text) {
+let cachedVoice = null
+
+export async function speak(text) {
+  const t = String(text || '').trim()
   try {
     const synth = window.speechSynthesis
-    if (!synth || !text) return
+    if (!synth || !t) return
     synth.cancel()
-    const u = new SpeechSynthesisUtterance(String(text))
-    u.lang = 'en-US'
-    u.rate = 0.95
-    const voices = synth.getVoices()
-    const v = voices.find((x) => /en-US/i.test(x.lang)) || voices.find((x) => /^en/i.test(x.lang))
-    if (v) u.voice = v
+    if (!cachedVoice) {
+      const voices = await getVoicesAsync()
+      cachedVoice = pickVoice(voices)
+    }
+    const u = new SpeechSynthesisUtterance(t)
+    u.lang = (cachedVoice && cachedVoice.lang) || 'en-US'
+    u.rate = 0.96
+    u.pitch = 1
+    if (cachedVoice) u.voice = cachedVoice
+    current = u
     synth.speak(u)
   } catch {
     /* speech unsupported — no-op */
   }
 }
 
-export async function speak(text) {
-  const t = String(text || '').trim()
-  if (!t) return
-  // 캐시된 오디오는 즉시(동기) 재생 — 사용자 제스처 컨텍스트 유지에도 유리.
-  if (cache.has(t)) {
-    playUrl(cache.get(t))
-    return
-  }
-  try {
-    const { data, error } = await supabase.functions.invoke('smooth-worker', {
-      body: { action: 'tts', text: t },
-    })
-    if (error || !data?.audio) throw new Error(data?.error || 'tts failed')
-    const url = b64ToBlobUrl(data.audio, data.mime)
-    cache.set(t, url)
-    playUrl(url)
-  } catch {
-    speakBrowser(t)
-  }
-}
-
 export function stopSpeak() {
   try {
-    if (currentAudio) {
-      currentAudio.pause()
-      currentAudio = null
-    }
-  } catch {
-    /* no-op */
-  }
-  try {
     window.speechSynthesis && window.speechSynthesis.cancel()
+    current = null
   } catch {
     /* no-op */
   }
