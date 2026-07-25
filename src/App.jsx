@@ -21,6 +21,7 @@ import ConfirmDialog from './components/ConfirmDialog.jsx'
 import { findEntryByKo } from './data/diary.js'
 import { lookupWord, lookupFix } from './data/lookups.js'
 import { explainFix } from './lib/write.js'
+import { explainWord } from './lib/word.js'
 
 const USER_NAME = '현진'
 
@@ -42,6 +43,7 @@ export default function App() {
   const [activeWord, setActiveWord] = useState(null)
   const lookTimer = useRef(null)
   const fixReq = useRef(0)
+  const wordReq = useRef(0)
 
   const showToast = (message, undo, check) => setToast({ message, undo, check })
 
@@ -94,13 +96,21 @@ export default function App() {
   }
 
   // ---- word / correction popups (mock async lookups) ----
-  const tapWord = (wid, term, sentence) => {
+  const tapWord = async (wid, term, sentence) => {
     setActiveWord(wid)
+    const token = ++wordReq.current
     setWordPop({ open: true, term, loading: true })
-    clearTimeout(lookTimer.current)
-    lookTimer.current = setTimeout(() => {
-      setWordPop({ open: true, loading: false, ...lookupWord(term) })
-    }, 450)
+    // 뒤늦게 도착한 응답이 다른 단어를 덮어쓰지 않도록 토큰으로 가드.
+    const finish = (res) => {
+      if (wordReq.current === token) setWordPop({ open: true, loading: false, ...res })
+    }
+    // AI로 뜻/예문을 받아오고, 실패하거나 비면 로컬 사전(mock)으로 폴백.
+    try {
+      const res = await explainWord(term, sentence)
+      finish(res.kr ? res : lookupWord(term))
+    } catch {
+      finish(lookupWord(term))
+    }
   }
   const closeWordPop = () => {
     setWordPop({ open: false })

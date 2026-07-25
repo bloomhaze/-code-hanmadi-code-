@@ -1,9 +1,10 @@
 // Supabase Edge Function: smooth-worker (Groq 무료 AI)
-// action 으로 네 가지를 처리한다:
+// action 으로 다섯 가지를 처리한다:
 //   'grade'     — 작문 퀴즈 채점        body: { action, ko, answer, model }          → { ok, feedback }
 //   'translate' — 일기 한글→영어 번역   body: { action, text }                       → { sentences: [{ ko, en }] }
 //   'correct'   — 영어 일기 교정        body: { action, text }                       → { sentences: [{ ko, original, corrected }] }
 //   'explain'   — 교정 사유 설명        body: { action, original, corrected, phrase } → { reason }
+//   'word'      — 단어 뜻/예문          body: { action, word, sentence }             → { kr, ex, exKr }
 //
 // 키 설정(Secrets): GROQ_API_KEY  (console.groq.com, 무료, 카드 불필요)
 
@@ -94,6 +95,19 @@ function explainPrompt(original: string, corrected: string, phrase: string) {
   )
 }
 
+function wordPrompt(word: string, sentence: string) {
+  return (
+    '너는 영어 학습자를 위한 친절한 영어 사전이야. 학습자가 문장에서 단어(또는 표현)를 탭했어.\n' +
+    (sentence ? '문장: ' + sentence + '\n' : '') +
+    '단어/표현: "' + word + '"\n' +
+    '요구사항:\n' +
+    '- kr: 이 문맥에서의 한국어 뜻. 앞에 품사를 괄호로 붙여줘. 예: "(동사) 끌어들이다, 유치하다"\n' +
+    '- ex: 그 단어/표현을 사용한 자연스럽고 쉬운 영어 예문 1개\n' +
+    '- exKr: 그 예문의 한국어 번역\n' +
+    '반드시 이 JSON만 반환: {"kr": "...", "ex": "...", "exKr": "..."}'
+  )
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   const json = (body: unknown, status = 200) =>
@@ -121,6 +135,14 @@ Deno.serve(async (req) => {
       const { data, error } = await callGroq(key, explainPrompt(original, corrected, phrase))
       if (error) return json({ error })
       return json({ reason: data.reason || '' })
+    }
+
+    if (action === 'word') {
+      const word = (body.word || '').trim()
+      if (!word) return json({ error: '단어가 없어요.' })
+      const { data, error } = await callGroq(key, wordPrompt(word, (body.sentence || '').trim()))
+      if (error) return json({ error })
+      return json({ kr: data.kr || '', ex: data.ex || '', exKr: data.exKr || '' })
     }
 
     const text = (body.text || '').trim()
