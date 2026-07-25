@@ -1,8 +1,8 @@
-// Supabase Edge Function: grade-writing (Groq 무료 채점)
-// 학습자의 영작을 AI로 채점한다.
-// 기준(엄격): 의미가 통하고 + 문법이 모두 정확하고 + 철자가 모두 정확하면 ok=true.
-//            문법/철자 오류가 하나라도 있으면 무조건 ok=false.
-//            (영어는 다양한 표현이 가능하므로 참고 정답과 표현이 달라도 위 조건을 만족하면 정답)
+// Supabase Edge Function: smooth-worker (Groq 무료 AI)
+// action 으로 세 가지를 처리한다:
+//   'grade'     — 작문 퀴즈 채점        body: { action, ko, answer, model } → { ok, feedback }
+//   'translate' — 일기 한글→영어 번역   body: { action, text }              → { sentences: [{ ko, en }] }
+//   'correct'   — 영어 일기 교정        body: { action, text }              → { sentences: [{ ko, original, corrected }] }
 //
 // 키 설정(Secrets): GROQ_API_KEY  (console.groq.com, 무료, 카드 불필요)
 
@@ -11,18 +11,69 @@ const cors = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-function buildPrompt(ko: string, answer: string, model: string) {
+const GROQ_MODEL = 'llama-3.3-70b-versatile'
+
+async function callGroq(key: string, prompt: string): Promise<{ data?: any; error?: string }> {
+  const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      temperature: 0,
+      response_format: { type: 'json_object' },
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  })
+  const j = await r.json().catch(() => ({}))
+  if (!r.ok) return { error: `AI 오류(${r.status}): ${j?.error?.message || JSON.stringify(j).slice(0, 200)}` }
+  const content = j?.choices?.[0]?.message?.content || ''
+  if (!content) return { error: 'AI 응답이 비었어요.' }
+  try {
+    return { data: JSON.parse(content) }
+  } catch {
+    const m = content.match(/\{[\s\S]*\}/)
+    if (m) {
+      try {
+        return { data: JSON.parse(m[0]) }
+      } catch {
+        /* fall through */
+      }
+    }
+    return { error: '응답 해석 실패' }
+  }
+}
+
+function gradePrompt(ko: string, answer: string, model: string) {
   return (
     '너는 매우 엄격한 영어 첨삭 선생님이야. 학습자가 한국어 문장을 영어로 작문했어.\n' +
     '평가 기준:\n' +
-    '- (1) 의미가 통하고(한국어 뜻을 제대로 전달) + (2) 문법이 모두 정확하고 + (3) 철자가 모두 정확하면 ok=true.\n' +
+    '- (1) 의미가 통하고 + (2) 문법이 모두 정확하고 + (3) 철자가 모두 정확하면 ok=true.\n' +
     '- 문법 오류나 철자 오류가 하나라도 있으면 무조건 ok=false.\n' +
-    '- 영어는 다양한 표현이 가능하니, 참고 정답과 표현/어휘가 달라도 위 세 조건을 만족하면 ok=true.\n' +
+    '- 영어는 다양한 표현이 가능하니, 참고 정답과 표현이 달라도 위 세 조건을 만족하면 ok=true.\n' +
     '- 대소문자, 관사(a/the), 단수/복수, 시제, 전치사 오류도 문법 오류로 본다.\n' +
-    '한국어 문장: ' + ko + '\n' +
-    '학습자 영작: ' + answer + '\n' +
-    '참고 정답(DB): ' + model + '\n' +
-    '반드시 아래 JSON만 반환해: {"ok": true 또는 false, "feedback": "한국어로 1~2문장 피드백 (틀렸다면 무엇이 틀렸는지)"}'
+    '한국어 문장: ' + ko + '\n학습자 영작: ' + answer + '\n참고 정답(DB): ' + model + '\n' +
+    '반드시 이 JSON만 반환: {"ok": true/false, "feedback": "한국어 1~2문장 피드백"}'
+  )
+}
+
+function translatePrompt(text: string) {
+  return (
+    '너는 한국어 일기를 자연스러운 원어민 영어로 번역하는 번역가야.\n' +
+    '아래 일기를 문장 단위로 나누고, 각 문장을 자연스럽고 문법적으로 정확한 영어로 번역해.\n' +
+    '일기:\n' + text + '\n' +
+    '반드시 이 JSON만 반환: {"sentences": [{"ko": "원문 한국어 문장", "en": "English translation"}]}'
+  )
+}
+
+function correctPrompt(text: string) {
+  return (
+    '너는 영어 첨삭 선생님이야. 학습자가 영어로 일기를 썼어.\n' +
+    '아래 일기를 문장 단위로 나누고, 각 문장마다 다음을 제공해:\n' +
+    '- ko: 그 문장의 한국어 뜻\n' +
+    '- original: 학습자가 쓴 원문 그대로\n' +
+    '- corrected: 문법·철자·자연스러움을 고친 버전 (이미 완벽하면 original과 동일하게)\n' +
+    '일기:\n' + text + '\n' +
+    '반드시 이 JSON만 반환: {"sentences": [{"ko": "...", "original": "...", "corrected": "..."}]}'
   )
 }
 
@@ -32,39 +83,34 @@ Deno.serve(async (req) => {
     new Response(JSON.stringify(body), { status, headers: { ...cors, 'content-type': 'application/json' } })
 
   try {
-    const { ko = '', answer = '', model = '' } = await req.json()
-    if (!answer.trim()) return json({ ok: false, feedback: '내용을 입력해주세요.' })
+    const body = await req.json()
+    const action = body.action || 'grade'
+    const key = Deno.env.get('GROQ_API_KEY')
+    if (!key) return json({ error: 'GROQ_API_KEY가 설정되지 않았어요.' })
 
-    const groqKey = Deno.env.get('GROQ_API_KEY')
-    if (!groqKey) return json({ ok: false, feedback: 'GROQ_API_KEY가 설정되지 않았어요.' })
-
-    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', authorization: `Bearer ${groqKey}` },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        temperature: 0,
-        response_format: { type: 'json_object' },
-        messages: [{ role: 'user', content: buildPrompt(ko, answer, model) }],
-      }),
-    })
-    const j = await r.json().catch(() => ({}))
-    if (!r.ok) {
-      const msg = j?.error?.message || JSON.stringify(j).slice(0, 300)
-      return json({ ok: false, feedback: `AI 오류(${r.status}): ${msg}` })
+    if (action === 'grade') {
+      const answer = (body.answer || '').trim()
+      if (!answer) return json({ ok: false, feedback: '내용을 입력해주세요.' })
+      const { data, error } = await callGroq(key, gradePrompt(body.ko || '', answer, body.model || ''))
+      if (error) return json({ ok: false, feedback: error })
+      return json({ ok: !!data.ok, feedback: data.feedback || '' })
     }
-    const content = j?.choices?.[0]?.message?.content || ''
-    if (!content) return json({ ok: false, feedback: 'AI 응답이 비었어요: ' + JSON.stringify(j).slice(0, 300) })
 
-    let data: { ok?: boolean; feedback?: string }
-    try {
-      data = JSON.parse(content)
-    } catch {
-      const m = content.match(/\{[\s\S]*\}/)
-      data = m ? JSON.parse(m[0]) : { ok: false, feedback: '채점 응답 해석 실패: ' + content.slice(0, 200) }
+    const text = (body.text || '').trim()
+    if (!text) return json({ error: '내용을 입력해주세요.' })
+
+    if (action === 'translate') {
+      const { data, error } = await callGroq(key, translatePrompt(text))
+      if (error) return json({ error })
+      return json({ sentences: Array.isArray(data.sentences) ? data.sentences : [] })
     }
-    return json({ ok: !!data.ok, feedback: data.feedback || '' })
+    if (action === 'correct') {
+      const { data, error } = await callGroq(key, correctPrompt(text))
+      if (error) return json({ error })
+      return json({ sentences: Array.isArray(data.sentences) ? data.sentences : [] })
+    }
+    return json({ error: 'unknown action' })
   } catch (e) {
-    return json({ ok: false, feedback: '서버 오류: ' + String(e) })
+    return json({ error: String(e) })
   }
 })

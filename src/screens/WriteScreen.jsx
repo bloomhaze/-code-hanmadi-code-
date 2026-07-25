@@ -4,6 +4,7 @@ import WordSearchSheet from '../components/WordSearchSheet.jsx'
 import { speak, stopSpeak } from '../lib/speak.js'
 import { MOCK_KO_RESULT, MOCK_EN_RESULT } from '../data/lookups.js'
 import { randomTopic } from '../data/writeTopics.js'
+import { translateOrCorrect } from '../lib/write.js'
 
 const KO_RE = /[ᄀ-ᇿ㄰-㆏가-힣]/g
 
@@ -47,13 +48,18 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
     setBody(v)
   }
 
-  const submit = () => {
-    if (!ctaActive) return
+  const submit = async () => {
+    if (!ctaActive || step === 'loading') return
     setStep('loading')
-    timer.current = setTimeout(() => {
+    try {
+      const result = await translateOrCorrect(body, mode)
+      setData(result)
+      setStep('result')
+    } catch {
+      // AI 함수 미배포/오류 시 데모용 mock으로 폴백
       setData(isEn ? MOCK_EN_RESULT : MOCK_KO_RESULT)
       setStep('result')
-    }, 1300)
+    }
   }
 
   const togglePlay = () => {
