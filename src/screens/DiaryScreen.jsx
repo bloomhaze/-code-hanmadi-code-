@@ -12,9 +12,15 @@ export default function DiaryScreen({ onWrite, onOpen, deletedIds }) {
   const q = query.trim().toLowerCase()
   const visible = DIARY_ENTRIES.filter((e) => !deletedIds?.has(e.id))
   const list = visible.filter(
-    (e) => !q || e.preview.toLowerCase().includes(q) || e.date.toLowerCase().includes(q),
+    (e) =>
+      !q ||
+      e.preview.toLowerCase().includes(q) ||
+      (e.allEn && e.allEn.toLowerCase().includes(q)) ||
+      e.date.toLowerCase().includes(q),
   )
   const hasItems = visible.length > 0
+  const noDiaries = visible.length === 0 // 작성한 일기 자체가 없음
+  const noSearchResults = hasItems && q && list.length === 0 // 검색 결과만 없음
 
   return (
     <>
@@ -107,7 +113,15 @@ export default function DiaryScreen({ onWrite, onOpen, deletedIds }) {
             )
           })}
 
-          {list.length === 0 && (
+          {/* search yielded nothing (but diaries do exist) */}
+          {noSearchResults && (
+            <div className="flex flex-col items-center pt-[180px]">
+              <span className="font-inter text-[16px] font-medium text-ink">관련된 일기가 없어요</span>
+            </div>
+          )}
+
+          {/* no diaries written at all */}
+          {noDiaries && (
             <div className="flex flex-col items-center gap-1.5 pt-[180px]">
               <span className="font-inter text-[16px] font-medium text-ink">작성한 일기가 없어요</span>
               <span className="font-inter text-[13px] font-light text-muted-2">
