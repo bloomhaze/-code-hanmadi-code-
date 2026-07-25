@@ -26,12 +26,14 @@ export async function translateOrCorrect(text, mode) {
     return withAll({ sentences }, 'translate')
   }
 
-  // correct → 원문/교정문 diff로 하이라이트 세그먼트 생성
+  // correct → 원문/교정문 diff로 하이라이트 세그먼트 생성.
+  // 바뀐 부분이 하나도 없으면 '완벽하게 쓴 문장'으로 표시(perfect).
   const sentences = data.sentences.map((s) => {
     const original = s.original || ''
     const corrected = s.corrected || original
     const { enSegs, fixSegs } = diffSegs(original, corrected)
-    return { correction: true, ko: s.ko || '', enSegs, fixSegs }
+    const perfect = !fixSegs.some((g) => g.kind === 'f') && !enSegs.some((g) => g.kind === 'w')
+    return { correction: true, perfect, ko: s.ko || '', en: corrected, enSegs, fixSegs }
   })
   return withAll({ sentences }, 'correct')
 }

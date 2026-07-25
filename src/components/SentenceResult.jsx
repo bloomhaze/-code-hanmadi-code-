@@ -137,7 +137,23 @@ export default function SentenceResult({
               >
                 <span className="mb-1.5 font-sans text-[14px] font-light leading-5 text-sub">{s.ko}</span>
 
-                {isCorrection ? (
+                {isCorrection && s.perfect ? (
+                  /* 완벽하게 쓴 문장 — 교정 없이 문장만 표시 */
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="font-inter text-[16px] text-ink"
+                      style={{ lineHeight: '28.8px' }}
+                    >
+                      {s.en}
+                    </span>
+                    <span
+                      className="shrink-0 whitespace-nowrap rounded-full bg-[#eafaf0] px-2 py-[3px] font-sans text-[11px] font-medium"
+                      style={{ color: '#12b76a', letterSpacing: '-.2px' }}
+                    >
+                      완벽해요
+                    </span>
+                  </div>
+                ) : isCorrection ? (
                   <>
                     {/* original — 바뀐(빨간) 부분은 취소선 표시(클릭 X) */}
                     <div className="font-inter text-[16px] text-ink" style={{ lineHeight: '28.8px' }}>
