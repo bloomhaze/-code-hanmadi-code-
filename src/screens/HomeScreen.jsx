@@ -73,7 +73,7 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
   return (
     <div className="relative flex h-full flex-col bg-white">
       {/* ===== HEADER : date row + week strip ===== */}
-      <div className="shrink-0 bg-white pt-2">
+      <div className="shrink-0 bg-white pt-4">
         {/* date row */}
         <div className="flex h-9 items-center justify-between px-4 py-0.5">
           <button
