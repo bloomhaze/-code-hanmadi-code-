@@ -6,9 +6,10 @@
 //
 // 배포:
 //   supabase functions deploy grade-writing
-// 키 설정(둘 중 하나):
-//   supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
-//   supabase secrets set OPENAI_API_KEY=sk-...
+// 키 설정(아래 중 하나 — Gemini가 무료 티어라 추천):
+//   supabase secrets set GEMINI_API_KEY=AIza...        (Google AI Studio, 무료)
+//   supabase secrets set ANTHROPIC_API_KEY=sk-ant-...  (유료)
+//   supabase secrets set OPENAI_API_KEY=sk-...         (유료)
 import { serve } from 'https://deno.land/std@0.203.0/http/server.ts'
 
 const cors = {
@@ -41,11 +42,26 @@ serve(async (req) => {
     if (!answer.trim()) return json({ ok: false, feedback: '내용을 입력해주세요.' })
 
     const prompt = buildPrompt(ko, answer, model)
+    const geminiKey = Deno.env.get('GEMINI_API_KEY')
     const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY')
     const openaiKey = Deno.env.get('OPENAI_API_KEY')
     let content = ''
 
-    if (anthropicKey) {
+    if (geminiKey) {
+      const r = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`,
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0, responseMimeType: 'application/json' },
+          }),
+        },
+      )
+      const j = await r.json()
+      content = j?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    } else if (anthropicKey) {
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -75,7 +91,7 @@ serve(async (req) => {
       const j = await r.json()
       content = j?.choices?.[0]?.message?.content || ''
     } else {
-      return json({ error: 'no LLM key configured (set ANTHROPIC_API_KEY or OPENAI_API_KEY)' }, 500)
+      return json({ error: 'no LLM key configured (set GEMINI_API_KEY, ANTHROPIC_API_KEY, or OPENAI_API_KEY)' }, 500)
     }
 
     let data: { ok?: boolean; feedback?: string }
