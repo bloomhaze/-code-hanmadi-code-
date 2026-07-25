@@ -1,6 +1,10 @@
 import { supabase } from './supabase.js'
 
-// 영작 채점 — Supabase Edge Function(grade-writing)의 AI 채점을 호출한다.
+// 배포된 Edge Function 이름. (대시보드 에디터가 자동으로 'smooth-worker'로
+// 배포함 — 나중에 grade-writing 으로 재배포하면 이 값만 바꾸면 됨)
+const FN_NAME = 'smooth-worker'
+
+// 영작 채점 — Supabase Edge Function의 AI 채점을 호출한다.
 // 함수 미배포/네트워크 오류 시에는 "저장 정답과 정확히 일치할 때만 정답"인
 // 엄격한 폴백으로 처리한다(오답을 정답으로 통과시키지 않기 위해).
 export async function gradeWriting(cur, answer) {
@@ -8,7 +12,7 @@ export async function gradeWriting(cur, answer) {
   const ko = cur?.ko || cur?.exKr || cur?.kr || ''
 
   try {
-    const { data, error } = await supabase.functions.invoke('grade-writing', {
+    const { data, error } = await supabase.functions.invoke(FN_NAME, {
       body: { ko, answer, model },
     })
     if (error || !data || typeof data.ok !== 'boolean') throw error || new Error('bad grade response')
