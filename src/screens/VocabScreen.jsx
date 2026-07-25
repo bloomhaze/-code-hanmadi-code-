@@ -324,7 +324,17 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz, locked = fa
             })}
           </div>
 
-          {items.length === 0 && (
+          {/* search yielded nothing */}
+          {items.length === 0 && q && (
+            <div className="mt-[120px] flex flex-col items-center">
+              <span className="font-sans text-[16px] font-medium text-ink">
+                검색한 단어·표현·뜻이 없어요
+              </span>
+            </div>
+          )}
+
+          {/* nothing saved at all */}
+          {items.length === 0 && !q && (
             <div className="mt-[120px] flex flex-col items-center gap-2">
               <span className="font-sans text-[16px] font-medium text-ink">저장한 내용이 없어요</span>
               <span className="font-sans text-[13px] font-light text-muted-2">
