@@ -3,7 +3,8 @@
 
 const W = (term, kr, ex, exKr) => ({ kind: 'word', term, kr, ex, exKr })
 const P = (term, kr, ex, exKr) => ({ kind: 'phrase', term, kr, ex, exKr })
-const S = (term, ko) => ({ kind: 'sentence', term, ko })
+// hint = 이 문장의 핵심 표현(작문 퀴즈 "이 표현 쓰기"에 노출)
+const S = (term, ko, hint) => ({ kind: 'sentence', term, ko, hint })
 
 export const VOCAB_DATA = {
   word: [
@@ -20,9 +21,9 @@ export const VOCAB_DATA = {
     P('brutally honest', '가차없이 솔직한', 'Can I be brutally honest with you?', '너한테 아주 솔직하게 말해도 될까?'),
   ],
   sentence: [
-    S('I ran into an old friend at a café today.', '오늘 카페에서 오랜 친구를 만났다.'),
-    S('We talked about all sorts of things over coffee.', '커피 마시면서 별별 얘기를 다 했다.'),
-    S('It had been so long that I thought it would be awkward.', '정말 오랜만이라 어색할 줄 알았다.'),
-    S('I want to live somewhere without summer.', '여름이 없는 나라로 떠나고싶다.'),
+    S('I ran into an old friend at a café today.', '오늘 카페에서 오랜 친구를 만났다.', 'ran into'),
+    S('We talked about all sorts of things over coffee.', '커피 마시면서 별별 얘기를 다 했다.', 'all sorts of'),
+    S('It had been so long that I thought it would be awkward.', '정말 오랜만이라 어색할 줄 알았다.', 'had been so long'),
+    S('I want to live somewhere without summer.', '여름이 없는 나라로 떠나고싶다.', 'somewhere without'),
   ],
 }

@@ -64,6 +64,8 @@ export function blankAnswerFor(cur) {
 export function writeHintFor(cur) {
   if (!cur) return ''
   if (cur.kind !== 'sentence') return cur.term || ''
+  // 문장에 지정된 핵심 표현이 있으면 그걸 우선 노출 (예: "ran into")
+  if (cur.hint) return cur.hint
   const model = cur.term || ''
   const low = model.toLowerCase()
   for (const p of VOCAB_DATA.phrase) if (low.includes(p.term.toLowerCase())) return p.term
