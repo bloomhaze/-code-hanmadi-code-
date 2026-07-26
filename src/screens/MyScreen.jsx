@@ -1,11 +1,30 @@
+import { useState } from 'react'
 import { ProfileAvatar, GoogleLogo, ChevronRightSmall, ExternalArrow } from '../components/icons.jsx'
 
 const ACCENT = '#0066FF'
+
+// 프로필 아바타 — 구글 프로필 사진이 있으면 그걸 쓰고, 없거나 로드 실패 시 기본 한마디 아바타.
+function Avatar({ url }) {
+  const [broken, setBroken] = useState(false)
+  if (url && !broken) {
+    return (
+      <img
+        src={url}
+        alt="프로필"
+        referrerPolicy="no-referrer"
+        onError={() => setBroken(true)}
+        className="h-full w-full rounded-full object-cover"
+      />
+    )
+  }
+  return <ProfileAvatar />
+}
 
 // 마이페이지 — profile, stats, settings menu, premium entry.
 export default function MyScreen({
   userName = '현진',
   email,
+  avatarUrl = '',
   isGuest = false,
   onNotif,
   onLogout,
@@ -60,8 +79,8 @@ export default function MyScreen({
           {/* profile + stats */}
           <div className="flex flex-col gap-2">
             <div className="flex h-[100px] items-center gap-3.5 rounded-[20px] bg-[#f7f7f7] p-[18px]">
-              <div className="h-[54px] w-[54px] shrink-0">
-                <ProfileAvatar />
+              <div className="h-[54px] w-[54px] shrink-0 overflow-hidden rounded-full">
+                <Avatar url={avatarUrl} />
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-[5px]">
                 <span className="font-sans text-[17px] font-semibold text-ink-2" style={{ letterSpacing: '-.3px' }}>
