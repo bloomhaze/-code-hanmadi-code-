@@ -147,6 +147,8 @@ function translatePrompt(text: string) {
     '- phrases: 그 en 문장 안에 등장하는 아래 두 종류를 en에 나타난 표면형(철자·활용형) 그대로 배열로 담아:\n' +
     '    (1) 구동사(phrasal verb) 예: run into, catch up on, come across, look forward to, give up\n' +
     '    (2) 관용 표현/이디엄(idiom) 예: piece of cake, break the ice, under the weather, once in a while, on the same page\n' +
+    '  ★ 분리형 구동사(목적어가 동사와 부사 사이에 끼는 경우)는 문장에 나타난 전체 구간을 그대로 넣어. ' +
+    '예: "tried it out", "picked it up", "turn it off", "figured it out" (X: "try out", "tried out")\n' +
     '  단어 하나짜리는 넣지 말고, 반드시 두 단어 이상으로 묶여야 뜻이 통하는 표현만. 없으면 빈 배열 [].\n' +
     '일기:\n' + text + '\n' +
     '반드시 이 JSON만 반환: {"sentences": [{"ko": "...", "en": "...", "phrases": ["..."]}]}'
