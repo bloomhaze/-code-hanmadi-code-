@@ -140,10 +140,17 @@ function gradePrompt(ko: string, answer: string, model: string) {
 
 function translatePrompt(text: string) {
   return (
-    '너는 한국어 일기를 자연스러운 원어민 영어로 번역하는 번역가야.\n' +
+    '너는 한국어 일기를 "원어민이 실제로 말하는" 자연스러운 영어로 옮기는 원어민 번역가야.\n' +
+    '★ 번역 원칙(매우 중요):\n' +
+    '- 절대 단어 대 단어 직역하지 마. 문장의 의미·뉘앙스를 파악해 원어민이 자기 일기에 쓸 법한 자연스럽고 구어적인 영어로 다시 써.\n' +
+    '- 콩글리쉬/어색한 표현 금지. 예: "모듬회"→"assorted sashimi"(O) "mixed raw fish dish"(X), ' +
+    '"약속을 잡고 갔는데"→"we met up"/"we made plans and went"(O) "made a sudden plan and went"(X).\n' +
+    '- 한국 음식·문화 용어는 영어권 통용 표현으로(sashimi, tteokbokki, kimchi 등).\n' +
+    '- 격식 빼고 친구한테 말하듯 캐주얼한 일기체. 대신 문법·관사·시제·전치사는 정확히.\n' +
+    '- 필요하면 과감히 의역. "원어민이 이 상황을 어떻게 말할까?"를 최우선으로.\n' +
     '아래 일기를 문장 단위로 나누고, 각 문장마다 다음을 제공해:\n' +
     '- ko: 원문 한국어 문장\n' +
-    '- en: 자연스럽고 문법적으로 정확한 영어 번역\n' +
+    '- en: 위 원칙에 따른 자연스러운 원어민 영어\n' +
     '- phrases: 그 en 문장 안에 등장하는 아래 두 종류를 en에 나타난 표면형(철자·활용형) 그대로 배열로 담아:\n' +
     '    (1) 구동사(phrasal verb) 예: run into, catch up on, come across, look forward to, give up\n' +
     '    (2) 관용 표현/이디엄(idiom) 예: piece of cake, break the ice, under the weather, once in a while, on the same page\n' +
