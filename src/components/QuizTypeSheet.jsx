@@ -32,8 +32,8 @@ export default function QuizTypeSheet({ onStart, onClose }) {
                 onClick={() => setType(t.key)}
                 className="flex h-[55px] items-center gap-3.5 rounded-[20px] px-5"
                 style={{
-                  background: active ? '#eef4ff' : '#f7f7f8',
-                  boxShadow: active ? 'inset 0 0 0 1.5px #0066ff' : 'none',
+                  background: '#f7f7f8',
+                  boxShadow: active ? 'inset 0 0 0 2px #121212' : 'none',
                 }}
               >
                 <span
