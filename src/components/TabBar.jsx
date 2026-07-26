@@ -17,8 +17,8 @@ export default function TabBar({ active, onChange }) {
       className="z-20 w-full shrink-0"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
-      {/* 64px tab row — items spread across the full column width (responsive) */}
-      <div className="flex h-16 w-full justify-around px-4 py-2.5">
+      {/* 56px tab row (표준 하단탭 높이) — 컬럼 전체 폭에 균등 배치 */}
+      <div className="flex h-14 w-full items-center justify-around px-4">
         {TABS.map(({ key, label, Icon }) => {
           const isActive = active === key
           const color = isActive ? '#121212' : '#c4c4c4'
@@ -46,8 +46,6 @@ export default function TabBar({ active, onChange }) {
           )
         })}
       </div>
-      {/* home-indicator space */}
-      <div className="h-6" />
     </div>
   )
 }
