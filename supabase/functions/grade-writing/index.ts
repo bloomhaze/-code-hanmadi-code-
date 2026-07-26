@@ -177,9 +177,15 @@ function translatePrompt(text: string) {
     '아래 일기를 문장 단위로 나누고, 각 문장마다 다음을 제공해:\n' +
     '- ko: 원문 한국어 문장\n' +
     '- en: 위 원칙과 예시 수준의 자연스러운 원어민 영어\n' +
-    '- phrases: 그 en 문장 안에 등장하는 아래 두 종류를 en에 나타난 표면형(철자·활용형) 그대로 배열로 담아:\n' +
+    '- phrases: 그 en 문장 안에 등장하는 아래 세 종류를 en에 나타난 표면형(철자·활용형) 그대로 배열로 담아:\n' +
     '    (1) 구동사(phrasal verb) 예: run into, catch up on, come across, look forward to, give up\n' +
     '    (2) 관용 표현/이디엄(idiom) 예: piece of cake, break the ice, under the weather, once in a while, on the same page\n' +
+    '    (3) 하나의 뜻으로 굳어진 전치사·부사 표현 — 개별 단어로 쪼개면 뜻이 안 통하고 통째로 외워야 하는 표현. ' +
+    '예: at the last minute(막판에), in the meantime(그동안에), out of nowhere(난데없이), on purpose(일부러), ' +
+    'for a while(한동안), all of a sudden(갑자기), by the way(그런데), in advance(미리), at least(적어도), ' +
+    'as soon as(~하자마자), in the end(결국), a couple of(두어 개의), make my day(하루를 행복하게 하다)\n' +
+    '  ★ (3)번이 특히 중요해. "at the last minute" 같은 표현은 반드시 통째로 한 덩어리로 넣어. ' +
+    'at, the, last, minute 처럼 따로 넣으면 안 돼.\n' +
     '  ★ 분리형 구동사(목적어가 동사와 부사 사이에 끼는 경우)는 문장에 나타난 전체 구간을 그대로 넣어. ' +
     '예: "tried it out", "picked it up", "turn it off", "figured it out" (X: "try out", "tried out")\n' +
     '  단어 하나짜리는 넣지 말고, 반드시 두 단어 이상으로 묶여야 뜻이 통하는 표현만. 없으면 빈 배열 [].\n' +
