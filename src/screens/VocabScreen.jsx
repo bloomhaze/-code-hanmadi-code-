@@ -8,7 +8,7 @@ import {
 } from '../components/icons.jsx'
 import { hlSegs } from '../lib/text.js'
 import { VOCAB_DATA } from '../data/vocab.js'
-import { speak } from '../lib/speak.js'
+import { speak, stopSpeak } from '../lib/speak.js'
 
 const ACCENT = '#0066FF'
 const TABS = [
@@ -22,7 +22,7 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
   const [tab, setTab] = useState('word')
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
-  const [listen, setListen] = useState({})
+  const [playing, setPlaying] = useState(null) // 현재 재생 중인 카드 key (하나만)
   const [bookmark, setBookmark] = useState({}) // key -> bool (default saved/true)
   const [rollIdx, setRollIdx] = useState(0)
 
@@ -46,6 +46,9 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
   }, [quizPool.length])
   const quizWord = quizPool.length ? quizPool[rollIdx % quizPool.length] : ''
 
+  // 화면을 벗어나면(탭 전환 등) 재생 중이던 음성을 멈춘다.
+  useEffect(() => () => stopSpeak(), [])
+
   const q = query.trim().toLowerCase()
   const matches = (it) =>
     !q ||
@@ -58,9 +61,15 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
     .filter(({ it }) => matches(it))
 
   const isSaved = (key) => (bookmark[key] === undefined ? true : bookmark[key])
+  // 켜면 재생(파랑), 다시 누르면 멈춤, 다 들으면 자동 off. 한 번에 하나만.
   const toggleListen = (key, text) => {
-    setListen((s) => ({ ...s, [key]: !s[key] }))
-    if (!listen[key]) speak(text)
+    if (playing === key) {
+      stopSpeak()
+      setPlaying(null)
+      return
+    }
+    setPlaying(key)
+    speak(text, () => setPlaying((cur) => (cur === key ? null : cur)))
   }
   const toggleBookmark = (key) => {
     const cur = isSaved(key)
@@ -213,7 +222,7 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
           <div className="flex flex-col gap-3">
             {items.map(({ it, key }) => {
               const saved = isSaved(key)
-              const ls = !!listen[key]
+              const ls = playing === key
               if (it.kind === 'sentence') {
                 return (
                   <div
