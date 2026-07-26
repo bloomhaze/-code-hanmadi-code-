@@ -96,13 +96,18 @@ const cors = {
 const GROQ_MODEL = 'llama-3.3-70b-versatile'
 const SMART_MODEL = 'openai/gpt-oss-120b' // 번역·교정 등 품질이 중요한 작업용 (Groq 무료)
 
-async function callGroq(key: string, prompt: string, model: string = GROQ_MODEL): Promise<{ data?: any; error?: string }> {
+async function callGroq(
+  key: string,
+  prompt: string,
+  model: string = GROQ_MODEL,
+  temperature = 0,
+): Promise<{ data?: any; error?: string }> {
   const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${key}` },
     body: JSON.stringify({
       model,
-      temperature: 0,
+      temperature,
       response_format: { type: 'json_object' },
       messages: [{ role: 'user', content: prompt }],
     }),
@@ -141,17 +146,37 @@ function gradePrompt(ko: string, answer: string, model: string) {
 
 function translatePrompt(text: string) {
   return (
-    '너는 한국어 일기를 "원어민이 실제로 말하는" 자연스러운 영어로 옮기는 원어민 번역가야.\n' +
+    '너는 한국어 일기를 원어민이 자기 일기장에 쓸 법한, 세련되고 완전히 자연스러운 영어로 옮기는 최고 수준의 번역가야. ' +
+    'ChatGPT처럼 매끄럽고 감정이 살아있는 영어를 뽑아내야 해.\n' +
+    '\n' +
+    '★ 작업 순서(머릿속으로):\n' +
+    '1) 먼저 각 문장이 "진짜로 말하려는 의미와 감정"을 파악해.\n' +
+    '2) 그 의미를 한국어 어순·단어에 얽매이지 말고, 원어민이 그 상황을 자기 일기에 어떻게 쓸지 상상해서 새로 써.\n' +
+    '3) 어색하면 문장을 합치거나 나눠도 되고, 접속사(but, and, so, that)로 자연스럽게 이어. 감정 표현은 살려서.\n' +
+    '\n' +
     '★ 번역 원칙(매우 중요):\n' +
-    '- 절대 단어 대 단어 직역하지 마. 문장의 의미·뉘앙스를 파악해 원어민이 자기 일기에 쓸 법한 자연스럽고 구어적인 영어로 다시 써.\n' +
-    '- 콩글리쉬/어색한 표현 금지. 예: "모듬회"→"assorted sashimi"(O) "mixed raw fish dish"(X), ' +
-    '"약속을 잡고 갔는데"→"we met up"/"we made plans and went"(O) "made a sudden plan and went"(X).\n' +
+    '- 절대 단어 대 단어 직역하지 마. 직역은 실패야.\n' +
+    '- 콩글리쉬/어색한 표현 절대 금지.\n' +
     '- 한국 음식·문화 용어는 영어권 통용 표현으로(sashimi, tteokbokki, kimchi 등).\n' +
-    '- 격식 빼고 친구한테 말하듯 캐주얼한 일기체. 대신 문법·관사·시제·전치사는 정확히.\n' +
-    '- 필요하면 과감히 의역. "원어민이 이 상황을 어떻게 말할까?"를 최우선으로.\n' +
+    '- 격식 빼고 자연스러운 일기체. 대신 문법·관사·시제·전치사·관용구는 원어민 수준으로 정확히.\n' +
+    '- "기분이 좋았다" 같은 감정은 밋밋하게 "I was happy"로 끝내지 말고 ' +
+    '"it really made my day", "it put me in a great mood", "I couldn\'t have been happier" 처럼 생생하게.\n' +
+    '\n' +
+    '★ 참고 예시 (이 수준·스타일 그대로 뽑아내):\n' +
+    '입력: "오늘 남자친구랑 모듬회를 먹었다. 갑자기 약속을 잡고 갔는데 너무 맛있어서 기분이좋았다"\n' +
+    '좋은 번역(O): "Today, my boyfriend and I went out for an assorted sashimi platter. ' +
+    'It was a spontaneous plan, but the food was so good that it put me in a great mood."\n' +
+    '또는(O): "Today, my boyfriend and I had an assorted sashimi platter. ' +
+    'We made plans at the last minute, and it turned out to be so delicious that it really made my day."\n' +
+    '나쁜 번역(X): "Today I ate mixed raw fish dish with my boyfriend. ' +
+    'We made a sudden plan and went, and it was so delicious that I felt good." ← 콩글리쉬·직역, 절대 이렇게 하지 마.\n' +
+    '\n' +
+    '★ 표현 참고: "갑자기 약속을 잡다"→"made plans at the last minute"/"it was a spontaneous plan", ' +
+    '"모듬회"→"assorted sashimi (platter)", "너무 맛있어서"→"it was so good that"/"it turned out to be so delicious that".\n' +
+    '\n' +
     '아래 일기를 문장 단위로 나누고, 각 문장마다 다음을 제공해:\n' +
     '- ko: 원문 한국어 문장\n' +
-    '- en: 위 원칙에 따른 자연스러운 원어민 영어\n' +
+    '- en: 위 원칙과 예시 수준의 자연스러운 원어민 영어\n' +
     '- phrases: 그 en 문장 안에 등장하는 아래 두 종류를 en에 나타난 표면형(철자·활용형) 그대로 배열로 담아:\n' +
     '    (1) 구동사(phrasal verb) 예: run into, catch up on, come across, look forward to, give up\n' +
     '    (2) 관용 표현/이디엄(idiom) 예: piece of cake, break the ice, under the weather, once in a while, on the same page\n' +
@@ -165,12 +190,21 @@ function translatePrompt(text: string) {
 
 function correctPrompt(text: string) {
   return (
-    '너는 원어민 영어 첨삭 선생님이야. 학습자가 영어로 일기를 썼어.\n' +
+    '너는 원어민 영어 첨삭 선생님이야. 학습자가 영어로 일기를 썼어. ' +
+    'ChatGPT 수준으로 자연스럽고 세련된 영어로 다듬어줘야 해.\n' +
     '★ 교정 원칙(매우 중요):\n' +
     '- 문법·철자 오류는 하나도 빠짐없이 정확히 고쳐.\n' +
-    '- 문법은 맞지만 어색하거나 콩글리쉬한 표현은, 원어민이 실제로 쓰는 자연스러운 표현으로 다듬어.\n' +
-    '- 단, 학습자의 원래 의도·의미는 반드시 유지해 (내용을 바꾸거나 덧붙이지 마).\n' +
+    '- 문법은 맞지만 어색하거나 콩글리쉬한 표현은, 원어민이 실제로 쓰는 자연스럽고 매끄러운 표현으로 다듬어. ' +
+    '밋밋한 표현(I was happy, it was good)은 더 생생한 원어민 표현으로.\n' +
+    '- 필요하면 어순을 바꾸거나 접속사(but, so, and, that)로 문장을 자연스럽게 이어도 돼.\n' +
+    '- 단, 학습자의 원래 의도·의미는 반드시 유지해 (내용을 바꾸거나 새 사실을 덧붙이지 마).\n' +
     '- 이미 문법·철자·표현이 모두 정확하고 자연스러우면 corrected를 original과 똑같이 둬 (억지 교정 금지).\n' +
+    '\n' +
+    '★ 참고 예시(이 수준으로 다듬어):\n' +
+    'original: "Today I eat mixed raw fish with my boyfriend. It was very delicious so I feel good."\n' +
+    'corrected: "Today, my boyfriend and I had an assorted sashimi platter. ' +
+    'It was so delicious that it really made my day."\n' +
+    '\n' +
     '아래 일기를 문장 단위로 나누고, 각 문장마다 다음을 제공해:\n' +
     '- ko: 그 문장의 한국어 뜻\n' +
     '- original: 학습자가 쓴 원문 그대로\n' +
@@ -287,14 +321,15 @@ Deno.serve(async (req) => {
     if (!text) return json({ error: '내용을 입력해주세요.' })
 
     if (action === 'translate') {
-      let r = await callGroq(key, translatePrompt(text), SMART_MODEL)
-      if (r.error) r = await callGroq(key, translatePrompt(text)) // gpt-oss 실패 시 llama 폴백
+      // 창의적 의역이 필요해 temperature 0.4. gpt-oss 실패 시 llama 폴백.
+      let r = await callGroq(key, translatePrompt(text), SMART_MODEL, 0.4)
+      if (r.error) r = await callGroq(key, translatePrompt(text), GROQ_MODEL, 0.4)
       if (r.error) return json({ error: r.error })
       return json({ sentences: Array.isArray(r.data.sentences) ? r.data.sentences : [] })
     }
     if (action === 'correct') {
-      let r = await callGroq(key, correctPrompt(text), SMART_MODEL)
-      if (r.error) r = await callGroq(key, correctPrompt(text)) // gpt-oss 실패 시 llama 폴백
+      let r = await callGroq(key, correctPrompt(text), SMART_MODEL, 0.4)
+      if (r.error) r = await callGroq(key, correctPrompt(text), GROQ_MODEL, 0.4)
       if (r.error) return json({ error: r.error })
       return json({ sentences: Array.isArray(r.data.sentences) ? r.data.sentences : [] })
     }
