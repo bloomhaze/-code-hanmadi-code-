@@ -1,15 +1,31 @@
 // Multi-word expressions to keep together when a learner taps a word.
+// 구동사(phrasal verbs) + 관용 표현(idioms). 실제 번역 결과에선 AI가 문장별
+// phrases 를 함께 주므로 이 목록은 mock/폴백용 기본값이다.
 export const PHRASES = [
+  // phrasal verbs
   'ran into',
   'run into',
   'caught up on',
   'catch up on',
   'look forward to',
   'looked forward to',
+  'came across',
+  'come across',
   'fell back into',
+  'get along with',
+  'gave up',
+  'give up',
+  // idioms
   'out of the blue',
   'at ease',
   'hard-hitting',
+  'piece of cake',
+  'break the ice',
+  'under the weather',
+  'once in a while',
+  'on the same page',
+  'in the same boat',
+  'a blessing in disguise',
 ]
 
 // Tokenize an English sentence into tappable tokens, grouping known phrases.
