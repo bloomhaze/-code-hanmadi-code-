@@ -1,90 +1,60 @@
-import { useEffect, useRef, useState } from 'react'
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronDownSmall,
-  ListenIcon,
-  BookmarkIcon,
-  PencilIcon,
-} from '../components/icons.jsx'
-import SegmentText from '../components/SegmentText.jsx'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { ChevronLeft, ChevronRight, ChevronDownSmall, PencilIcon } from '../components/icons.jsx'
 import CalendarSheet from '../components/CalendarSheet.jsx'
-import { speak } from '../lib/speak.js'
-import {
-  buildWeek,
-  dateFromOff,
-  HOME_ENTRIES,
-  DAYS_WITH_ENTRY,
-  DAY_LANG,
-  PROMPTS,
-} from '../data/diary.js'
+import { buildWeek, dateInfo, monthsRange, midnight, realToday } from '../lib/homecal.js'
+import { PROMPTS } from '../data/diary.js'
 
 const ACCENT = '#0066FF'
 
-export default function HomeScreen({ userName = '현진', onWrite, onToast, onOpenEntry }) {
-  const [selOff, setSelOff] = useState(0) // 0 = today (6/4)
-  const [todayWritten] = useState(false)
+// 홈 탭 — 실제 날짜 달력(가입일 이후 노출, 일기 쓴 날 파란 닷) + 선택일의 내 일기.
+export default function HomeScreen({ userName = '현진', diaries = [], signupDate, onWrite, onToast, onOpen }) {
+  const [selOff, setSelOff] = useState(0) // 0 = 오늘
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [promptIdx, setPromptIdx] = useState(0)
-  const [listen, setListen] = useState({})
-  const [bookmark, setBookmark] = useState({})
   const scrollRef = useRef(null)
 
   const prompts = PROMPTS(userName)
-
-  // rotate the writing prompt on the "오늘" empty card
   useEffect(() => {
     const t = setInterval(() => setPromptIdx((i) => (i + 1) % prompts.length), 3600)
     return () => clearInterval(t)
   }, [prompts.length])
 
-  const date = dateFromOff(selOff)
-  const week = buildWeek(selOff)
-  const key = date.key
+  const signup = useMemo(() => midnight(signupDate), [signupDate])
+  const entrySet = useMemo(() => new Set(diaries.map((e) => e.dateKey)), [diaries])
+  const months = useMemo(() => monthsRange(signup, entrySet), [signup, entrySet])
 
-  const written = selOff === 0 ? todayWritten : selOff < 0 && DAYS_WITH_ENTRY.has(key)
+  const date = dateInfo(selOff)
+  const week = buildWeek(selOff, entrySet, signup)
+
+  const selDate = useMemo(() => {
+    const d = realToday()
+    d.setDate(d.getDate() + selOff)
+    return d
+  }, [selOff])
+  const isToday = selOff === 0
   const isFuture = selOff > 0
-  const todayEmpty = selOff === 0 && !todayWritten
-  const emptyPast = selOff < 0 && !written
-  const entries = written ? HOME_ENTRIES[key] || [] : []
-  const lang = DAY_LANG[key] || 'KR'
+  const beforeSignup = signup ? selDate < signup : false
+  const blocked = isFuture || beforeSignup
+
+  const entries = useMemo(() => diaries.filter((e) => e.dateKey === date.key), [diaries, date.key])
+  const hasEntries = entries.length > 0
+  const lang = hasEntries ? entries[0].lang : 'KR'
+  const todayEmpty = isToday && !hasEntries
+  const emptyPast = !blocked && !isToday && !hasEntries
 
   const selectDay = (d) => {
-    if (d.isFuture) {
-      onToast?.('아직 오지 않은 미래는 작성할 수 없어요.')
-      return
-    }
+    if (d.isFuture) return onToast?.('아직 오지 않은 미래는 작성할 수 없어요.')
+    if (d.beforeSignup) return onToast?.('가입 전 날짜예요.')
     setSelOff(d.off)
-  }
-
-  const toggleListen = (i, text) => {
-    setListen((s) => ({ ...s, [i]: !s[i] }))
-    if (!listen[i]) speak(text)
-  }
-  const toggleBookmark = (i) => {
-    const was = bookmark[i]
-    setBookmark((s) => ({ ...s, [i]: !s[i] }))
-    onToast?.(
-      was ? '저장을 취소했어요' : '표현을 저장했어요',
-      was ? () => setBookmark((s) => ({ ...s, [i]: true })) : undefined,
-    )
   }
 
   return (
     <div className="relative flex h-full flex-col bg-white">
       {/* ===== HEADER : date row + week strip ===== */}
       <div className="shrink-0 bg-white pt-4">
-        {/* date row */}
         <div className="flex h-9 items-center justify-between px-4 py-0.5">
-          <button
-            type="button"
-            className="flex items-center gap-1.5 px-1"
-            onClick={() => setCalendarOpen(true)}
-          >
-            <span
-              className="font-inter text-[20px] font-semibold text-ink"
-              style={{ letterSpacing: '-.5px' }}
-            >
+          <button type="button" className="flex items-center gap-1.5 px-1" onClick={() => setCalendarOpen(true)}>
+            <span className="font-inter text-[20px] font-semibold text-ink" style={{ letterSpacing: '-.5px' }}>
               {date.title}
             </span>
             <span className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#f4f4f4]">
@@ -111,7 +81,7 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
             </button>
             <button
               type="button"
-              onClick={() => setSelOff((o) => o + 1)}
+              onClick={() => !isFuture && setSelOff((o) => o + 1)}
               className="flex h-8 w-8 items-center justify-center rounded-full"
             >
               <ChevronRight color={isFuture ? '#d4d4d4' : '#121212'} />
@@ -123,9 +93,10 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
         <div className="flex h-[108px] justify-between gap-0 border-b border-[#eee] p-4">
           {week.map((d) => {
             const selected = d.off === selOff
+            const disabled = d.isFuture || d.beforeSignup
             let numColor = '#121212'
             if (selected) numColor = '#fff'
-            else if (d.isFuture) numColor = '#c4c4c4'
+            else if (disabled) numColor = '#c4c4c4'
             else if (d.isToday) numColor = ACCENT
             return (
               <button
@@ -154,20 +125,13 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
       </div>
 
       {/* ===== CONTENT ===== */}
-      <div
-        ref={scrollRef}
-        className="no-scrollbar min-h-0 flex-1 overflow-y-auto bg-white"
-      >
+      <div ref={scrollRef} className="no-scrollbar min-h-0 flex-1 overflow-y-auto bg-white">
         <div className="px-5 pb-6 pt-7">
-          {/* section header */}
           <div className="mb-5 flex h-[22px] items-center justify-between">
-            <span
-              className="font-inter text-[14px] font-semibold text-ink"
-              style={{ letterSpacing: '.2px' }}
-            >
+            <span className="font-inter text-[14px] font-semibold text-ink" style={{ letterSpacing: '.2px' }}>
               나의 일기
             </span>
-            {written && (
+            {hasEntries && (
               <span
                 className="flex h-[22px] w-[31px] items-center justify-center rounded-full"
                 style={{ background: lang === 'EN' ? '#dcebff' : '#f1f1f2' }}
@@ -190,22 +154,14 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
               className="flex min-h-[71px] w-full flex-col items-center justify-center gap-0.5 rounded-[20px] px-[18px] py-4"
               style={{ outline: '.5px dashed #abcfff', outlineOffset: '-.5px' }}
             >
-              <span
-                className="font-inter text-[12px]"
-                style={{ color: ACCENT, letterSpacing: '-.2px' }}
-              >
-                6월 4일
+              <span className="font-inter text-[12px]" style={{ color: ACCENT, letterSpacing: '-.2px' }}>
+                {date.label}
               </span>
               <div className="flex h-6 items-center justify-center overflow-hidden">
                 <span
                   key={promptIdx}
                   className="font-inter text-[15px] font-medium"
-                  style={{
-                    color: ACCENT,
-                    lineHeight: '24px',
-                    letterSpacing: '-.2px',
-                    animation: 'promptFade 3.6s ease-in-out',
-                  }}
+                  style={{ color: ACCENT, lineHeight: '24px', letterSpacing: '-.2px', animation: 'promptFade 3.6s ease-in-out' }}
                 >
                   {prompts[promptIdx]}
                 </span>
@@ -213,14 +169,14 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
             </button>
           )}
 
-          {/* future day */}
-          {isFuture && (
+          {/* future / before-signup */}
+          {blocked && (
             <div
               className="flex min-h-[71px] flex-col items-center justify-center rounded-[20px] bg-[#fafafa] px-[18px] py-5 opacity-60"
               style={{ outline: '.5px dashed #e2e2e2', outlineOffset: '-.5px' }}
             >
               <span className="font-inter text-[14px] font-medium text-muted-2">
-                아직 오지 않은 날이에요
+                {isFuture ? '아직 오지 않은 날이에요' : '가입 전 날짜예요'}
               </span>
             </div>
           )}
@@ -244,76 +200,47 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
             </div>
           )}
 
-          {/* entries */}
+          {/* entries for the selected day */}
           <div className="flex flex-col gap-3">
-            {entries.map((e, i) => (
-              <div
-                key={i}
-                onClick={() => onOpenEntry?.(e.ko)}
-                className="flex cursor-pointer items-start gap-3 rounded-[20px] bg-[#f7f7f7] p-4"
-                style={{ boxShadow: 'inset 0 0 0 .5px #eee' }}
-              >
-                <div className="flex flex-1 flex-col items-end gap-3">
-                  <div className="flex w-full flex-col gap-1">
-                    {e.ko && (
-                      <span className="mb-1.5 font-inter text-[14px] font-light leading-5 text-sub">
-                        {e.ko}
-                      </span>
-                    )}
-                    <SegmentText
-                      segments={e.enSegs}
-                      className="font-inter text-[16px] font-medium leading-6 text-ink-2"
-                      style={{ letterSpacing: '-.2px' }}
-                    />
-
-                    {e.hasCorrection && (
-                      <div className="mt-0.5 flex flex-col">
-                        <div className="my-3 mb-3 mt-4 h-px bg-[#e6e6e6]" />
-                        <span
-                          className="font-inter text-[13px] font-medium"
-                          style={{ color: ACCENT, letterSpacing: '-.1px' }}
-                        >
-                          교정
-                        </span>
-                        <SegmentText
-                          segments={e.fixSegs}
-                          className="mt-2 font-inter text-[16px] font-medium leading-6 text-ink-2"
-                          style={{ letterSpacing: '-.2px' }}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={(ev) => {
-                        ev.stopPropagation()
-                        toggleListen(
-                          i,
-                          e.hasCorrection
-                            ? e.fixSegs.map((g) => g.t).join('')
-                            : e.enSegs.map((g) => g.t).join(''),
-                        )
-                      }}
-                      className="flex h-8 w-8"
+            {hasEntries &&
+              entries.map((e) => (
+                <button
+                  key={e.id}
+                  type="button"
+                  onClick={() => onOpen?.(e.id)}
+                  className="flex flex-col gap-2 rounded-[20px] bg-[#f7f7f7] p-4 text-left"
+                  style={{ boxShadow: 'inset 0 0 0 .5px #eee' }}
+                >
+                  <span
+                    className="flex h-[22px] w-[31px] items-center justify-center self-start rounded-full"
+                    style={{ background: e.lang === 'EN' ? '#dcebff' : '#f1f1f2' }}
+                  >
+                    <span
+                      className="font-inter text-[11px] font-semibold"
+                      style={{ color: e.lang === 'EN' ? '#0066ff' : '#7a7b7d' }}
                     >
-                      <ListenIcon on={!!listen[i]} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(ev) => {
-                        ev.stopPropagation()
-                        toggleBookmark(i)
-                      }}
-                      className="flex h-8 w-8"
-                    >
-                      <BookmarkIcon on={!!bookmark[i]} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+                      {e.lang}
+                    </span>
+                  </span>
+                  <span
+                    className="text-[15px] font-normal text-ink-2"
+                    style={{
+                      fontFamily:
+                        e.lang === 'EN'
+                          ? "'Inter Variable', 'Inter', sans-serif"
+                          : "'Pretendard Variable', 'Pretendard', sans-serif",
+                      lineHeight: e.lang === 'EN' ? '24px' : '20.8px',
+                      letterSpacing: '-.2px',
+                      display: '-webkit-box',
+                      WebkitBoxOrient: 'vertical',
+                      WebkitLineClamp: 3,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {e.preview}
+                  </span>
+                </button>
+              ))}
           </div>
         </div>
       </div>
@@ -331,6 +258,7 @@ export default function HomeScreen({ userName = '현진', onWrite, onToast, onOp
       {/* ===== CALENDAR ===== */}
       {calendarOpen && (
         <CalendarSheet
+          months={months}
           selOff={selOff}
           onSelect={(off) => {
             setSelOff(off)

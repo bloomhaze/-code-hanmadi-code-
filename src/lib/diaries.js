@@ -40,11 +40,14 @@ function toEntry(r) {
   const isEn = r.mode === 'en'
   const d = r.data || {}
   const sentences = Array.isArray(d.sentences) ? d.sentences : []
+  const c = r.created_at ? new Date(r.created_at) : new Date()
   return {
     id: r.id,
     real: true,
     date: r.title || '',
     title: r.title || '',
+    // 달력 매칭용 날짜 키 (로컬 기준 YYYY-M-D)
+    dateKey: `${c.getFullYear()}-${c.getMonth() + 1}-${c.getDate()}`,
     lang: isEn ? 'EN' : 'KR',
     correction: isEn,
     sentences,

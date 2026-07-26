@@ -1,16 +1,17 @@
-import { calendarMonths } from '../data/diary.js'
-
 const ACCENT = '#0066FF'
 const DOW = ['일', '월', '화', '수', '목', '금', '토']
 
 // 홈 날짜 옆 ⌄ 를 누르면 열리는 월별 달력. 날짜를 고르면 그 날로 이동.
-export default function CalendarSheet({ selOff, onSelect, onClose, onToast }) {
-  const months = calendarMonths()
-
+// months: 실제 날짜 기반 월 목록(가입월~이번달). 각 셀에 isFuture/beforeSignup/hasEntry.
+export default function CalendarSheet({ months = [], selOff, onSelect, onClose, onToast }) {
   const pick = (c) => {
     if (!c) return
     if (c.isFuture) {
       onToast?.('아직 오지 않은 미래는 작성할 수 없어요.')
+      return
+    }
+    if (c.beforeSignup) {
+      onToast?.('가입 전 날짜예요.')
       return
     }
     onSelect(c.off)
@@ -69,7 +70,7 @@ export default function CalendarSheet({ selOff, onSelect, onClose, onToast }) {
                     const selected = c.off === selOff
                     let numColor = '#121212'
                     if (selected) numColor = '#fff'
-                    else if (c.isFuture) numColor = '#c4c4c4'
+                    else if (c.isFuture || c.beforeSignup) numColor = '#c4c4c4'
                     else if (c.isToday) numColor = ACCENT
                     return (
                       <button
