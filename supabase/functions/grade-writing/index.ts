@@ -94,13 +94,14 @@ const cors = {
 }
 
 const GROQ_MODEL = 'llama-3.3-70b-versatile'
+const SMART_MODEL = 'openai/gpt-oss-120b' // 번역·교정 등 품질이 중요한 작업용 (Groq 무료)
 
-async function callGroq(key: string, prompt: string): Promise<{ data?: any; error?: string }> {
+async function callGroq(key: string, prompt: string, model: string = GROQ_MODEL): Promise<{ data?: any; error?: string }> {
   const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${key}` },
     body: JSON.stringify({
-      model: GROQ_MODEL,
+      model,
       temperature: 0,
       response_format: { type: 'json_object' },
       messages: [{ role: 'user', content: prompt }],
@@ -164,11 +165,16 @@ function translatePrompt(text: string) {
 
 function correctPrompt(text: string) {
   return (
-    '너는 영어 첨삭 선생님이야. 학습자가 영어로 일기를 썼어.\n' +
+    '너는 원어민 영어 첨삭 선생님이야. 학습자가 영어로 일기를 썼어.\n' +
+    '★ 교정 원칙(매우 중요):\n' +
+    '- 문법·철자 오류는 하나도 빠짐없이 정확히 고쳐.\n' +
+    '- 문법은 맞지만 어색하거나 콩글리쉬한 표현은, 원어민이 실제로 쓰는 자연스러운 표현으로 다듬어.\n' +
+    '- 단, 학습자의 원래 의도·의미는 반드시 유지해 (내용을 바꾸거나 덧붙이지 마).\n' +
+    '- 이미 문법·철자·표현이 모두 정확하고 자연스러우면 corrected를 original과 똑같이 둬 (억지 교정 금지).\n' +
     '아래 일기를 문장 단위로 나누고, 각 문장마다 다음을 제공해:\n' +
     '- ko: 그 문장의 한국어 뜻\n' +
     '- original: 학습자가 쓴 원문 그대로\n' +
-    '- corrected: 문법·철자·자연스러움을 고친 버전 (이미 완벽하면 original과 동일하게)\n' +
+    '- corrected: 위 원칙으로 고친 버전\n' +
     '일기:\n' + text + '\n' +
     '반드시 이 JSON만 반환: {"sentences": [{"ko": "...", "original": "...", "corrected": "..."}]}'
   )
@@ -281,14 +287,16 @@ Deno.serve(async (req) => {
     if (!text) return json({ error: '내용을 입력해주세요.' })
 
     if (action === 'translate') {
-      const { data, error } = await callGroq(key, translatePrompt(text))
-      if (error) return json({ error })
-      return json({ sentences: Array.isArray(data.sentences) ? data.sentences : [] })
+      let r = await callGroq(key, translatePrompt(text), SMART_MODEL)
+      if (r.error) r = await callGroq(key, translatePrompt(text)) // gpt-oss 실패 시 llama 폴백
+      if (r.error) return json({ error: r.error })
+      return json({ sentences: Array.isArray(r.data.sentences) ? r.data.sentences : [] })
     }
     if (action === 'correct') {
-      const { data, error } = await callGroq(key, correctPrompt(text))
-      if (error) return json({ error })
-      return json({ sentences: Array.isArray(data.sentences) ? data.sentences : [] })
+      let r = await callGroq(key, correctPrompt(text), SMART_MODEL)
+      if (r.error) r = await callGroq(key, correctPrompt(text)) // gpt-oss 실패 시 llama 폴백
+      if (r.error) return json({ error: r.error })
+      return json({ sentences: Array.isArray(r.data.sentences) ? r.data.sentences : [] })
     }
     return json({ error: 'unknown action' })
   } catch (e) {
