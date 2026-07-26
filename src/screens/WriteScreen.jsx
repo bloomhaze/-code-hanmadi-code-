@@ -112,7 +112,11 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
           </svg>
         </button>
         {step === 'result' && (
-          <button type="button" onClick={onSave} className="px-1 py-0.5">
+          <button
+            type="button"
+            onClick={() => onSave?.({ mode, body, data })}
+            className="px-1 py-0.5"
+          >
             <span className="font-sans text-[16px] font-medium text-accent" style={{ letterSpacing: '-.32px' }}>
               저장
             </span>

@@ -4,8 +4,9 @@ import { speak, stopSpeak } from '../lib/speak.js'
 import { getEntry } from '../data/diary.js'
 
 // 일기 상세 — 문장별 / 전체 보기 + 교정 사유. Reuses SentenceResult.
-export default function DiaryDetailScreen({ id, onBack, onDelete, onToast, onTapWord, onTapFix, activeWord, activeFix }) {
-  const entry = getEntry(id)
+export default function DiaryDetailScreen({ id, entry: passedEntry, onBack, onDelete, onToast, onTapWord, onTapFix, activeWord, activeFix }) {
+  // 실제 저장한 일기면 그 엔트리를, 아니면 mock(id 조회).
+  const entry = passedEntry || getEntry(id)
   const [dm, setDm] = useState('sentence')
   const [bookmark, setBookmark] = useState({})
   const [playId, setPlayId] = useState(null) // null | 'all' | 문장 index (하나만 재생)

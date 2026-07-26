@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { SearchIcon, PencilIcon } from '../components/icons.jsx'
-import { DIARY_ENTRIES, diaryBadge } from '../data/diary.js'
+import { diaryBadge } from '../data/diary.js'
 
 const ACCENT = '#0066FF'
 
-// 일기 탭 — grouped list of diary entries with a togglable search field.
-export default function DiaryScreen({ onWrite, onOpen, deletedIds }) {
+// 일기 탭 — 유저가 실제 저장한 일기 목록(diaries) + 검색.
+export default function DiaryScreen({ diaries = [], onWrite, onOpen, deletedIds }) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
 
   const q = query.trim().toLowerCase()
-  const visible = DIARY_ENTRIES.filter((e) => !deletedIds?.has(e.id))
+  const visible = diaries.filter((e) => !deletedIds?.has(e.id))
   const list = visible.filter(
     (e) =>
       !q ||

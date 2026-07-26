@@ -1,5 +1,4 @@
 import { ProfileAvatar, GoogleLogo, ChevronRightSmall, ExternalArrow } from '../components/icons.jsx'
-import { DIARY_ENTRIES } from '../data/diary.js'
 import { VOCAB_DATA } from '../data/vocab.js'
 
 const ACCENT = '#0066FF'
@@ -13,10 +12,11 @@ export default function MyScreen({
   onLogout,
   onWithdraw,
   onToast,
+  diaryCount = 0,
 }) {
   const displayName = userName.length <= 2 ? userName.split('').join(' ') : userName
   const displayEmail = email || 'svs9645@gmail.com'
-  const diaryCount = DIARY_ENTRIES.length
+  // 작성 일기 = 실제 저장 개수(prop). 저장 표현/복습 표현은 다음 단계에서 연동 예정(임시 mock).
   const vocabCount = VOCAB_DATA.word.length + VOCAB_DATA.phrase.length + VOCAB_DATA.sentence.length
 
   const SectionLabel = ({ children }) => (
