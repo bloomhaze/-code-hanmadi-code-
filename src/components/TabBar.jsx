@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { HomeIcon, DiaryIcon, VocabIcon, MyIcon } from './icons.jsx'
+import { haptic } from '../lib/haptic.js'
 
 const TABS = [
   { key: 'home', label: '홈', Icon: HomeIcon },
@@ -27,6 +28,7 @@ export default function TabBar({ active, onChange }) {
               key={key}
               type="button"
               onClick={() => {
+                haptic()
                 setPopped(key)
                 onChange(key)
               }}
