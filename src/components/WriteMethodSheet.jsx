@@ -7,10 +7,12 @@ export default function WriteMethodSheet({ onChoose, onClose, enLocked = false }
   )
 
   return (
-    <div className="fixed inset-0 z-[54] flex items-center justify-center bg-black/35 px-5" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[54] flex items-end justify-center bg-black/35 sm:items-center sm:px-5"
+      onClick={onClose}
+    >
       <div
-        className="w-full max-w-[440px] rounded-3xl bg-white px-4 pb-5 pt-5"
-        style={{ animation: 'scaleIn .24s cubic-bezier(.22,1,.36,1)' }}
+        className="modal-pop w-full max-w-[500px] rounded-t-[24px] bg-white px-4 pb-8 pt-5 sm:max-w-[440px] sm:rounded-3xl sm:pb-5"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col gap-4">

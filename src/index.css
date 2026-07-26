@@ -225,6 +225,17 @@ body {
   }
 }
 
+/* 모달 등장 — 모바일(<640px)은 하단 바텀시트처럼 올라오고(sheetUp),
+   그 이상은 중앙에서 팝(scaleIn). */
+.modal-pop {
+  animation: sheetUp 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (min-width: 640px) {
+  .modal-pop {
+    animation: scaleIn 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
 /* 교정 사유 우측 패널(데스크탑/태블릿) 슬라이드 인 */
 @keyframes fixPanelIn {
   from {

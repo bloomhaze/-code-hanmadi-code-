@@ -11,10 +11,12 @@ export default function QuizTypeSheet({ onStart, onClose }) {
   const [type, setType] = useState('flash')
 
   return (
-    <div className="fixed inset-0 z-[55] flex items-center justify-center bg-black/35 px-5" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[55] flex items-end justify-center bg-black/35 sm:items-center sm:px-5"
+      onClick={onClose}
+    >
       <div
-        className="box-border flex w-full max-w-[440px] flex-col rounded-3xl bg-white px-5 pb-6 pt-6"
-        style={{ animation: 'scaleIn .24s cubic-bezier(.22,1,.36,1)' }}
+        className="modal-pop box-border flex w-full max-w-[500px] flex-col rounded-t-3xl bg-white px-5 pb-8 pt-6 sm:max-w-[440px] sm:rounded-3xl sm:pb-6"
         onClick={(e) => e.stopPropagation()}
       >
         <span className="font-sans text-[20px] font-semibold text-ink">학습 방식</span>
