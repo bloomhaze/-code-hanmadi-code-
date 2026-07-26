@@ -19,7 +19,7 @@ export default function Toast({ toast, onClose }) {
 
   return (
     <div
-      className="absolute left-4 right-4 top-[60px] z-50 flex min-h-[50px] items-center gap-2.5 rounded-2xl px-4 py-3"
+      className="absolute left-4 right-4 top-2 z-50 flex min-h-[50px] items-center gap-2.5 rounded-2xl px-4 py-3"
       style={{
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',

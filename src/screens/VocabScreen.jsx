@@ -145,7 +145,7 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
                   이거 뭐였더라?
                 </span>
                 <span
-                  className="flex h-[30px] items-center overflow-hidden font-inter text-[22px] font-medium text-white"
+                  className="flex h-[30px] items-center overflow-hidden font-inter text-[22px] font-semibold text-white"
                   style={{ lineHeight: '29.7px', letterSpacing: '-.5px' }}
                 >
                   <span key={rollIdx} style={{ display: 'inline-block', animation: 'rollUp .5s cubic-bezier(.22,1,.36,1)' }}>
@@ -234,7 +234,7 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
                       {it.ko}
                     </span>
                     <span
-                      className="font-inter text-[16px] font-medium text-ink"
+                      className="font-inter text-[16px] font-semibold text-ink"
                       style={{ lineHeight: '28px', letterSpacing: '-.3px' }}
                     >
                       {it.term}
@@ -273,7 +273,7 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
                 >
                   <div className="flex items-start justify-between gap-2.5">
                     <span
-                      className="font-inter text-[18px] font-medium text-ink-2"
+                      className="font-inter text-[18px] font-semibold text-ink-2"
                       style={{ lineHeight: '100%', letterSpacing: '-.3px' }}
                     >
                       {it.term}
