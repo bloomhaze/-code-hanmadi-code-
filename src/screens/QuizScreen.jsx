@@ -18,7 +18,7 @@ const CONFETTI = [
   ['75%', '300px', 12, 12, '50%', '#f5a2e0', '3.4s', '.5s'],
 ]
 
-export default function QuizScreen({ type = 'flash', onClose, onToast }) {
+export default function QuizScreen({ type = 'flash', onClose, onToast, onComplete }) {
   const initial = useMemo(() => buildQuizList(type, 1), [type])
   const [list, setList] = useState(initial)
   const [qi, setQi] = useState(0)
@@ -68,6 +68,8 @@ export default function QuizScreen({ type = 'flash', onClose, onToast }) {
 
   const next = () => {
     if (qi >= list.length - 1) {
+      // 세션 완료 기록 (복습 문항 수 = 이번 리스트 길이)
+      onComplete?.({ total: list.length, correct: right })
       setDone(true)
       return
     }

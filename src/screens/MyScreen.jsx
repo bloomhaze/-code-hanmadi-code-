@@ -13,10 +13,10 @@ export default function MyScreen({
   onToast,
   diaryCount = 0,
   savedCount = 0,
+  reviewedCount = 0,
 }) {
   const displayName = userName.length <= 2 ? userName.split('').join(' ') : userName
   const displayEmail = email || 'svs9645@gmail.com'
-  // 작성 일기 / 저장 표현 = 실제 개수(prop). 복습 표현(퀴즈)은 다음 단계에서 연동 예정.
   const vocabCount = savedCount
 
   const SectionLabel = ({ children }) => (
@@ -86,7 +86,7 @@ export default function MyScreen({
               {[
                 { label: '작성 일기', value: `${diaryCount}개` },
                 { label: '저장 표현', value: `${vocabCount}개` },
-                { label: '복습 표현', value: '300개' },
+                { label: '복습 표현', value: `${reviewedCount}개` },
               ].map((s) => (
                 <div
                   key={s.label}
