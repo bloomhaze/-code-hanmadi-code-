@@ -56,12 +56,32 @@ export function mkWords(en, extra = []) {
     }
     const span = matched ? matched.length : 1
     const raw = toks.slice(i, i + span).join(' ')
-    const term = matched ? matched.term : clean(raw)
-    out.push({ t: raw, term, isPhrase: !!matched })
+    let term = matched ? matched.term : clean(raw)
+
+    // 분리형 구동사(예: "tried it out") — 중간 목적어는 일반, 동사+부사만 하이라이트.
+    let sep = null
+    if (matched && span >= 3) {
+      const ws = toks.slice(i, i + span)
+      const last = clean(ws[span - 1]).toLowerCase()
+      const mids = ws.slice(1, span - 1).map((w) => clean(w).toLowerCase())
+      if (PARTICLES.has(last) && mids.length && mids.every((m) => PRONOUNS.has(m))) {
+        sep = [
+          { t: ws[0], hl: true },
+          { t: ' ' + ws.slice(1, span - 1).join(' ') + ' ', hl: false },
+          { t: ws[span - 1], hl: true },
+        ]
+        term = `${clean(ws[0])} ${clean(ws[span - 1])}` // 구동사(동사+부사)
+      }
+    }
+    out.push({ t: raw, term, isPhrase: !!matched, sep })
     i += span - 1
   }
   return out
 }
+
+// 분리형 구동사 판별용 — 부사(파티클) / 목적어 대명사
+const PARTICLES = new Set(['out', 'up', 'off', 'on', 'over', 'away', 'back', 'down', 'in', 'through', 'around', 'apart'])
+const PRONOUNS = new Set(['it', 'them', 'him', 'her', 'me', 'us', 'you', 'this', 'that', 'one'])
 
 // Highlight occurrences of `term` inside an example sentence (accent blue),
 // expanding to full word boundaries so inflected forms highlight fully.

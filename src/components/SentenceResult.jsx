@@ -216,11 +216,33 @@ export default function SentenceResult({
                     {mkWords(s.en, s.phrases).map((w, wi) => {
                       const wid = `${i}-${wi}`
                       if (!w.term) return <span key={wi}>{w.t} </span>
+                      const cls = `tap-word${activeWord === wid ? ' is-active' : ''}`
+                      // 분리형 구동사 — 동사/부사만 하이라이트, 중간 목적어는 일반.
+                      if (w.sep) {
+                        return (
+                          <span key={wi}>
+                            {w.sep.map((p, pi) =>
+                              p.hl ? (
+                                <span
+                                  key={pi}
+                                  onClick={() => onTapWord?.(wid, w.term, s.en)}
+                                  className={cls}
+                                  style={{ padding: '1px 3px', fontWeight: 400 }}
+                                >
+                                  {p.t}
+                                </span>
+                              ) : (
+                                <span key={pi}>{p.t}</span>
+                              ),
+                            )}{' '}
+                          </span>
+                        )
+                      }
                       return (
                         <span key={wi}>
                           <span
                             onClick={() => onTapWord?.(wid, w.term, s.en)}
-                            className={`tap-word${activeWord === wid ? ' is-active' : ''}`}
+                            className={cls}
                             style={{ padding: '1px 3px', margin: '0 -1px', fontWeight: 400 }}
                           >
                             {w.t}
