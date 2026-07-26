@@ -3,9 +3,9 @@ import { hlSegs } from '../lib/text.js'
 import { speak } from '../lib/speak.js'
 
 // Bottom-sheet showing a tapped word's meaning + example (단어 뜻 팝업).
-export default function WordPopup({ state, onClose, onToast }) {
+export default function WordPopup({ state, saved = false, onToggleSave, onClose, onToast }) {
   if (!state?.open) return null
-  const { term, loading, kr, ex, exKr, saved } = state
+  const { term, loading, kr, ex, exKr } = state
   const segs = hlSegs(ex || '', term)
 
   return (
@@ -32,10 +32,11 @@ export default function WordPopup({ state, onClose, onToast }) {
             </button>
             <button
               type="button"
-              onClick={() => onToast?.(saved ? '저장을 취소했어요' : '단어를 저장했어요')}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f1f1f2]"
+              onClick={() => (loading ? null : onToggleSave?.())}
+              className="flex h-8 w-8 items-center justify-center rounded-full"
+              style={{ background: saved ? '#0066ff' : '#f1f1f2' }}
             >
-              <BookmarkSmall fill="none" stroke="#121212" />
+              <BookmarkSmall fill={saved ? '#fff' : 'none'} stroke={saved ? '#fff' : '#121212'} />
             </button>
           </div>
         </div>

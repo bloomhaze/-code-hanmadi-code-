@@ -4,7 +4,7 @@ import { speak, stopSpeak } from '../lib/speak.js'
 import { getEntry } from '../data/diary.js'
 
 // 일기 상세 — 문장별 / 전체 보기 + 교정 사유. Reuses SentenceResult.
-export default function DiaryDetailScreen({ id, entry: passedEntry, onBack, onDelete, onToast, onTapWord, onTapFix, activeWord, activeFix }) {
+export default function DiaryDetailScreen({ id, entry: passedEntry, onBack, onDelete, onToast, onTapWord, onTapFix, onSaveExpr, activeWord, activeFix }) {
   // 실제 저장한 일기면 그 엔트리를, 아니면 mock(id 조회).
   const entry = passedEntry || getEntry(id)
   const [dm, setDm] = useState('sentence')
@@ -39,13 +39,12 @@ export default function DiaryDetailScreen({ id, entry: passedEntry, onBack, onDe
     setPlayId(i)
     speak(text, () => setPlayId((c) => (c === i ? null : c)))
   }
+  const sentText = (s) => (s?.correction ? (s.fixSegs || []).map((g) => g.t).join('') : s?.en || '')
   const toggleBookmark = (i) => {
-    const was = bookmark[i]
-    setBookmark((s) => ({ ...s, [i]: !s[i] }))
-    onToast?.(
-      was ? '저장을 취소했어요' : '표현을 저장했어요',
-      was ? () => setBookmark((s) => ({ ...s, [i]: true })) : undefined,
-    )
+    const s = entry?.sentences?.[i]
+    if (!s) return
+    setBookmark((m) => ({ ...m, [i]: !m[i] }))
+    onSaveExpr?.({ type: 'sentence', term: sentText(s), data: { ko: s.ko || '' } })
   }
 
   return (

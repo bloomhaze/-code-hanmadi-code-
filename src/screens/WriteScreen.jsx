@@ -9,7 +9,7 @@ import { translateOrCorrect } from '../lib/write.js'
 const KO_RE = /[ᄀ-ᇿ㄰-㆏가-힣]/g
 
 // 일기 작성 플로우: edit → loading → result (번역/교정).
-export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTapWord, onTapFix, activeWord, activeFix }) {
+export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTapWord, onTapFix, onSaveExpr, activeWord, activeFix }) {
   const [step, setStep] = useState('edit') // edit | loading | result
   const [body, setBody] = useState('')
   const [data, setData] = useState(null)
@@ -86,13 +86,13 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
     setPlayId(i)
     speak(text, () => setPlayId((c) => (c === i ? null : c)))
   }
+  // 문장 표현 저장 — 교정문은 fixSegs 합침, 번역문은 en.
+  const sentText = (s) => (s?.correction ? (s.fixSegs || []).map((g) => g.t).join('') : s?.en || '')
   const toggleBookmark = (i) => {
-    const was = bookmark[i]
-    setBookmark((s) => ({ ...s, [i]: !s[i] }))
-    onToast?.(
-      was ? '저장을 취소했어요' : '표현을 저장했어요',
-      was ? () => setBookmark((s) => ({ ...s, [i]: true })) : undefined,
-    )
+    const s = data?.sentences?.[i]
+    if (!s) return
+    setBookmark((m) => ({ ...m, [i]: !m[i] })) // 즉각 표시(옵티미스틱)
+    onSaveExpr?.({ type: 'sentence', term: sentText(s), data: { ko: s.ko || '' } })
   }
 
   return (

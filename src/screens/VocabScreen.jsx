@@ -7,7 +7,6 @@ import {
   PencilIcon,
 } from '../components/icons.jsx'
 import { hlSegs } from '../lib/text.js'
-import { VOCAB_DATA } from '../data/vocab.js'
 import { speak, stopSpeak } from '../lib/speak.js'
 
 const ACCENT = '#0066FF'
@@ -17,27 +16,34 @@ const TABS = [
   { key: 'sentence', label: '문장' },
 ]
 
-// 단어장 탭 — Quick Quiz card, filter chips, and saved word/phrase/sentence cards.
-export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
+// 단어장 탭 — 유저가 저장한 표현(saved)을 단어/표현/문장으로 나눠 보여준다.
+export default function VocabScreen({ saved = [], onToggleSave, onWrite, onToast, onStartQuiz }) {
   const [tab, setTab] = useState('word')
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [playing, setPlaying] = useState(null) // 현재 재생 중인 카드 key (하나만)
-  const [bookmark, setBookmark] = useState({}) // key -> bool (default saved/true)
   const [rollIdx, setRollIdx] = useState(0)
 
+  // 저장 표현을 타입별로 그룹핑
+  const byType = useMemo(() => {
+    const g = { word: [], phrase: [], sentence: [] }
+    saved.forEach((it) => {
+      if (g[it.type]) g[it.type].push(it)
+    })
+    return g
+  }, [saved])
   const counts = {
-    word: VOCAB_DATA.word.length,
-    phrase: VOCAB_DATA.phrase.length,
-    sentence: VOCAB_DATA.sentence.length,
+    word: byType.word.length,
+    phrase: byType.phrase.length,
+    sentence: byType.sentence.length,
   }
-  const total = counts.word + counts.phrase + counts.sentence
+  const total = saved.length
   const hasSaved = total > 0
 
   // rolling quiz word from saved words + phrases
   const quizPool = useMemo(
-    () => [...VOCAB_DATA.word, ...VOCAB_DATA.phrase].map((x) => x.term).filter(Boolean),
-    [],
+    () => [...byType.word, ...byType.phrase].map((x) => x.term).filter(Boolean),
+    [byType],
   )
   useEffect(() => {
     if (quizPool.length < 2) return
@@ -56,11 +62,10 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
     (it.kr && it.kr.toLowerCase().includes(q)) ||
     (it.ko && it.ko.toLowerCase().includes(q))
 
-  const items = (VOCAB_DATA[tab] || [])
-    .map((it, oi) => ({ it, key: `${tab}-${oi}` }))
+  const items = (byType[tab] || [])
+    .map((it) => ({ it, key: it.id }))
     .filter(({ it }) => matches(it))
 
-  const isSaved = (key) => (bookmark[key] === undefined ? true : bookmark[key])
   // 켜면 재생(파랑), 다시 누르면 멈춤, 다 들으면 자동 off. 한 번에 하나만.
   const toggleListen = (key, text) => {
     if (playing === key) {
@@ -71,11 +76,8 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
     setPlaying(key)
     speak(text, () => setPlaying((cur) => (cur === key ? null : cur)))
   }
-  const toggleBookmark = (key) => {
-    const cur = isSaved(key)
-    setBookmark((s) => ({ ...s, [key]: !cur }))
-    if (cur) onToast?.('저장을 취소했어요', () => setBookmark((s) => ({ ...s, [key]: true })))
-  }
+  // 단어장에 보이는 건 전부 저장된 것 → 북마크 누르면 저장 취소(삭제).
+  const toggleBookmark = (it) => onToggleSave?.({ type: it.type, term: it.term })
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -221,9 +223,9 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
           {/* cards */}
           <div className="flex flex-col gap-3">
             {items.map(({ it, key }) => {
-              const saved = isSaved(key)
+              const saved = true // 단어장에 보이는 건 전부 저장된 것
               const ls = playing === key
-              if (it.kind === 'sentence') {
+              if (it.type === 'sentence') {
                 return (
                   <div
                     key={key}
@@ -250,7 +252,7 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => toggleBookmark(key)}
+                        onClick={() => toggleBookmark(it)}
                         className="flex h-9 w-9 items-center justify-center rounded-full"
                         style={{ background: saved ? ACCENT : '#eee' }}
                       >
@@ -289,7 +291,7 @@ export default function VocabScreen({ onWrite, onToast, onStartQuiz }) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => toggleBookmark(key)}
+                        onClick={() => toggleBookmark(it)}
                         className="flex h-8 w-8 items-center justify-center rounded-full"
                         style={{ background: saved ? ACCENT : '#eee' }}
                       >
