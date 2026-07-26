@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import SentenceResult from '../components/SentenceResult.jsx'
 import { speak, stopSpeak } from '../lib/speak.js'
 import { getEntry } from '../data/diary.js'
@@ -7,25 +7,36 @@ import { getEntry } from '../data/diary.js'
 export default function DiaryDetailScreen({ id, onBack, onDelete, onToast, onTapWord, onTapFix, activeWord, activeFix }) {
   const entry = getEntry(id)
   const [dm, setDm] = useState('sentence')
-  const [listen, setListen] = useState({})
   const [bookmark, setBookmark] = useState({})
-  const [playing, setPlaying] = useState(false)
+  const [playId, setPlayId] = useState(null) // null | 'all' | 문장 index (하나만 재생)
+
+  // 화면을 벗어나면 재생 중이던 음성 정지
+  useEffect(() => () => stopSpeak(), [])
 
   if (!entry) return null
   const isCorrection = !!entry.correction
 
+  const playing = playId === 'all'
+  const listen = typeof playId === 'number' ? { [playId]: true } : {}
+
+  // 전체 듣기 / 문장별 듣기 — 한 번에 하나만, 다시 누르면 정지, 끝나면 자동 off.
   const togglePlay = () => {
-    if (playing) {
+    if (playId === 'all') {
       stopSpeak()
-      setPlaying(false)
-    } else {
-      speak(entry.allEn)
-      setPlaying(true)
+      setPlayId(null)
+      return
     }
+    setPlayId('all')
+    speak(entry.allEn, () => setPlayId((c) => (c === 'all' ? null : c)))
   }
   const toggleListen = (i, text) => {
-    setListen((s) => ({ ...s, [i]: !s[i] }))
-    if (!listen[i]) speak(text)
+    if (playId === i) {
+      stopSpeak()
+      setPlayId(null)
+      return
+    }
+    setPlayId(i)
+    speak(text, () => setPlayId((c) => (c === i ? null : c)))
   }
   const toggleBookmark = (i) => {
     const was = bookmark[i]

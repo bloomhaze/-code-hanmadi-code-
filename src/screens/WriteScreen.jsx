@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import SentenceResult from '../components/SentenceResult.jsx'
 import WordSearchSheet from '../components/WordSearchSheet.jsx'
 import { speak, stopSpeak } from '../lib/speak.js'
@@ -14,11 +14,16 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
   const [body, setBody] = useState('')
   const [data, setData] = useState(null)
   const [dm, setDm] = useState('sentence')
-  const [listen, setListen] = useState({})
   const [bookmark, setBookmark] = useState({})
-  const [playing, setPlaying] = useState(false)
+  const [playId, setPlayId] = useState(null) // null | 'all' | 문장 index (하나만 재생)
   const [wordSheet, setWordSheet] = useState(false)
   const timer = useRef(null)
+
+  const playing = playId === 'all'
+  const listen = typeof playId === 'number' ? { [playId]: true } : {}
+
+  // 화면을 벗어나면 재생 중이던 음성 정지
+  useEffect(() => () => stopSpeak(), [])
 
   // 작성 주제 — 카테고리별 질문 풀에서 랜덤. 새로고침 시 직전과 다른 카테고리에서
   // 뽑고(같은 카테고리 연속 X), 카테고리는 노출하지 않고 질문만 보여준다. X로 닫기.
@@ -62,18 +67,24 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
     }
   }
 
+  // 전체 듣기 / 문장별 듣기 — 한 번에 하나만, 다시 누르면 정지, 끝나면 자동 off.
   const togglePlay = () => {
-    if (playing) {
+    if (playId === 'all') {
       stopSpeak()
-      setPlaying(false)
-    } else {
-      speak(data.allEn)
-      setPlaying(true)
+      setPlayId(null)
+      return
     }
+    setPlayId('all')
+    speak(data.allEn, () => setPlayId((c) => (c === 'all' ? null : c)))
   }
   const toggleListen = (i, text) => {
-    setListen((s) => ({ ...s, [i]: !s[i] }))
-    if (!listen[i]) speak(text)
+    if (playId === i) {
+      stopSpeak()
+      setPlayId(null)
+      return
+    }
+    setPlayId(i)
+    speak(text, () => setPlayId((c) => (c === i ? null : c)))
   }
   const toggleBookmark = (i) => {
     const was = bookmark[i]
