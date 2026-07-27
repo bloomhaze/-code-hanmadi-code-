@@ -82,7 +82,7 @@ export default function MyScreen({
               <div className="h-[54px] w-[54px] shrink-0 overflow-hidden rounded-full">
                 <Avatar url={avatarUrl} />
               </div>
-              <div className="flex min-w-0 flex-1 flex-col gap-[5px]">
+              <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
                 <span className="font-sans text-[17px] font-semibold text-ink-2" style={{ letterSpacing: '-.3px' }}>
                   {displayName}
                 </span>
