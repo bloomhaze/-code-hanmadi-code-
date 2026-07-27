@@ -109,7 +109,7 @@ export default function MyScreen({
               ].map((s) => (
                 <div
                   key={s.label}
-                  className="flex h-[68px] flex-1 flex-col items-center justify-center gap-1.5 rounded-2xl bg-[#f7f7f7]"
+                  className="flex h-[68px] flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl bg-[#f7f7f7]"
                 >
                   <span
                     className="whitespace-nowrap font-sans text-[12px] font-medium"
