@@ -141,6 +141,7 @@ function ResultCard({ w, onToast }) {
               onToast?.(
                 saved ? '저장을 취소했어요' : '단어를 저장했어요',
                 saved ? () => setSaved(true) : undefined,
+                saved ? undefined : true, // 저장 성공 → 체크 아이콘
               )
             }}
             className="flex h-8 w-8 items-center justify-center rounded-full"
