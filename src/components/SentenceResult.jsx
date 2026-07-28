@@ -64,6 +64,10 @@ export default function SentenceResult({
   const showSentence = hint === 'correction' ? true : mode === 'sentence'
   const showAll = hint !== 'correction' && mode === 'all'
   const segX = mode === 'sentence' ? '0%' : '100%'
+  // 교정 모드에서 실제로 고쳐진(파란) 문장이 하나라도 있는지 — 없으면 안내 문구 숨김
+  const hasFix =
+    hint === 'correction' &&
+    (data?.sentences || []).some((s) => s.correction && !s.perfect)
 
   return (
     <div className="flex flex-col">
@@ -106,20 +110,22 @@ export default function SentenceResult({
         </div>
       )}
 
-      {/* hint */}
-      <div className="mb-4 flex items-center justify-center gap-1">
-        <HandIcon />
-        {hint === 'correction' ? (
-          <div className="flex items-center gap-1.5">
-            <div className="flex items-center rounded bg-[#dcebff] px-1.5 py-[3px]">
-              <span className="font-inter text-[12px] font-medium leading-none text-[#0066ff]">파란 영역</span>
+      {/* hint — 교정 모드에선 고쳐진 부분이 있을 때만 안내 노출 */}
+      {(hint !== 'correction' || hasFix) && (
+        <div className="mb-4 flex items-center justify-center gap-1">
+          <HandIcon />
+          {hint === 'correction' ? (
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center rounded bg-[#dcebff] px-1.5 py-[3px]">
+                <span className="font-inter text-[12px] font-medium leading-none text-[#0066ff]">파란 영역</span>
+              </div>
+              <span className="font-sans text-[13px] text-muted">클릭하고 교정 이유 확인</span>
             </div>
-            <span className="font-sans text-[13px] text-muted">클릭하고 교정 이유 확인</span>
-          </div>
-        ) : (
-          <span className="font-sans text-[13px] text-muted">단어를 탭하면 뜻과 예문을 볼 수 있어요</span>
-        )}
-      </div>
+          ) : (
+            <span className="font-sans text-[13px] text-muted">단어를 탭하면 뜻과 예문을 볼 수 있어요</span>
+          )}
+        </div>
+      )}
 
       {/* SENTENCE MODE */}
       {showSentence && (

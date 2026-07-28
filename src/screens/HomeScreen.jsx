@@ -35,6 +35,13 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
   const isFuture = selOff > 0
   const beforeSignup = signup ? selDate < signup : false
   const blocked = isFuture || beforeSignup
+  // 이전(<) 화살표: 하루 전이 가입일보다 앞서면 더 이동 불가 (가입 전은 아예 노출 X)
+  const prevBlocked = useMemo(() => {
+    if (!signup) return false
+    const p = new Date(selDate)
+    p.setDate(p.getDate() - 1)
+    return p < signup
+  }, [selDate, signup])
 
   const entries = useMemo(() => diaries.filter((e) => e.dateKey === date.key), [diaries, date.key])
   const hasEntries = entries.length > 0
@@ -65,10 +72,10 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
           <div className="flex items-center gap-[5px]">
             <button
               type="button"
-              onClick={() => setSelOff((o) => o - 1)}
+              onClick={() => !prevBlocked && setSelOff((o) => o - 1)}
               className="flex h-8 w-8 items-center justify-center rounded-full"
             >
-              <ChevronLeft />
+              <ChevronLeft color={prevBlocked ? '#d4d4d4' : '#121212'} />
             </button>
             <button
               type="button"
@@ -92,8 +99,10 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
         {/* week strip */}
         <div className="flex h-[108px] justify-between gap-0 border-b border-[#eee] p-4">
           {week.map((d) => {
+            // 가입 전 날짜는 아예 노출하지 않음 — 빈칸만 유지
+            if (d.beforeSignup) return <div key={d.key} className="w-[41px]" />
             const selected = d.off === selOff
-            const disabled = d.isFuture || d.beforeSignup
+            const disabled = d.isFuture
             let numColor = '#121212'
             if (selected) numColor = '#fff'
             else if (disabled) numColor = '#c4c4c4'
