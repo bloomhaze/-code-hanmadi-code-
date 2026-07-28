@@ -66,12 +66,12 @@ export default function CalendarSheet({ months = [], selOff, onSelect, onClose, 
               {m.weeks.map((week, wi) => (
                 <div key={wi} className="flex">
                   {week.map((c, ci) => {
-                    // 빈칸 + 가입 전 날짜는 아예 노출하지 않음
-                    if (!c || c.beforeSignup) return <div key={ci} className="h-16 flex-1" />
+                    if (!c) return <div key={ci} className="h-16 flex-1" />
                     const selected = c.off === selOff
+                    // 가입 전 / 미래(오늘 아님)는 비활성(회색)으로 보여줌
                     let numColor = '#121212'
                     if (selected) numColor = '#fff'
-                    else if (c.isFuture) numColor = '#c4c4c4'
+                    else if (c.isFuture || c.beforeSignup) numColor = '#c4c4c4'
                     else if (c.isToday) numColor = ACCENT
                     return (
                       <button
