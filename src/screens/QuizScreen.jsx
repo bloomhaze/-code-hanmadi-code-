@@ -18,8 +18,8 @@ const CONFETTI = [
   ['75%', '300px', 12, 12, '50%', '#f5a2e0', '3.4s', '.5s'],
 ]
 
-export default function QuizScreen({ type = 'flash', onClose, onToast, onComplete }) {
-  const initial = useMemo(() => buildQuizList(type, 1), [type])
+export default function QuizScreen({ type = 'flash', saved = [], onClose, onToast, onComplete }) {
+  const initial = useMemo(() => buildQuizList(type, saved, 1), [type, saved])
   const [list, setList] = useState(initial)
   const [qi, setQi] = useState(0)
   const [right, setRight] = useState(0)
@@ -94,11 +94,45 @@ export default function QuizScreen({ type = 'flash', onClose, onToast, onComplet
     resetPerQuestion()
   }
   const continueMore = () => {
-    const more = buildQuizList(type, list.length + 7)
+    const more = buildQuizList(type, saved, list.length + 7)
     setList(list.concat(more))
     setQi(list.length)
     setDone(false)
     resetPerQuestion()
+  }
+
+  // ---- 저장한 표현이 없어 퀴즈를 만들 수 없을 때 ----
+  if (!list.length) {
+    const label = type === 'write' ? '문장' : type === 'blank' ? '표현·문장' : '단어·표현'
+    return (
+      <div className="absolute inset-0 z-40 flex flex-col bg-white">
+        <div className="flex h-[60px] w-full shrink-0 items-center px-5 pt-4">
+          <button type="button" onClick={onClose} className="flex h-7 w-7 items-center justify-center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M6 6l12 12M18 6L6 18" stroke="#121212" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center px-8 pb-24">
+          <span className="text-[40px]">📚</span>
+          <span className="mt-4 font-sans text-[17px] font-semibold text-ink" style={{ letterSpacing: '-.3px' }}>
+            아직 복습할 {label}이 없어요
+          </span>
+          <span className="mt-2 text-center font-sans text-[14px] text-muted" style={{ lineHeight: '21px' }}>
+            일기를 쓰고 마음에 드는 {label}을(를) 저장하면
+            <br />
+            그 표현으로 퀴즈가 만들어져요
+          </span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-7 flex h-12 items-center justify-center rounded-[20px] bg-ink px-7"
+          >
+            <span className="font-sans text-[15px] font-medium text-white">확인</span>
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // ---- DONE ----

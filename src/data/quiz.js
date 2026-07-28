@@ -1,6 +1,5 @@
-// Quiz pool + helpers — ported from the 시안 quiz logic (SRS persistence omitted;
-// order is a simple shuffle since it isn't visible in the UI).
-import { VOCAB_DATA } from './vocab.js'
+// Quiz pool + helpers — 로그인 후 사용자가 실제로 저장한 표현(saved_items) 기반.
+//   saved 항목: { id, type: 'word'|'phrase'|'sentence', term, kr?, ex?, exKr?, ko? }
 
 const STOP = new Set(
   ('the a an and or but if so of to in on at by for with from as is am are was were be been being do does did have has had ' +
@@ -30,11 +29,9 @@ export function pickBlankKey(sentence) {
   return best
 }
 
-// Find a saved word/phrase that appears in a sentence (for blanking).
-function savedTermIn(sentence) {
-  const cands = [...VOCAB_DATA.phrase.map((p) => p.term), ...VOCAB_DATA.word.map((w) => w.term)]
-    .filter((t) => t && t.trim())
-    .sort((a, b) => b.length - a.length)
+// Find one of the user's saved words/phrases inside a sentence (for blanking).
+function savedTermIn(sentence, terms = []) {
+  const cands = terms.filter((t) => t && t.trim()).sort((a, b) => b.length - a.length)
   const low = (sentence || '').toLowerCase()
   for (const t of cands) {
     const tl = t.toLowerCase()
@@ -55,7 +52,7 @@ export function blankAnswerFor(cur) {
   const words = term.split(/\s+/).filter(Boolean)
   if (words.length <= 1) return term
   if (cur && cur.kind === 'sentence') {
-    const found = savedTermIn(term)
+    const found = savedTermIn(term, (cur && cur.savedTerms) || [])
     if (found) return found
   }
   return pickBlankKey(term)
@@ -64,37 +61,43 @@ export function blankAnswerFor(cur) {
 export function writeHintFor(cur) {
   if (!cur) return ''
   if (cur.kind !== 'sentence') return cur.term || ''
-  // 문장에 지정된 핵심 표현이 있으면 그걸 우선 노출 (예: "ran into")
   if (cur.hint) return cur.hint
   const model = cur.term || ''
   const low = model.toLowerCase()
-  for (const p of VOCAB_DATA.phrase) if (low.includes(p.term.toLowerCase())) return p.term
+  for (const t of (cur.savedTerms || [])) if (t && low.includes(t.toLowerCase())) return t
   return pickBlankKey(model)
 }
 
-// Build the candidate pool for a quiz type.
-function poolFor(type) {
-  const items = []
-  const pushAll = (arr, kind) => arr.forEach((it, i) => items.push({ ...it, key: `${kind}-${i}` }))
+// 저장 항목 → 퀴즈 카드 형태
+const mapItem = (it) => ({ term: it.term, kind: it.type, ko: it.ko, kr: it.kr, exKr: it.exKr, key: it.id })
+
+// Build the candidate pool for a quiz type from the user's saved items.
+function poolFor(type, saved) {
+  const words = saved.filter((s) => s.type === 'word')
+  const phrases = saved.filter((s) => s.type === 'phrase')
+  const sentences = saved.filter((s) => s.type === 'sentence')
+  // 문장 빈칸/작문에서 핵심 표현으로 쓸 후보(저장한 표현·단어)
+  const savedTerms = [...phrases, ...words].map((s) => s.term).filter(Boolean)
+
   if (type === 'write') {
-    pushAll(VOCAB_DATA.sentence, 'sentence')
-  } else if (type === 'flash') {
-    pushAll(VOCAB_DATA.word, 'word')
-    pushAll(VOCAB_DATA.phrase, 'phrase')
-  } else {
-    // blank: multi-word phrases + short single sentences
-    VOCAB_DATA.phrase.forEach((it, i) => {
-      if ((it.term || '').trim().split(/\s+/).length >= 2) items.push({ ...it, key: `phrase-${i}` })
-    })
-    VOCAB_DATA.sentence.forEach((it, i) => {
-      const t = (it.term || '').trim()
-      const wc = t.split(/\s+/).filter(Boolean).length
-      const enders = (t.match(/[.!?]/g) || []).length
-      const oneSentence = enders <= 1 && !/[.!?]\s+\S/.test(t)
-      if (wc <= 12 && oneSentence) items.push({ ...it, key: `sentence-${i}` })
-    })
+    return sentences.map((it) => ({ ...mapItem(it), savedTerms }))
   }
-  return items
+  if (type === 'flash') {
+    return [...words, ...phrases].map(mapItem)
+  }
+  // blank: 여러 단어짜리 표현 + 짧은 단일 문장
+  const out = []
+  phrases.forEach((it) => {
+    if ((it.term || '').trim().split(/\s+/).filter(Boolean).length >= 2) out.push(mapItem(it))
+  })
+  sentences.forEach((it) => {
+    const t = (it.term || '').trim()
+    const wc = t.split(/\s+/).filter(Boolean).length
+    const enders = (t.match(/[.!?]/g) || []).length
+    const oneSentence = enders <= 1 && !/[.!?]\s+\S/.test(t)
+    if (wc <= 12 && oneSentence) out.push({ ...mapItem(it), savedTerms })
+  })
+  return out
 }
 
 // Deterministic-ish shuffle seeded by length so repeat runs vary without Date/random.
@@ -112,14 +115,11 @@ function shuffle(arr, seed = 0) {
   return a
 }
 
-// Build a session of exactly 10 questions (cycling the pool if smaller).
-export function buildQuizList(type, seed = 0) {
-  const pool = shuffle(poolFor(type), seed)
+// 저장한 표현으로 최대 10문항 세션 구성. 저장분이 적으면 있는 만큼만(목업 패딩 없음).
+export function buildQuizList(type, saved = [], seed = 0) {
+  const pool = shuffle(poolFor(type, saved || []), seed)
   if (!pool.length) return []
-  const list = pool.slice(0, 10)
-  let i = 0
-  while (list.length < 10) list.push(pool[i++ % pool.length])
-  return list
+  return pool.slice(0, 10)
 }
 
 // The Korean prompt / meaning for a card.
