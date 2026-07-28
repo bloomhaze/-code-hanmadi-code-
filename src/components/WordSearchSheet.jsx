@@ -2,23 +2,29 @@ import { useRef, useState } from 'react'
 import { SpeakerSmall, BookmarkSmall, SearchIcon } from './icons.jsx'
 import { hlSegs } from '../lib/text.js'
 import { speak } from '../lib/speak.js'
-import { searchExpressions } from '../data/lookups.js'
+import { searchExpressions } from '../lib/search.js'
 
-// 단어 검색 시트 — 모르는 표현을 검색해 영어 표현 제안을 받는다.
+// 단어 검색 시트 — 모르는 표현을 검색해 AI가 실제로 많이 쓰는 영어 표현 1~5개를 제안한다.
 export default function WordSearchSheet({ onClose, onToast }) {
   const [query, setQuery] = useState('')
-  const [status, setStatus] = useState('idle') // idle | loading | results
+  const [status, setStatus] = useState('idle') // idle | loading | results | error
   const [results, setResults] = useState([])
-  const timer = useRef(null)
+  const reqId = useRef(0)
 
-  const run = () => {
-    if (!query.trim()) return
+  const run = async () => {
+    const q = query.trim()
+    if (!q) return
+    const id = ++reqId.current
     setStatus('loading')
-    clearTimeout(timer.current)
-    timer.current = setTimeout(() => {
-      setResults(searchExpressions(query))
-      setStatus('results')
-    }, 700)
+    try {
+      const list = await searchExpressions(q)
+      if (id !== reqId.current) return // 더 최근 검색이 있으면 무시
+      setResults(list)
+      setStatus(list.length ? 'results' : 'error')
+    } catch {
+      if (id !== reqId.current) return
+      setStatus('error')
+    }
   }
 
   return (
@@ -86,6 +92,15 @@ export default function WordSearchSheet({ onClose, onToast }) {
             <SearchIcon color="#dcdcdc" />
             <span className="text-center font-sans text-[14px]" style={{ color: '#c4c4c4' }}>
               표현하고 싶은 단어를 검색해보세요
+            </span>
+          </div>
+        )}
+
+        {status === 'error' && (
+          <div className="mt-24 flex flex-col items-center gap-3">
+            <SearchIcon color="#dcdcdc" />
+            <span className="text-center font-sans text-[14px]" style={{ color: '#c4c4c4' }}>
+              표현을 찾지 못했어요. 다시 검색해보세요
             </span>
           </div>
         )}

@@ -236,6 +236,24 @@ function explainPrompt(original: string, corrected: string, phrase: string) {
   )
 }
 
+function searchPrompt(query: string) {
+  return (
+    '너는 영어 표현 사전이야. 학습자가 한국어 단어나 표현을 검색했어. ' +
+    '그 뜻을 영어로 말할 때 원어민이 "실제로 가장 많이 쓰는" 표현을 사용 빈도가 높은 순서로 최대 5개(최소 1개) 뽑아줘.\n' +
+    '검색어: "' + query + '"\n' +
+    '요구사항:\n' +
+    '- 가장 흔하고 자연스러운 표현이 1위, 그 다음으로 자주 쓰는 순서로 정렬.\n' +
+    '- 억지로 5개 채우지 말고, 정말 자주 쓰는 것만. 뜻이 거의 같아도 뉘앙스가 다르면 포함 가능.\n' +
+    '- 각 표현마다:\n' +
+    '  - term: 영어 표현(구동사/숙어면 통째로). 예: "have an interview", "go for an interview"\n' +
+    '  - kr: 그 표현의 한국어 뜻(짧게). 뉘앙스 차이가 있으면 살짝 덧붙여.\n' +
+    '  - ex: 그 표현을 그 형태 그대로 포함하는, 일상에서 자주 쓸 법한 자연스러운 예문 1개.\n' +
+    '  - exKr: 그 예문의 한국어 번역.\n' +
+    '- 검색어가 영어면 그대로 영어 표현으로 다뤄도 돼.\n' +
+    '반드시 이 JSON만 반환: {"results": [{"term": "...", "kr": "...", "ex": "...", "exKr": "..."}]}'
+  )
+}
+
 function wordPrompt(word: string, sentence: string) {
   return (
     '너는 영어 학습자를 위한 친절한 영어 사전이야. 학습자가 문장에서 단어(또는 표현)를 탭했어.\n' +
@@ -321,6 +339,17 @@ Deno.serve(async (req) => {
       const { data, error } = await callGroq(key, wordPrompt(word, (body.sentence || '').trim()))
       if (error) return json({ error })
       return json({ kr: data.kr || '', ex: data.ex || '', exKr: data.exKr || '' })
+    }
+
+    if (action === 'search') {
+      const q = (body.query || body.text || '').trim()
+      if (!q) return json({ error: '검색어가 없어요.' })
+      // 자연스러운 표현이 필요해 SMART_MODEL + temperature 0.3, 실패 시 llama 폴백.
+      let r = await callGroq(key, searchPrompt(q), SMART_MODEL, 0.3)
+      if (r.error) r = await callGroq(key, searchPrompt(q), GROQ_MODEL, 0.3)
+      if (r.error) return json({ error: r.error })
+      const results = Array.isArray(r.data.results) ? r.data.results.slice(0, 5) : []
+      return json({ results })
     }
 
     const text = (body.text || '').trim()
