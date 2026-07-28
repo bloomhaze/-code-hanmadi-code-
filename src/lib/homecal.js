@@ -75,18 +75,21 @@ function buildMonth(year, month, entrySet, signup) {
   return { title: `${year}년 ${month}월`, weeks }
 }
 
-// 가입월 ~ 이번 달까지의 월 목록 (가입일 없으면 이번 달만)
+// 가입월 ~ 다음 달까지의 월 목록 (미래는 이번 달 + 다음 달까지 노출, 회색 비활성)
 export function monthsRange(signup, entrySet) {
   const today = realToday()
   const startY = signup ? signup.getFullYear() : today.getFullYear()
   const startM = signup ? signup.getMonth() : today.getMonth()
+  // 종료 월 = 이번 달 + 1 (다음 달까지)
+  const end = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+  const endY = end.getFullYear()
+  const endM = end.getMonth()
   const months = []
   let y = startY
   let m = startM // 0-based
-  // 이번 달까지 (최대 60개월 가드)
-  for (let guard = 0; guard < 60; guard++) {
+  for (let guard = 0; guard < 72; guard++) {
     months.push(buildMonth(y, m + 1, entrySet, signup))
-    if (y === today.getFullYear() && m === today.getMonth()) break
+    if (y === endY && m === endM) break
     m += 1
     if (m > 11) { m = 0; y += 1 }
   }
