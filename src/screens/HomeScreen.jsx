@@ -42,6 +42,12 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
     p.setDate(p.getDate() - 1)
     return p < signup
   }, [selDate, signup])
+  // 다음(>) 화살표: 다음 날이 미래(오늘 이후)면 이동 불가
+  const nextBlocked = useMemo(() => {
+    const n = new Date(selDate)
+    n.setDate(n.getDate() + 1)
+    return n > realToday()
+  }, [selDate])
 
   const entries = useMemo(() => diaries.filter((e) => e.dateKey === date.key), [diaries, date.key])
   const hasEntries = entries.length > 0
@@ -88,10 +94,10 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
             </button>
             <button
               type="button"
-              onClick={() => !isFuture && setSelOff((o) => o + 1)}
+              onClick={() => !nextBlocked && setSelOff((o) => o + 1)}
               className="flex h-8 w-8 items-center justify-center rounded-full"
             >
-              <ChevronRight color={isFuture ? '#d4d4d4' : '#121212'} />
+              <ChevronRight color={nextBlocked ? '#d4d4d4' : '#121212'} />
             </button>
           </div>
         </div>
