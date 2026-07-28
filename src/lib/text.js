@@ -50,6 +50,18 @@ export const PHRASES = [
   'on time',
   'at first',
   'after all',
+  // 관용 표현(활용형 포함)
+  'mind goes blank',
+  'mind went blank',
+  'my mind goes blank',
+  'my mind went blank',
+  'change my mind',
+  'make up my mind',
+  'keep in mind',
+  'end up',
+  'ended up',
+  'give it a try',
+  'let it go',
 ]
 
 // Tokenize an English sentence into tappable tokens, grouping known phrases.

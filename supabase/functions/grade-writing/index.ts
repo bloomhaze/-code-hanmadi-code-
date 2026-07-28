@@ -131,6 +131,17 @@ async function callGroq(
   }
 }
 
+// 한국어 출력 필드 보호 — 한자(CJK)·일본어 가나·키릴(러시아어 등) 문자를 강제 제거.
+// 프롬프트로 막아도 모델이 드물게 섞어 내보내므로 코드에서 최종 차단한다.
+const FOREIGN_RE = /[぀-ヿ㐀-䶿一-鿿豈-﫿Ѐ-ӿ]/g
+function stripForeign(s: string): string {
+  return (s || '').replace(FOREIGN_RE, '').replace(/\s{2,}/g, ' ').trim()
+}
+function hasForeign(s: string): boolean {
+  // /g 정규식의 .test()는 상태를 유지하므로, 플래그 없는 새 정규식으로 검사
+  return new RegExp(FOREIGN_RE.source).test(s || '')
+}
+
 function gradePrompt(ko: string, answer: string, model: string) {
   return (
     '너는 매우 엄격한 영어 첨삭 선생님이야. 학습자가 한국어 문장을 영어로 작문했어.\n' +
@@ -183,7 +194,8 @@ function translatePrompt(text: string) {
     '- en: 위 원칙과 예시 수준의 자연스러운 원어민 영어\n' +
     '- phrases: 그 en 문장 안에 등장하는 아래 세 종류를 en에 나타난 표면형(철자·활용형) 그대로 배열로 담아:\n' +
     '    (1) 구동사(phrasal verb) 예: run into, catch up on, come across, look forward to, give up\n' +
-    '    (2) 관용 표현/이디엄(idiom) 예: piece of cake, break the ice, under the weather, once in a while, on the same page\n' +
+    '    (2) 관용 표현/이디엄(idiom) 예: piece of cake, break the ice, under the weather, once in a while, on the same page, ' +
+    'mind goes blank(머리가 하얘지다), end up, let it go, make up my mind — 이런 여러 단어가 한 뜻으로 굳어진 표현은 통째로 넣어\n' +
     '    (3) 하나의 뜻으로 굳어진 전치사·부사 표현 — 개별 단어로 쪼개면 뜻이 안 통하고 통째로 외워야 하는 표현. ' +
     '예: at the last minute(막판에), in the meantime(그동안에), out of nowhere(난데없이), on purpose(일부러), ' +
     'for a while(한동안), all of a sudden(갑자기), by the way(그런데), in advance(미리), at least(적어도), ' +
@@ -342,15 +354,20 @@ Deno.serve(async (req) => {
       if (!phrase || !original) return json({ error: '설명할 내용이 부족해요.' })
       const { data, error } = await callGroq(key, explainPrompt(original, corrected, phrase))
       if (error) return json({ error })
-      return json({ reason: data.reason || '' })
+      return json({ reason: stripForeign(data.reason || '') })
     }
 
     if (action === 'word') {
       const word = (body.word || '').trim()
       if (!word) return json({ error: '단어가 없어요.' })
-      const { data, error } = await callGroq(key, wordPrompt(word, (body.sentence || '').trim()))
+      let { data, error } = await callGroq(key, wordPrompt(word, (body.sentence || '').trim()))
+      // 한자·러시아어 등이 섞이면 SMART_MODEL로 한 번 재시도(품질↑), 그래도 남으면 코드에서 제거
+      if (!error && (hasForeign(data.kr) || hasForeign(data.exKr))) {
+        const retry = await callGroq(key, wordPrompt(word, (body.sentence || '').trim()), SMART_MODEL, 0.2)
+        if (!retry.error) data = retry.data
+      }
       if (error) return json({ error })
-      return json({ kr: data.kr || '', ex: data.ex || '', exKr: data.exKr || '' })
+      return json({ kr: stripForeign(data.kr || ''), ex: (data.ex || '').trim(), exKr: stripForeign(data.exKr || '') })
     }
 
     if (action === 'search') {
@@ -360,7 +377,12 @@ Deno.serve(async (req) => {
       let r = await callGroq(key, searchPrompt(q), SMART_MODEL, 0.3)
       if (r.error) r = await callGroq(key, searchPrompt(q), GROQ_MODEL, 0.3)
       if (r.error) return json({ error: r.error })
-      const results = Array.isArray(r.data.results) ? r.data.results.slice(0, 5) : []
+      const results = (Array.isArray(r.data.results) ? r.data.results.slice(0, 5) : []).map((it: any) => ({
+        term: (it.term || '').trim(),
+        kr: stripForeign(it.kr || ''),
+        ex: (it.ex || '').trim(),
+        exKr: stripForeign(it.exKr || ''),
+      }))
       return json({ results })
     }
 
@@ -372,13 +394,21 @@ Deno.serve(async (req) => {
       let r = await callGroq(key, translatePrompt(text), SMART_MODEL, 0.4)
       if (r.error) r = await callGroq(key, translatePrompt(text), GROQ_MODEL, 0.4)
       if (r.error) return json({ error: r.error })
-      return json({ sentences: Array.isArray(r.data.sentences) ? r.data.sentences : [] })
+      const sentences = (Array.isArray(r.data.sentences) ? r.data.sentences : []).map((s: any) => ({
+        ...s,
+        ko: stripForeign(s.ko || ''), // 한국어 원문 필드에 한자 등 혼입 방지
+      }))
+      return json({ sentences })
     }
     if (action === 'correct') {
       let r = await callGroq(key, correctPrompt(text), SMART_MODEL, 0.4)
       if (r.error) r = await callGroq(key, correctPrompt(text), GROQ_MODEL, 0.4)
       if (r.error) return json({ error: r.error })
-      return json({ sentences: Array.isArray(r.data.sentences) ? r.data.sentences : [] })
+      const sentences = (Array.isArray(r.data.sentences) ? r.data.sentences : []).map((s: any) => ({
+        ...s,
+        ko: stripForeign(s.ko || ''), // 한국어 뜻 필드에 한자 등 혼입 방지
+      }))
+      return json({ sentences })
     }
     return json({ error: 'unknown action' })
   } catch (e) {
