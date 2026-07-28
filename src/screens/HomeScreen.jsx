@@ -260,15 +260,17 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
         </div>
       </div>
 
-      {/* ===== FAB ===== */}
-      <button
-        type="button"
-        onClick={onWrite}
-        className="absolute bottom-5 right-5 z-[25] flex h-14 w-14 items-center justify-center rounded-full"
-        style={{ background: ACCENT, boxShadow: '0 8px 24px rgba(42,56,89,.25)' }}
-      >
-        <PencilIcon size={26} />
-      </button>
+      {/* ===== FAB — 오늘 날짜에서만 노출 ===== */}
+      {isToday && (
+        <button
+          type="button"
+          onClick={onWrite}
+          className="absolute bottom-5 right-5 z-[25] flex h-14 w-14 items-center justify-center rounded-full"
+          style={{ background: ACCENT, boxShadow: '0 8px 24px rgba(42,56,89,.25)' }}
+        >
+          <PencilIcon size={26} />
+        </button>
+      )}
 
       {/* ===== CALENDAR ===== */}
       {calendarOpen && (
