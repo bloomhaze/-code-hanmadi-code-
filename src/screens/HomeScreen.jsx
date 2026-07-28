@@ -1,17 +1,43 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight, ChevronDownSmall, PencilIcon } from '../components/icons.jsx'
+import { ChevronLeft, ChevronRight, ChevronDownSmall, PencilIcon, ListenIcon, BookmarkIcon } from '../components/icons.jsx'
 import CalendarSheet from '../components/CalendarSheet.jsx'
 import { buildWeek, dateInfo, monthsRange, midnight, realToday } from '../lib/homecal.js'
+import { speak, stopSpeak } from '../lib/speak.js'
 import { PROMPTS } from '../data/diary.js'
 
 const ACCENT = '#0066FF'
 
+// 문장의 영어 표시 텍스트 (교정본 우선, 없으면 원문/번역)
+function enText(s) {
+  if (!s) return ''
+  if (s.correction) {
+    if (Array.isArray(s.fixSegs)) return s.fixSegs.map((g) => g.t).join('')
+    return s.corrected || s.en || ''
+  }
+  return s.en || ''
+}
+
 // 홈 탭 — 실제 날짜 달력(가입일 이후 노출, 일기 쓴 날 파란 닷) + 선택일의 내 일기.
-export default function HomeScreen({ userName = '현진', diaries = [], signupDate, onWrite, onToast, onOpen }) {
+export default function HomeScreen({ userName = '현진', diaries = [], signupDate, onWrite, onToast, onOpen, onSaveExpr, isSaved }) {
   const [selOff, setSelOff] = useState(0) // 0 = 오늘
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [promptIdx, setPromptIdx] = useState(0)
+  const [playId, setPlayId] = useState(null) // 재생 중인 문장 키 `${entryId}-${i}`
   const scrollRef = useRef(null)
+
+  // 화면 벗어나면 재생 중지
+  useEffect(() => () => stopSpeak(), [])
+
+  // 문장 듣기 — 한 번에 하나, 다시 누르면 정지, 끝나면 자동 off
+  const toggleListen = (pid, text) => {
+    if (playId === pid) {
+      stopSpeak()
+      setPlayId(null)
+      return
+    }
+    setPlayId(pid)
+    speak(text, () => setPlayId((c) => (c === pid ? null : c)))
+  }
 
   const prompts = PROMPTS(userName)
   useEffect(() => {
@@ -215,46 +241,45 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
             </div>
           )}
 
-          {/* entries for the selected day */}
-          <div className="flex flex-col gap-3">
+          {/* entries for the selected day — 문장 단위(한/영) 글 형태. 단어 탭 없음, 전체 클릭 시 상세로 이동 */}
+          <div className="flex flex-col gap-5">
             {hasEntries &&
               entries.map((e) => (
-                <button
-                  key={e.id}
-                  type="button"
-                  onClick={() => onOpen?.(e.id)}
-                  className="flex flex-col gap-2 rounded-[20px] bg-[#f7f7f7] p-4 text-left"
-                  style={{ boxShadow: 'inset 0 0 0 .5px #eee' }}
-                >
-                  <span
-                    className="flex h-[22px] w-[31px] items-center justify-center self-start rounded-full"
-                    style={{ background: e.lang === 'EN' ? '#dcebff' : '#f1f1f2' }}
-                  >
-                    <span
-                      className="font-inter text-[11px] font-semibold"
-                      style={{ color: e.lang === 'EN' ? '#0066ff' : '#7a7b7d' }}
-                    >
-                      {e.lang}
-                    </span>
-                  </span>
-                  <span
-                    className="text-[15px] font-normal text-ink-2"
-                    style={{
-                      fontFamily:
-                        e.lang === 'EN'
-                          ? "'Inter Variable', 'Inter', sans-serif"
-                          : "'Pretendard Variable', 'Pretendard', sans-serif",
-                      lineHeight: e.lang === 'EN' ? '24px' : '20.8px',
-                      letterSpacing: '-.2px',
-                      display: '-webkit-box',
-                      WebkitBoxOrient: 'vertical',
-                      WebkitLineClamp: 3,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {e.preview}
-                  </span>
-                </button>
+                <div key={e.id} className="flex flex-col gap-[9px]">
+                  {(e.sentences || []).map((s, i) => {
+                    const en = enText(s)
+                    const pid = `${e.id}-${i}`
+                    const bm = isSaved?.('sentence', en) || false
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => onOpen?.(e.id)}
+                        className="flex cursor-pointer flex-col gap-1.5 rounded-[20px] bg-[#f7f7f7] p-5"
+                        style={{ boxShadow: 'inset 0 0 0 .5px #eee' }}
+                      >
+                        <span className="mb-1.5 font-sans text-[14px] font-light leading-5 text-sub">{s.ko}</span>
+                        <span
+                          className="font-inter text-[16px] text-ink"
+                          style={{ lineHeight: '26px', letterSpacing: '-.2px' }}
+                        >
+                          {en}
+                        </span>
+                        <div className="mt-1 flex justify-end gap-2" onClick={(ev) => ev.stopPropagation()}>
+                          <button type="button" onClick={() => toggleListen(pid, en)} className="h-8 w-8">
+                            <ListenIcon on={playId === pid} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onSaveExpr?.({ type: 'sentence', term: en, data: { ko: s.ko || '' } })}
+                            className="h-8 w-8"
+                          >
+                            <BookmarkIcon on={bm} />
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               ))}
           </div>
         </div>
