@@ -161,6 +161,10 @@ function translatePrompt(text: string) {
     '- 격식 빼고 자연스러운 일기체. 대신 문법·관사·시제·전치사·관용구는 원어민 수준으로 정확히.\n' +
     '- "기분이 좋았다" 같은 감정은 밋밋하게 "I was happy"로 끝내지 말고 ' +
     '"it really made my day", "it put me in a great mood", "I couldn\'t have been happier" 처럼 생생하게.\n' +
+    '★ 어휘 난이도(매우 중요): 원어민이 일상 대화에서 자주 쓰는 쉽고 흔한 단어를 우선해. ' +
+    '문어적·시적·잘 안 쓰는 어려운 단어는 피하고, 더 쉬운 표현으로 같은 뜻을 전달할 수 있으면 그걸 써. ' +
+    '예: "linger"(X, 문어체) → "is still there"/"won\'t go away"(O), "a pang of regret"(X) → "a bit of regret"/"I felt bad"(O), ' +
+    '"commence"(X) → "start"(O), "utilize"(X) → "use"(O). 어려운 단어로 유식해 보이려 하지 말고, 실제 원어민이 편하게 쓰는 말로.\n' +
     '\n' +
     '★ 참고 예시 (이 수준·스타일 그대로 뽑아내):\n' +
     '입력: "오늘 남자친구랑 모듬회를 먹었다. 갑자기 약속을 잡고 갔는데 너무 맛있어서 기분이좋았다"\n' +
@@ -203,6 +207,8 @@ function correctPrompt(text: string) {
     '- 문법은 맞지만 어색하거나 콩글리쉬한 표현은, 원어민이 실제로 쓰는 자연스럽고 매끄러운 표현으로 다듬어. ' +
     '밋밋한 표현(I was happy, it was good)은 더 생생한 원어민 표현으로.\n' +
     '- 필요하면 어순을 바꾸거나 접속사(but, so, and, that)로 문장을 자연스럽게 이어도 돼.\n' +
+    '- 어휘는 원어민이 일상에서 자주 쓰는 쉽고 흔한 단어를 우선해. 문어적·잘 안 쓰는 어려운 단어(linger, commence, utilize 등)는 피하고 ' +
+    '더 쉬운 표현(is still there, start, use 등)으로 바꿔.\n' +
     '- 단, 학습자의 원래 의도·의미는 반드시 유지해 (내용을 바꾸거나 새 사실을 덧붙이지 마).\n' +
     '- 이미 문법·철자·표현이 모두 정확하고 자연스러우면 corrected를 original과 똑같이 둬 (억지 교정 금지).\n' +
     '\n' +
