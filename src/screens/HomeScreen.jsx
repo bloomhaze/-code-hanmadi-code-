@@ -285,8 +285,8 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
         </div>
       </div>
 
-      {/* ===== FAB — 오늘 날짜에서만 노출 ===== */}
-      {isToday && (
+      {/* ===== FAB — 오늘이고 아직 일기를 안 쓴 경우에만 노출(하루 1개) ===== */}
+      {todayEmpty && (
         <button
           type="button"
           onClick={onWrite}
