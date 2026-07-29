@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   SearchIcon,
   SpeakerSmall,
@@ -24,20 +24,33 @@ export default function VocabScreen({ saved = [], onToggleSave, onWrite, onToast
   const [playing, setPlaying] = useState(null) // 현재 재생 중인 카드 key (하나만)
   const [rollIdx, setRollIdx] = useState(0)
 
-  // 저장 표현을 타입별로 그룹핑
+  // 화면에 보이는 목록(view)은 이번 방문 동안 고정 — 저장 취소해도 카드는 남고,
+  // 탭을 벗어났다 돌아오면(재마운트) 새로 반영되어 사라진다.
+  const [view, setView] = useState(saved)
+  useEffect(() => {
+    setView((prev) => {
+      const map = new Map(prev.map((x) => [x.id, x]))
+      saved.forEach((it) => map.set(it.id, it)) // 새로 저장/재저장된 건 추가·갱신, 취소된 건 유지
+      return Array.from(map.values())
+    })
+  }, [saved])
+  // 실제 저장 여부(북마크 채움 상태 표시용)
+  const savedIds = useMemo(() => new Set(saved.map((s) => s.id)), [saved])
+
+  // 저장 표현을 타입별로 그룹핑 (보이는 목록 기준)
   const byType = useMemo(() => {
     const g = { word: [], phrase: [], sentence: [] }
-    saved.forEach((it) => {
+    view.forEach((it) => {
       if (g[it.type]) g[it.type].push(it)
     })
     return g
-  }, [saved])
+  }, [view])
   const counts = {
     word: byType.word.length,
     phrase: byType.phrase.length,
     sentence: byType.sentence.length,
   }
-  const total = saved.length
+  const total = view.length
   const hasSaved = total > 0
 
   // rolling quiz word from saved words + phrases
@@ -223,7 +236,7 @@ export default function VocabScreen({ saved = [], onToggleSave, onWrite, onToast
           {/* cards */}
           <div className="flex flex-col gap-3">
             {items.map(({ it, key }) => {
-              const saved = true // 단어장에 보이는 건 전부 저장된 것
+              const saved = savedIds.has(it.id) // 실제 저장 상태 (취소하면 off로 바뀌지만 카드는 유지)
               const ls = playing === key
               if (it.type === 'sentence') {
                 return (
