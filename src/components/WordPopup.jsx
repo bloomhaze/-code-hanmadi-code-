@@ -15,10 +15,10 @@ export default function WordPopup({ state, saved = false, onToggleSave, onClose,
         style={{ animation: 'scaleIn .24s cubic-bezier(.22,1,.36,1)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex min-h-8 items-center justify-between">
+        <div className="flex min-h-8 items-center justify-between gap-3">
           <span
-            className="font-inter text-[22px] font-semibold text-ink-2"
-            style={{ lineHeight: '100%', letterSpacing: '-.3px' }}
+            className="flex h-8 items-center font-inter text-[22px] font-semibold text-ink-2"
+            style={{ lineHeight: '32px', letterSpacing: '-.3px' }}
           >
             {term}
           </span>
