@@ -73,6 +73,11 @@ const PHRASAL_VERBS = [
   'set up', 'sort out', 'use up', 'write down', 'knock out', 'freak out', 'wipe out', 'call off',
   'drop off', 'pick out', 'shut down', 'break down', 'hold up', 'kick out', 'lock up', 'mess up',
   'pull off', 'push away', 'talk over', 'think over', 'turn down', 'wake up', 'warm up',
+  // 기본형(표제어) 매핑용 — 연속형 구동사 포함
+  'run into', 'run over', 'stream down', 'sneak up', 'turn out', 'break out', 'come across',
+  'catch up', 'look into', 'go through', 'come up', 'show up', 'take out', 'put off', 'give in',
+  'move on', 'carry on', 'settle down', 'slow down', 'speed up', 'stand out', 'reach out',
+  'pass out', 'sign up', 'sit down', 'stand up', 'end up', 'get up', 'grow up', 'look up',
 ]
 
 // 동사의 흔한 활용형 집합 (규칙 변화 위주)
@@ -86,13 +91,48 @@ function verbForms(v) {
     f.add(v.slice(0, -1) + 'ies')
     f.add(v.slice(0, -1) + 'ied')
   }
+  // 자음 중복(run→running, sit→sitting): 짧은 CVC 단어만
+  if (v.length >= 3 && /[bcdfghjklmnpqrstvwxz][aeiou][bcdfghjklmnpqrstvwxz]$/.test(v)) {
+    const d = v[v.length - 1]
+    f.add(v + d + 'ing')
+    f.add(v + d + 'ed')
+  }
   return f
 }
 
 const PV_INDEX = PHRASAL_VERBS.map((pv) => {
   const [verb, particle] = pv.split(' ')
-  return { forms: verbForms(verb), particle }
+  return { verb, forms: verbForms(verb), particle }
 })
+
+// 활용형 동사 → 기본형(휴리스틱). 알려진 구동사면 목록에서 정확히 찾고, 아니면 규칙 역변환.
+function baseVerb(w) {
+  const v = (w || '').toLowerCase()
+  if (v.length <= 3) return v
+  if (v.endsWith('ies')) return v.slice(0, -3) + 'y'
+  if (v.endsWith('ied')) return v.slice(0, -3) + 'y'
+  if (v.endsWith('ing')) {
+    let b = v.slice(0, -3)
+    if (b.length >= 2 && b[b.length - 1] === b[b.length - 2] && !'aeiou'.includes(b[b.length - 1])) b = b.slice(0, -1)
+    return b
+  }
+  if (v.endsWith('ed')) {
+    let b = v.slice(0, -2)
+    if (b.length >= 2 && b[b.length - 1] === b[b.length - 2] && !'aeiou'.includes(b[b.length - 1])) b = b.slice(0, -1)
+    return b
+  }
+  if (/(ch|sh|ss|x|z|o)es$/.test(v)) return v.slice(0, -2)
+  if (v.endsWith('s') && !v.endsWith('ss')) return v.slice(0, -1)
+  return v
+}
+
+// 구동사 표제어 = 기본형 동사 + 부사. (running into → run into)
+function phrasalBase(verbTok, particle) {
+  const v = (verbTok || '').toLowerCase()
+  const p = (particle || '').toLowerCase()
+  for (const pv of PV_INDEX) if (pv.particle === p && pv.forms.has(v)) return `${pv.verb} ${p}`
+  return `${baseVerb(v)} ${p}`
+}
 
 // 위치 i에서 "동사(활용형) + 목적어대명사 1~2개 + 부사" 분리형 구동사면 그 길이(3~4)를 반환.
 function matchSeparable(toks, i, clean) {
@@ -134,7 +174,7 @@ export function mkWords(en, extra = []) {
       const ws = toks.slice(i, i + sepLen)
       out.push({
         t: ws.join(' '),
-        term: `${clean(ws[0])} ${clean(ws[sepLen - 1])}`,
+        term: phrasalBase(clean(ws[0]), clean(ws[sepLen - 1])), // 표제어는 기본형 (wears out → wear out)
         isPhrase: true,
         sep: [
           { t: ws[0], hl: true },
@@ -172,6 +212,12 @@ export function mkWords(en, extra = []) {
     const raw = toks.slice(i, i + span).join(' ')
     let term = matched ? matched.term : clean(raw)
 
+    // 2단어 구동사(동사+부사)면 표제어를 기본형으로 (running into → run into)
+    if (matched && span === 2) {
+      const p = term.split(' ')
+      if (p.length === 2 && PARTICLES.has(p[1])) term = phrasalBase(p[0], p[1])
+    }
+
     // 분리형 구동사(예: "tried it out") — 중간 목적어는 일반, 동사+부사만 하이라이트.
     let sep = null
     if (matched && span >= 3) {
@@ -184,7 +230,7 @@ export function mkWords(en, extra = []) {
           { t: ' ' + ws.slice(1, span - 1).join(' ') + ' ', hl: false },
           { t: ws[span - 1], hl: true },
         ]
-        term = `${clean(ws[0])} ${clean(ws[span - 1])}` // 구동사(동사+부사)
+        term = phrasalBase(clean(ws[0]), clean(ws[span - 1])) // 구동사 기본형(동사+부사)
       }
     }
     out.push({ t: raw, term, isPhrase: !!matched, sep })

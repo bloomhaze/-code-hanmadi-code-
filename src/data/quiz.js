@@ -123,8 +123,10 @@ export function buildQuizList(type, saved = [], seed = 0) {
 }
 
 // The Korean prompt / meaning for a card.
+// 앞에 붙는 품사 분류 태그(예: "(구동사) ", "(형용사) ")는 퀴즈에선 제거.
 export function koOf(cur) {
-  return (cur && (cur.ko || cur.kr || cur.exKr)) || ''
+  const s = (cur && (cur.ko || cur.kr || cur.exKr)) || ''
+  return s.replace(/^\s*\([^)]*\)\s*/, '').trim()
 }
 
 // 작문 채점은 src/lib/grade.js 로 이동 (Supabase Edge Function 기반 AI 채점 + 엄격 폴백).
