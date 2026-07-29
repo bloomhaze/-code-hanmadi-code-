@@ -206,14 +206,19 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
               className="flex min-h-[71px] w-full items-center justify-center gap-2 rounded-[20px] px-[18px] py-4"
               style={{ outline: '.5px dashed #abcfff', outlineOffset: '-.5px' }}
             >
-              <PencilIcon size={15} fill={ACCENT} />
-              <div className="flex h-6 items-center overflow-hidden">
+              <div className="flex h-6 items-center justify-center overflow-hidden">
                 <span
                   key={promptIdx}
-                  className="whitespace-nowrap font-inter text-[15px] font-medium"
-                  style={{ color: ACCENT, lineHeight: '24px', letterSpacing: '-.2px', animation: 'promptFade 3.6s ease-in-out' }}
+                  className="flex items-center gap-1.5 whitespace-nowrap"
+                  style={{ animation: 'promptFade 3.6s ease-in-out' }}
                 >
-                  {prompts[promptIdx]}
+                  <PencilIcon size={15} fill={ACCENT} />
+                  <span
+                    className="font-inter text-[15px] font-medium"
+                    style={{ color: ACCENT, lineHeight: '24px', letterSpacing: '-.2px' }}
+                  >
+                    {prompts[promptIdx]}
+                  </span>
                 </span>
               </div>
             </button>
