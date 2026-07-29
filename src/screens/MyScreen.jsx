@@ -118,12 +118,12 @@ export default function MyScreen({
                     {displayName}
                   </span>
                   <span
-                    className="truncate font-inter text-[13px] font-extralight"
+                    className="truncate font-inter text-[13px] font-light"
                     style={{ color: '#8c8c8c', letterSpacing: '-.2px' }}
                   >
                     {displayEmail}
                   </span>
-                  <span className="font-sans text-[13px] font-light" style={{ color: ACCENT, letterSpacing: '-.2px' }}>
+                  <span className="font-sans text-[13px] font-normal" style={{ color: ACCENT, letterSpacing: '-.2px' }}>
                     2026년 1월 8일 가입
                   </span>
                 </div>
