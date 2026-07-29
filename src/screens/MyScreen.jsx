@@ -99,7 +99,7 @@ export default function MyScreen({
                 </div>
                 <span
                   className="font-sans text-[13px] font-light"
-                  style={{ color: '#9b9b9b', lineHeight: '19px', letterSpacing: '-.2px' }}
+                  style={{ color: '#7c7c7c', lineHeight: '19px', letterSpacing: '-.2px' }}
                 >
                   로그인하고 한마디 다이어리를
                   <br />
