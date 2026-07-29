@@ -335,15 +335,33 @@ export default function App() {
   // 모바일: 스크롤 내리면 하단탭 숨김, 올리면 다시 표시
   const [tabHidden, setTabHidden] = useState(false)
   const lastScrollY = useRef(0)
+  const scrollLockUntil = useRef(0) // 토글 후 레이아웃 전환 동안 재토글 방지
   useEffect(() => {
     setTabHidden(false)
     lastScrollY.current = 0
+    scrollLockUntil.current = 0
   }, [tab])
   const onContentScroll = (e) => {
     const y = e.target?.scrollTop ?? 0
-    const last = lastScrollY.current
-    if (y > last + 6 && y > 48) setTabHidden(true) // 아래로 스크롤
-    else if (y < last - 6) setTabHidden(false) // 위로 스크롤
+    const now = Date.now()
+    // 토글 직후 300ms는 레이아웃 전환에 의한 스크롤 이벤트라 무시(피드백 루프 방지)
+    if (now < scrollLockUntil.current) {
+      lastScrollY.current = y
+      return
+    }
+    const dy = y - lastScrollY.current
+    if (y <= 4) {
+      if (tabHidden) {
+        setTabHidden(false)
+        scrollLockUntil.current = now + 320
+      }
+    } else if (dy > 6 && !tabHidden) {
+      setTabHidden(true) // 아래로 스크롤 → 숨김
+      scrollLockUntil.current = now + 320
+    } else if (dy < -6 && tabHidden) {
+      setTabHidden(false) // 위로 스크롤 → 표시
+      scrollLockUntil.current = now + 320
+    }
     lastScrollY.current = y
   }
 
