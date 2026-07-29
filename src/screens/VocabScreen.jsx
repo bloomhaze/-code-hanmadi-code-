@@ -17,40 +17,40 @@ const TABS = [
 ]
 
 // 단어장 탭 — 유저가 저장한 표현(saved)을 단어/표현/문장으로 나눠 보여준다.
-export default function VocabScreen({ saved = [], onToggleSave, onWrite, onToast, onStartQuiz }) {
+export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToast, onStartQuiz }) {
   const [tab, setTab] = useState('word')
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [playing, setPlaying] = useState(null) // 현재 재생 중인 카드 key (하나만)
   const [rollIdx, setRollIdx] = useState(0)
 
-  // 화면에 보이는 목록(view)은 이번 방문 동안 고정 — 저장 취소해도 카드는 남고,
-  // 탭을 벗어났다 돌아오면(재마운트) 새로 반영되어 사라진다.
-  const [view, setView] = useState(saved)
-  useEffect(() => {
-    setView((prev) => {
-      const map = new Map(prev.map((x) => [x.id, x]))
-      saved.forEach((it) => map.set(it.id, it)) // 새로 저장/재저장된 건 추가·갱신, 취소된 건 유지
-      return Array.from(map.values())
-    })
-  }, [saved])
-  // 실제 저장 여부(북마크 채움 상태 표시용)
-  const savedIds = useMemo(() => new Set(saved.map((s) => s.id)), [saved])
+  // 저장 취소는 "이번 방문 동안 보류(pending)" — 카드는 남고 북마크만 off,
+  // 되돌리기는 pending 해제(같은 카드), 화면을 벗어날 때 실제 DB 삭제를 커밋한다.
+  const [pending, setPending] = useState(() => new Set())
+  const pendingRef = useRef(pending)
+  pendingRef.current = pending
+  useEffect(
+    () => () => {
+      const ids = Array.from(pendingRef.current)
+      if (ids.length) onUnsaveCommit?.(ids)
+    },
+    [], // 언마운트 시 1회 커밋
+  )
 
-  // 저장 표현을 타입별로 그룹핑 (보이는 목록 기준)
+  // 저장 표현을 타입별로 그룹핑
   const byType = useMemo(() => {
     const g = { word: [], phrase: [], sentence: [] }
-    view.forEach((it) => {
+    saved.forEach((it) => {
       if (g[it.type]) g[it.type].push(it)
     })
     return g
-  }, [view])
+  }, [saved])
   const counts = {
     word: byType.word.length,
     phrase: byType.phrase.length,
     sentence: byType.sentence.length,
   }
-  const total = view.length
+  const total = saved.length
   const hasSaved = total > 0
 
   // rolling quiz word from saved words + phrases
@@ -89,8 +89,26 @@ export default function VocabScreen({ saved = [], onToggleSave, onWrite, onToast
     setPlaying(key)
     speak(text, () => setPlaying((cur) => (cur === key ? null : cur)))
   }
-  // 단어장에 보이는 건 전부 저장된 것 → 북마크 누르면 저장 취소(삭제).
-  const toggleBookmark = (it) => onToggleSave?.({ type: it.type, term: it.term })
+  // 북마크 토글 — 취소는 DB 즉시 삭제 대신 pending에 넣고(카드 유지), 되돌리기 토스트.
+  // 되돌리기(또는 다시 클릭)는 pending 해제 → 같은 카드 북마크 on (새 카드 X).
+  const toggleBookmark = (it) => {
+    setPending((prev) => {
+      const n = new Set(prev)
+      if (n.has(it.id)) {
+        n.delete(it.id) // 이미 취소 상태 → 다시 저장(북마크 on)
+      } else {
+        n.add(it.id) // 취소(보류) → 북마크 off, 카드는 유지
+        onToast?.('저장을 취소했어요', () =>
+          setPending((p) => {
+            const m = new Set(p)
+            m.delete(it.id)
+            return m
+          }),
+        )
+      }
+      return n
+    })
+  }
 
   return (
     <div className="flex h-full flex-col bg-white">
@@ -236,7 +254,7 @@ export default function VocabScreen({ saved = [], onToggleSave, onWrite, onToast
           {/* cards */}
           <div className="flex flex-col gap-3">
             {items.map(({ it, key }) => {
-              const saved = savedIds.has(it.id) // 실제 저장 상태 (취소하면 off로 바뀌지만 카드는 유지)
+              const saved = !pending.has(it.id) // 취소(pending)면 북마크 off, 카드는 유지
               const ls = playing === key
               if (it.type === 'sentence') {
                 return (

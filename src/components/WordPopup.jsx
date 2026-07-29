@@ -17,8 +17,8 @@ export default function WordPopup({ state, saved = false, onToggleSave, onClose,
       >
         <div className="flex min-h-8 items-center justify-between gap-3">
           <span
-            className="flex h-8 items-center font-inter text-[22px] font-semibold text-ink-2"
-            style={{ lineHeight: '32px', letterSpacing: '-.3px' }}
+            className="font-inter text-[22px] font-semibold leading-none text-ink-2"
+            style={{ letterSpacing: '-.3px', transform: 'translateY(1px)' }}
           >
             {term}
           </span>

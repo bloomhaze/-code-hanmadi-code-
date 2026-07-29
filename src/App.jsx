@@ -100,6 +100,17 @@ export default function App() {
   )
   const isSaved = (type, term) => savedSet.has(savedKey(type, term))
   // 저장돼 있으면 취소, 없으면 저장 (토글). 로그인 안 하면 안내.
+  // 단어장에서 화면을 벗어날 때, 취소 보류(pending)됐던 항목들을 실제로 DB에서 삭제.
+  const commitUnsave = async (ids) => {
+    if (!ids?.length) return
+    try {
+      for (const id of ids) await removeSaved(id)
+      await refreshSaved()
+    } catch {
+      /* 실패 시 다음 진입에 그대로 남아있게 둔다 */
+    }
+  }
+
   const toggleSave = async ({ type, term, data }) => {
     if (!authed) {
       showToast('로그인하면 표현을 저장할 수 있어요.')
@@ -357,7 +368,7 @@ export default function App() {
           {tab === 'vocab' && (
             <VocabScreen
               saved={mySaved}
-              onToggleSave={toggleSave}
+              onUnsaveCommit={commitUnsave}
               onWrite={openWriteSheet}
               onToast={showToast}
               onStartQuiz={openQuizSheet}
