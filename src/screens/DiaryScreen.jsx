@@ -75,7 +75,7 @@ export default function DiaryScreen({ diaries = [], onWrite, onOpen, deletedIds 
                   {e.date}
                 </span>
                 <div
-                  className="flex flex-col gap-2 rounded-[20px] bg-[#f7f7f7] px-[18px] py-4 transition-shadow"
+                  className="flex flex-col gap-2 rounded-[20px] bg-[#f7f7f7] px-[18px] py-4 transition-transform duration-200 hover:scale-[1.02]"
                   style={{ boxShadow: 'inset 0 0 0 .5px #eee' }}
                 >
                   <div className="flex min-h-[22px] items-center justify-between pb-1">
