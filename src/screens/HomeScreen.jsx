@@ -99,8 +99,10 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
 
   return (
     <div className="relative flex h-full flex-col bg-white">
+      {/* 스크롤 컨테이너 — 모바일에선 헤더도 함께 스크롤, 데스크탑(≥sm)에선 헤더 고정(sticky) */}
+      <div ref={scrollRef} className="no-scrollbar min-h-0 flex-1 overflow-y-auto bg-white">
       {/* ===== HEADER : date row + week strip ===== */}
-      <div className="shrink-0 bg-white pt-4">
+      <div className="bg-white pt-4 sm:sticky sm:top-0 sm:z-10">
         <div className="flex h-9 items-center justify-between px-4 py-0.5">
           <button type="button" className="flex items-center gap-1.5 px-1" onClick={() => setCalendarOpen(true)}>
             <span className="font-inter text-[20px] font-semibold text-ink" style={{ letterSpacing: '-.5px' }}>
@@ -176,7 +178,6 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
       </div>
 
       {/* ===== CONTENT ===== */}
-      <div ref={scrollRef} className="no-scrollbar min-h-0 flex-1 overflow-y-auto bg-white">
         <div className="px-5 pb-6 pt-7">
           <div className="mb-5 flex h-[22px] items-center justify-between">
             <span className="font-inter text-[14px] font-semibold text-ink" style={{ letterSpacing: '.2px' }}>
