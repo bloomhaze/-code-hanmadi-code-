@@ -26,6 +26,7 @@ export default function MyScreen({
   email,
   avatarUrl = '',
   isGuest = false,
+  onLogin,
   onNotif,
   onLogout,
   onWithdraw,
@@ -77,59 +78,109 @@ export default function MyScreen({
       <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto bg-white">
         <div className="flex flex-col gap-6 px-5 pb-10 pt-3">
           {/* profile + stats */}
-          <div className="flex flex-col gap-2">
-            <div className="flex h-[100px] items-center gap-3.5 rounded-[20px] bg-[#f7f7f7] p-[18px]">
-              <div className="h-[54px] w-[54px] shrink-0 overflow-hidden rounded-full">
-                <Avatar url={avatarUrl} />
+          {isGuest ? (
+            /* 비회원 — 회원가입/로그인 유도 카드 (이름/통계 없음) */
+            <button
+              type="button"
+              onClick={onLogin}
+              className="flex items-center gap-3.5 rounded-[20px] bg-[#f7f7f7] p-[18px] text-left"
+            >
+              <div className="h-[54px] w-[54px] shrink-0">
+                <ProfileAvatar mono />
               </div>
-              <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
-                <span className="font-sans text-[17px] font-semibold text-ink-2" style={{ letterSpacing: '-.3px' }}>
-                  {displayName}
-                </span>
+              <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                <div className="flex items-center gap-1">
+                  <span className="font-sans text-[17px] font-medium" style={{ color: '#1a1a1b', letterSpacing: '-.3px' }}>
+                    회원가입 / 로그인
+                  </span>
+                  <ChevronRightSmall />
+                </div>
                 <span
-                  className="truncate font-inter text-[13px] font-extralight"
-                  style={{ color: '#AFAFAF', letterSpacing: '-.2px' }}
+                  className="font-sans text-[13px] font-light"
+                  style={{ color: '#9b9b9b', lineHeight: '19px', letterSpacing: '-.2px' }}
                 >
-                  {displayEmail}
-                </span>
-                <span className="font-sans text-[13px] font-light" style={{ color: ACCENT, letterSpacing: '-.2px' }}>
-                  2026년 1월 8일 가입
+                  로그인하고 한마디 다이어리를
+                  <br />
+                  자유롭게 이용해보세요
                 </span>
               </div>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">
-                <GoogleLogo />
-              </div>
-            </div>
-
-            <div className="flex flex-row gap-[9px]">
-              {[
-                { label: '작성 일기', value: `${diaryCount}개` },
-                { label: '저장 표현', value: `${vocabCount}개` },
-                { label: '복습 표현', value: `${reviewedCount}개` },
-              ].map((s) => (
-                <div
-                  key={s.label}
-                  className="flex h-[68px] flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl bg-[#f7f7f7]"
-                >
-                  <span
-                    className="whitespace-nowrap font-sans text-[12px] font-medium"
-                    style={{ color: 'rgba(46,47,51,.61)', letterSpacing: '-.2px' }}
-                  >
-                    {s.label}
+            </button>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <div className="flex h-[100px] items-center gap-3.5 rounded-[20px] bg-[#f7f7f7] p-[18px]">
+                <div className="h-[54px] w-[54px] shrink-0 overflow-hidden rounded-full">
+                  <Avatar url={avatarUrl} />
+                </div>
+                <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
+                  <span className="font-sans text-[17px] font-semibold text-ink-2" style={{ letterSpacing: '-.3px' }}>
+                    {displayName}
                   </span>
                   <span
-                    className="whitespace-nowrap font-inter text-[18px] font-semibold text-ink-2"
-                    style={{ letterSpacing: '-.5px' }}
+                    className="truncate font-inter text-[13px] font-extralight"
+                    style={{ color: '#AFAFAF', letterSpacing: '-.2px' }}
                   >
-                    {s.value}
+                    {displayEmail}
+                  </span>
+                  <span className="font-sans text-[13px] font-light" style={{ color: ACCENT, letterSpacing: '-.2px' }}>
+                    2026년 1월 8일 가입
                   </span>
                 </div>
-              ))}
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">
+                  <GoogleLogo />
+                </div>
+              </div>
+
+              <div className="flex flex-row gap-[9px]">
+                {[
+                  { label: '작성 일기', value: `${diaryCount}개` },
+                  { label: '저장 표현', value: `${vocabCount}개` },
+                  { label: '복습 표현', value: `${reviewedCount}개` },
+                ].map((s) => (
+                  <div
+                    key={s.label}
+                    className="flex h-[68px] flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl bg-[#f7f7f7]"
+                  >
+                    <span
+                      className="whitespace-nowrap font-sans text-[12px] font-medium"
+                      style={{ color: 'rgba(46,47,51,.61)', letterSpacing: '-.2px' }}
+                    >
+                      {s.label}
+                    </span>
+                    <span
+                      className="whitespace-nowrap font-inter text-[18px] font-semibold text-ink-2"
+                      style={{ letterSpacing: '-.5px' }}
+                    >
+                      {s.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* menu sections */}
           <div className="flex flex-col gap-5">
+            {/* 프리미엄 */}
+            <div className="flex flex-col gap-2.5">
+              <SectionLabel>프리미엄</SectionLabel>
+              <button
+                type="button"
+                onClick={() => onToast?.('준비 중이에요')}
+                className="flex h-[51px] items-center rounded-2xl px-[18px]"
+                style={{ background: 'linear-gradient(90deg,#0066ff 0%,#21aaff 100%)' }}
+              >
+                <span
+                  className="flex-1 text-left font-sans text-[15px] font-normal text-white"
+                  style={{ letterSpacing: '-.3px' }}
+                >
+                  연간 / 월간 결제
+                </span>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M6.75 4.5 11.25 9 6.75 13.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+
             {/* 설정 */}
             <div className="flex flex-col gap-2.5">
               <SectionLabel>설정</SectionLabel>
@@ -163,7 +214,8 @@ export default function MyScreen({
               </div>
             </div>
 
-            {/* logout / withdraw */}
+            {/* logout / withdraw — 회원만 */}
+            {!isGuest && (
             <div className="flex flex-row items-center gap-2.5 px-4">
               <button
                 type="button"
@@ -183,6 +235,7 @@ export default function MyScreen({
                 탈퇴
               </button>
             </div>
+            )}
           </div>
         </div>
       </div>

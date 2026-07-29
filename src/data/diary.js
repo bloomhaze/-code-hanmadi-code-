@@ -86,7 +86,7 @@ export const DAY_LANG = { '6-1': 'EN', '6-3': 'KR', '6-4': 'KR' }
 
 // Rotating writing prompts on the "오늘" empty card.
 export const PROMPTS = (name) => [
-  `${name}님, 오늘은 어떤 하루를 보냈나요?`,
+  name ? `${name}님, 오늘은 어떤 하루를 보냈나요?` : '오늘은 어떤 하루를 보냈나요?',
   '오늘 감사한 일은 무엇인가요?',
   '요즘 푹 빠진 게 있나요?',
   '요즘 고민거리가 있나요?',

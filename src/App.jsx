@@ -347,7 +347,7 @@ export default function App() {
           {tab === 'home' && (
             <HomeScreen
               key={homeKey}
-              userName={userName}
+              userName={authed ? userName : ''}
               diaries={myDiaries}
               signupDate={user?.created_at}
               onWrite={openWriteSheet}
@@ -380,6 +380,7 @@ export default function App() {
               email={userEmail}
               avatarUrl={avatarUrl}
               isGuest={!authed}
+              onLogin={loginWithGoogle}
               onNotif={() => setOverlay({ type: 'notif' })}
               onLogout={() => setDialog({ kind: 'logout' })}
               onWithdraw={() => setDialog({ kind: 'withdraw' })}
