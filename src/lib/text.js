@@ -50,6 +50,24 @@ export const PHRASES = [
   'on time',
   'at first',
   'after all',
+  // 고정 접속·연결 표현 (하나의 뜻으로 묶여야 함)
+  'even if',
+  'even though',
+  'as if',
+  'as though',
+  'as long as',
+  'as far as',
+  'so that',
+  'in case',
+  'in order to',
+  'rather than',
+  'such as',
+  'no matter',
+  'no matter what',
+  'no matter how',
+  'other than',
+  'so far',
+  'up to',
   // 관용 표현(활용형 포함)
   'mind goes blank',
   'mind went blank',
@@ -200,12 +218,19 @@ export function mkWords(en, extra = []) {
       if (ok && (!matched || words.length > matched.length)) matched = { length: words.length, term: p }
     }
     // 목록/AI에 없어도 "동사 + 부사(particle)" 연속 구동사는 자동으로 묶는다.
-    // 예: streams down, sneaks up, turn out, running into, breaks out …
+    // 강한 파티클(out/up/off/down…)은 바로 묶고, 전치사성 파티클(in/into/on…)은
+    // "알려진 구동사"일 때만 묶는다 → "summers in" 같은 명사+전치사 오탐 방지.
     if (!matched && i + 1 < toks.length) {
       const w0 = clean(toks[i]).toLowerCase()
       const w1 = clean(toks[i + 1]).toLowerCase()
-      if (w1 && PARTICLES.has(w1) && w0 && w0.length >= 2 && !NON_VERB_FIRST.has(w0)) {
-        matched = { length: 2, term: `${w0} ${w1}` }
+      if (w0 && w0.length >= 2 && !NON_VERB_FIRST.has(w0) && w1) {
+        let ok = false
+        if (STRONG_PARTICLES.has(w1)) ok = true
+        else if (PARTICLES.has(w1)) {
+          const base = baseVerb(w0)
+          ok = PV_INDEX.some((pv) => pv.particle === w1 && (pv.forms.has(w0) || pv.verb === base))
+        }
+        if (ok) matched = { length: 2, term: `${w0} ${w1}` }
       }
     }
     const span = matched ? matched.length : 1
@@ -241,6 +266,9 @@ export function mkWords(en, extra = []) {
 
 // 분리형 구동사 판별용 — 부사(파티클) / 목적어 대명사
 const PARTICLES = new Set(['out', 'up', 'off', 'on', 'over', 'away', 'back', 'down', 'in', 'into', 'onto', 'through', 'around', 'apart', 'along'])
+// 거의 항상 부사로 쓰이는 "강한" 파티클 — 동사 뒤면 구동사일 확률이 매우 높음(자동 묶음 허용).
+// (in/on/into/over 등 전치사성 파티클은 애매해서 "알려진 구동사"일 때만 묶는다 → "summers in" 오탐 방지)
+const STRONG_PARTICLES = new Set(['out', 'up', 'off', 'down', 'away', 'back', 'apart'])
 const PRONOUNS = new Set(['it', 'them', 'him', 'her', 'me', 'us', 'you', 'this', 'that', 'one'])
 
 // 연속 구동사("동사 + 부사") 자동 매칭 시, 앞 단어가 동사가 아닌 경우 제외할 목록.
