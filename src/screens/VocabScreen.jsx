@@ -247,13 +247,13 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
                   style={{ background: active ? '#121212' : '#f7f7f7' }}
                 >
                   <span
-                    className="font-sans text-[13px] font-medium"
+                    className={`font-sans text-[13px] ${active ? 'font-semibold' : 'font-medium'}`}
                     style={{ color: active ? '#fff' : '#b0b0b0' }}
                   >
                     {t.label}
                   </span>
                   <span
-                    className="font-inter text-[13px] font-medium"
+                    className={`font-inter text-[13px] ${active ? 'font-semibold' : 'font-medium'}`}
                     style={{ color: active ? '#fff' : '#b0b0b0' }}
                   >
                     {counts[t.key]}
