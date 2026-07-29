@@ -134,9 +134,9 @@ export default function MyScreen({
 
               <div className="flex flex-row gap-[9px]">
                 {[
-                  { label: '작성 일기', value: `${diaryCount}개` },
-                  { label: '저장 표현', value: `${vocabCount}개` },
-                  { label: '복습 표현', value: `${reviewedCount}개` },
+                  { label: '작성 일기', value: `${diaryCount}` },
+                  { label: '저장 표현', value: `${vocabCount}` },
+                  { label: '복습 표현', value: `${reviewedCount}` },
                 ].map((s) => (
                   <div
                     key={s.label}
