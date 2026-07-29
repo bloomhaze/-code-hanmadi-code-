@@ -49,7 +49,7 @@ export default function DevFeedbackScreen({ onBack, onToast }) {
         <button
           type="button"
           onClick={copy}
-          className="mt-8 font-inter text-[21px] font-medium"
+          className="mt-8 font-inter text-[16px] font-medium"
           style={{ color: '#0066ff', letterSpacing: '-.3px' }}
         >
           {EMAIL}
