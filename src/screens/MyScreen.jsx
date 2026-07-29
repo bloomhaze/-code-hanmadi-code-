@@ -27,6 +27,7 @@ export default function MyScreen({
   avatarUrl = '',
   isGuest = false,
   onLogin,
+  onProfile,
   onNotif,
   onLogout,
   onWithdraw,
@@ -109,7 +110,11 @@ export default function MyScreen({
             </button>
           ) : (
             <div className="flex flex-col gap-2">
-              <div className="flex h-[100px] items-center gap-3.5 rounded-[20px] bg-[#f7f7f7] p-[18px]">
+              <button
+                type="button"
+                onClick={onProfile}
+                className="flex h-[100px] w-full items-center gap-3.5 rounded-[20px] bg-[#f7f7f7] p-[18px] text-left"
+              >
                 <div className="h-[54px] w-[54px] shrink-0 overflow-hidden rounded-full">
                   <Avatar url={avatarUrl} />
                 </div>
@@ -130,7 +135,7 @@ export default function MyScreen({
                 <div className="flex shrink-0 items-center">
                   <ChevronRightSmall />
                 </div>
-              </div>
+              </button>
 
               <div className="flex flex-row gap-[9px]">
                 {[

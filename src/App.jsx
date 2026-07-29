@@ -16,6 +16,7 @@ import OnboardingScreen from './screens/OnboardingScreen.jsx'
 import QuizScreen from './screens/QuizScreen.jsx'
 import QuizTypeSheet from './components/QuizTypeSheet.jsx'
 import NotifScreen from './screens/NotifScreen.jsx'
+import ProfileEditScreen from './screens/ProfileEditScreen.jsx'
 import DeleteDialog from './components/DeleteDialog.jsx'
 import ConfirmDialog from './components/ConfirmDialog.jsx'
 import { findEntryByKo } from './data/diary.js'
@@ -100,6 +101,18 @@ export default function App() {
   )
   const isSaved = (type, term) => savedSet.has(savedKey(type, term))
   // 저장돼 있으면 취소, 없으면 저장 (토글). 로그인 안 하면 안내.
+  // 닉네임 저장 — Supabase 사용자 메타데이터(full_name) 업데이트 → userName 갱신.
+  const saveNickname = async (nick) => {
+    try {
+      const { data, error } = await supabase.auth.updateUser({ data: { full_name: nick, name: nick } })
+      if (error) throw error
+      if (data?.user) setSession((s) => (s ? { ...s, user: data.user } : s))
+      showToast('저장했어요', undefined, true)
+    } catch {
+      showToast('저장에 실패했어요. 잠시 후 다시 시도해주세요.')
+    }
+  }
+
   // 단어장에서 화면을 벗어날 때, 취소 보류(pending)됐던 항목들을 실제로 DB에서 삭제.
   const commitUnsave = async (ids) => {
     if (!ids?.length) return
@@ -414,6 +427,7 @@ export default function App() {
               avatarUrl={avatarUrl}
               isGuest={!authed}
               onLogin={loginWithGoogle}
+              onProfile={() => setOverlay({ type: 'profile' })}
               onNotif={() => setOverlay({ type: 'notif' })}
               onLogout={() => setDialog({ kind: 'logout' })}
               onWithdraw={() => setDialog({ kind: 'withdraw' })}
@@ -458,6 +472,16 @@ export default function App() {
       )}
 
         {overlay?.type === 'notif' && <NotifScreen onClose={closeOverlay} />}
+
+        {overlay?.type === 'profile' && (
+          <ProfileEditScreen
+            name={userName}
+            avatarUrl={avatarUrl}
+            onBack={closeOverlay}
+            onSave={saveNickname}
+            onToast={showToast}
+          />
+        )}
 
         {quiz && (
           <QuizScreen
