@@ -195,6 +195,18 @@ function translatePrompt(text: string) {
     `입력: "여유로운 마음을 가지고 해야하는데 막상 내가 준비했던 것보다 답변을 못해서 아쉽고, 자괴감이 든다."\n` +
     `좋은(O): "I wanted to stay calm and relaxed, but once the interview started, I didn't answer the questions as well as I had during my preparation. I'm disappointed in myself, and I can't help feeling a bit defeated."\n` +
     `\n` +
+    `[난이도 예시 — 딱 이 정도 "쉽고 담백한" 수준이 목표. 괜히 어렵거나 화려하게 꼬지 마]\n` +
+    `입력: "내가 가장 싫어하는 계절은 여름이다. 한국의 여름은 굉장히 습하고 덥다. 가만히 있어도 땀이 줄줄 흐르고, 진이 빠진다. ` +
+    `좀 웃기지만, 항상 여름이 오기 전에 두려움이 크다. 이번 여름은 또 얼마나 더울까? 매년 여름 한국을 떠나 추운 나라로 갈 돈이 있으면 좋겠다."\n` +
+    `좋은(O): "My least favorite season is summer. Summers in Korea are incredibly hot and humid. ` +
+    `Even if I'm just standing still, I end up drenched in sweat, and it completely drains my energy. ` +
+    `It might sound a little funny, but I always feel a sense of dread before summer arrives. ` +
+    `I can't help but wonder, 'How hot is it going to be this year?' ` +
+    `Sometimes I find myself wishing I had enough money to escape to a colder country every summer in Korea."\n` +
+    `나쁜(X, 너무 어렵게 꼰 예): "Korean summers are brutally humid and scorching. Even sitting still, sweat streams down my back. ` +
+    `I keep running into the question of just how scorching this summer will turn out to be." ` +
+    `← 이렇게 어려운 단어(brutally, scorching)와 과하게 꼬인 구문은 피하고, 위 좋은(O)처럼 쉽고 담백하게.\n` +
+    `\n` +
     `[출력 구조 — 매우 중요] 우리 앱은 단어 탭 기능 때문에 "원문 한국어 문장(ko) ↔ 자연스러운 영어(en)" 쌍이 필요해. ` +
     `각 ko(원문 한국어 문장)마다 en을 주되, en은 그 한 문장만 축자로 옮기는 게 아니라 위 규칙대로 원어민답게 다시 쓴 결과여야 해. ` +
     `en은 여러 문장이어도 되고, 흐름을 위해 접속사로 이어도 돼(To be honest, but once ~, On top of that 등).\n` +
