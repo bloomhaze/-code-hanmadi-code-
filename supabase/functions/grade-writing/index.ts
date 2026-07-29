@@ -201,11 +201,17 @@ function translatePrompt(text: string) {
     `각 문장마다 제공:\n` +
     `- ko: 원문 한국어 문장\n` +
     `- en: 위 규칙 수준의 자연스러운 원어민 영어\n` +
-    `- phrases: 그 en 안에 등장하는 아래 종류를 en에 나타난 표면형(철자·활용형) 그대로 배열로:\n` +
-    `    (1) 구동사(phrasal verb): run into, catch up on, come across, look forward to, give up\n` +
-    `    (2) 관용/이디엄: piece of cake, break the ice, under the weather, once in a while, on the same page, mind goes blank, end up, let it go\n` +
+    `- phrases: 그 en 문장 안에 등장하는 아래 종류를, en에 나타난 표면형(철자·활용형) 그대로, 하나도 빠짐없이 배열로 담아.\n` +
+    `    (1) 구동사(phrasal verb) = "동사 + 부사(up/out/off/on/down/into/over/away/back/around/along...)". ` +
+    `문장에 있는 모든 구동사를 활용된 형태 그대로 넣어. ` +
+    `예: run into, running into, streams down, sneaks up, turned out, turn out, break out, figured out, wears me out, cheer me up, ` +
+    `catch up on, come across, look forward to, give up\n` +
+    `    (2) 관용/이디엄 및 자주 쓰는 연어(collocation): piece of cake, break the ice, under the weather, once in a while, ` +
+    `on the same page, mind goes blank, a wave of dread, get a wave of, make a good first impression, a sense of relief, ` +
+    `end up, let it go\n` +
     `    (3) 하나의 뜻으로 굳어진 전치사·부사 표현: at the last minute, in the meantime, out of nowhere, on purpose, for a while, all of a sudden, by the way, in advance, at least, as soon as, in the end, a couple of, make my day\n` +
-    `  ★ "at the last minute" 같은 표현은 반드시 통째로 한 덩어리로. at, the, last, minute 처럼 쪼개 넣지 마.\n` +
+    `  ★ 매우 중요: 구동사(동사+부사)는 문장에 보이는 즉시 반드시 통째로 넣어. streams, down 처럼 따로 넣지 마. 활용형(streams down, sneaks up)도 그대로.\n` +
+    `  ★ "at the last minute"/"a wave of dread" 같은 표현도 통째로 한 덩어리로. at, the, last, minute 처럼 쪼개지 마.\n` +
     `  ★ 분리형 구동사는 동사가 활용된 형태 그대로, 문장에 나타난 전체 구간을 넣어: "tried it out", "wears me out", "cheer me up" (X: 기본형 "wear out"만 넣기).\n` +
     `  단어 하나짜리는 넣지 말고, 두 단어 이상 묶여야 뜻이 통하는 표현만. 없으면 빈 배열 [].\n` +
     `일기:\n${text}\n` +
