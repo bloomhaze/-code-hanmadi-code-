@@ -159,6 +159,15 @@ export function mkWords(en, extra = []) {
       }
       if (ok && (!matched || words.length > matched.length)) matched = { length: words.length, term: p }
     }
+    // 목록/AI에 없어도 "동사 + 부사(particle)" 연속 구동사는 자동으로 묶는다.
+    // 예: streams down, sneaks up, turn out, running into, breaks out …
+    if (!matched && i + 1 < toks.length) {
+      const w0 = clean(toks[i]).toLowerCase()
+      const w1 = clean(toks[i + 1]).toLowerCase()
+      if (w1 && PARTICLES.has(w1) && w0 && w0.length >= 2 && !NON_VERB_FIRST.has(w0)) {
+        matched = { length: 2, term: `${w0} ${w1}` }
+      }
+    }
     const span = matched ? matched.length : 1
     const raw = toks.slice(i, i + span).join(' ')
     let term = matched ? matched.term : clean(raw)
@@ -185,8 +194,22 @@ export function mkWords(en, extra = []) {
 }
 
 // 분리형 구동사 판별용 — 부사(파티클) / 목적어 대명사
-const PARTICLES = new Set(['out', 'up', 'off', 'on', 'over', 'away', 'back', 'down', 'in', 'through', 'around', 'apart'])
+const PARTICLES = new Set(['out', 'up', 'off', 'on', 'over', 'away', 'back', 'down', 'in', 'into', 'onto', 'through', 'around', 'apart', 'along'])
 const PRONOUNS = new Set(['it', 'them', 'him', 'her', 'me', 'us', 'you', 'this', 'that', 'one'])
+
+// 연속 구동사("동사 + 부사") 자동 매칭 시, 앞 단어가 동사가 아닌 경우 제외할 목록.
+// (관사·대명사·전치사·be동사·조동사·부사 + 파티클 자신 → "out of", "my back" 등 오탐 방지)
+const NON_VERB_FIRST = new Set([
+  'the', 'a', 'an', 'this', 'that', 'these', 'those', 'some', 'any', 'no', 'every', 'each',
+  'my', 'your', 'his', 'her', 'its', 'our', 'their',
+  'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'us', 'them', 'one',
+  'is', 'am', 'are', 'was', 'were', 'be', 'been', 'being',
+  'do', 'does', 'did', 'have', 'has', 'had', 'will', 'would', 'can', 'could', 'may', 'might', 'must', 'should', 'shall',
+  'to', 'of', 'for', 'with', 'from', 'as', 'at', 'by', 'and', 'or', 'but', 'so', 'if', 'than', 'then',
+  'not', 'very', 'too', 'just', 'also', 'there', 'here', 'still', 'even', 'really', 'quite', 'so',
+  'what', 'which', 'who', 'when', 'where', 'how', 'why',
+  'out', 'up', 'off', 'on', 'over', 'away', 'back', 'down', 'in', 'through', 'around', 'apart', 'along',
+])
 
 // Highlight occurrences of `term` inside an example sentence (accent blue),
 // expanding to full word boundaries so inflected forms highlight fully.
