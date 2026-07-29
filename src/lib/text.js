@@ -64,6 +64,57 @@ export const PHRASES = [
   'let it go',
 ]
 
+// 분리형으로도 잡아야 하는 대표 구동사(기본형). "wear out" → "wears me out" 처럼
+// 동사가 활용되고 중간에 목적어(me/it/them 등)가 껴도 통째로 잡는다.
+const PHRASAL_VERBS = [
+  'wear out', 'tire out', 'try out', 'pick up', 'turn off', 'turn on', 'figure out', 'work out',
+  'give up', 'put on', 'take off', 'throw away', 'bring up', 'calm down', 'cheer up', 'check out',
+  'fill out', 'find out', 'hand in', 'let down', 'look up', 'make up', 'pay off', 'point out',
+  'set up', 'sort out', 'use up', 'write down', 'knock out', 'freak out', 'wipe out', 'call off',
+  'drop off', 'pick out', 'shut down', 'break down', 'hold up', 'kick out', 'lock up', 'mess up',
+  'pull off', 'push away', 'talk over', 'think over', 'turn down', 'wake up', 'warm up',
+]
+
+// 동사의 흔한 활용형 집합 (규칙 변화 위주)
+function verbForms(v) {
+  const f = new Set([v, v + 's', v + 'es', v + 'ed', v + 'ing'])
+  if (v.endsWith('e')) {
+    f.add(v.slice(0, -1) + 'ing')
+    f.add(v + 'd')
+  }
+  if (v.endsWith('y')) {
+    f.add(v.slice(0, -1) + 'ies')
+    f.add(v.slice(0, -1) + 'ied')
+  }
+  return f
+}
+
+const PV_INDEX = PHRASAL_VERBS.map((pv) => {
+  const [verb, particle] = pv.split(' ')
+  return { forms: verbForms(verb), particle }
+})
+
+// 위치 i에서 "동사(활용형) + 목적어대명사 1~2개 + 부사" 분리형 구동사면 그 길이(3~4)를 반환.
+function matchSeparable(toks, i, clean) {
+  const w0 = clean(toks[i]).toLowerCase()
+  for (const pv of PV_INDEX) {
+    if (!pv.forms.has(w0)) continue
+    for (let mid = 1; mid <= 2; mid++) {
+      const partIdx = i + 1 + mid
+      if (partIdx >= toks.length) break
+      let midOk = true
+      for (let k = 1; k <= mid; k++) {
+        if (!PRONOUNS.has(clean(toks[i + k]).toLowerCase())) {
+          midOk = false
+          break
+        }
+      }
+      if (midOk && clean(toks[partIdx]).toLowerCase() === pv.particle) return mid + 2
+    }
+  }
+  return 0
+}
+
 // Tokenize an English sentence into tappable tokens, grouping known phrases.
 // `extra` is a list of surface-form phrases (구동사/관용표현) for THIS sentence,
 // e.g. from the AI translation — merged with the built-in list so any phrasal
@@ -77,6 +128,24 @@ export function mkWords(en, extra = []) {
     .filter((p) => p.split(/\s+/).length >= 2)
   const out = []
   for (let i = 0; i < toks.length; i++) {
+    // 분리형 구동사(동사 활용형 + 목적어 + 부사) 우선 — AI가 전체 구간을 안 줘도 잡는다.
+    const sepLen = matchSeparable(toks, i, clean)
+    if (sepLen >= 3) {
+      const ws = toks.slice(i, i + sepLen)
+      out.push({
+        t: ws.join(' '),
+        term: `${clean(ws[0])} ${clean(ws[sepLen - 1])}`,
+        isPhrase: true,
+        sep: [
+          { t: ws[0], hl: true },
+          { t: ' ' + ws.slice(1, sepLen - 1).join(' ') + ' ', hl: false },
+          { t: ws[sepLen - 1], hl: true },
+        ],
+      })
+      i += sepLen - 1
+      continue
+    }
+
     let matched = null
     for (const p of phrases) {
       const words = p.split(' ')

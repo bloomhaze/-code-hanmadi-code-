@@ -225,8 +225,9 @@ function translatePrompt(text: string) {
     'as soon as(~하자마자), in the end(결국), a couple of(두어 개의), make my day(하루를 행복하게 하다)\n' +
     '  ★ (3)번이 특히 중요해. "at the last minute" 같은 표현은 반드시 통째로 한 덩어리로 넣어. ' +
     'at, the, last, minute 처럼 따로 넣으면 안 돼.\n' +
-    '  ★ 분리형 구동사(목적어가 동사와 부사 사이에 끼는 경우)는 문장에 나타난 전체 구간을 그대로 넣어. ' +
-    '예: "tried it out", "picked it up", "turn it off", "figured it out" (X: "try out", "tried out")\n' +
+    '  ★ 분리형 구동사(목적어가 동사와 부사 사이에 끼는 경우)는 동사가 활용된 형태 그대로, 문장에 나타난 전체 구간을 넣어. ' +
+    '예: "tried it out", "picked it up", "turn it off", "figured it out", "wears me out", "wore me out", "cheer me up" ' +
+    '(X: 기본형 "wear out"/"try out"만 넣지 말 것 — 문장에 "wears me out"이면 그대로 "wears me out")\n' +
     '  단어 하나짜리는 넣지 말고, 반드시 두 단어 이상으로 묶여야 뜻이 통하는 표현만. 없으면 빈 배열 [].\n' +
     '일기:\n' + text + '\n' +
     '반드시 이 JSON만 반환: {"sentences": [{"ko": "...", "en": "...", "phrases": ["..."]}]}'
