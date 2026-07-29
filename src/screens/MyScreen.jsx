@@ -90,10 +90,12 @@ export default function MyScreen({
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                 <div className="flex items-center gap-1">
-                  <span className="font-sans text-[17px] font-medium" style={{ color: '#1a1a1b', letterSpacing: '-.3px' }}>
+                  <span className="font-sans text-[17px] font-medium" style={{ color: '#121212', letterSpacing: '-.3px' }}>
                     회원가입 / 로그인
                   </span>
-                  <ChevronRightSmall />
+                  <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+                    <path d="M6.75 4.5 11.25 9 6.75 13.5" stroke="#121212" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </div>
                 <span
                   className="font-sans text-[13px] font-light"
