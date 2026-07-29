@@ -28,6 +28,7 @@ import { saveDiary, listMyDiaries, deleteDiary, todayTitle } from './lib/diaries
 import { listMySaved, addSaved, removeSaved } from './lib/saved.js'
 import { saveQuizResult, reviewedCount } from './lib/quizlog.js'
 import { uploadAvatar } from './lib/avatar.js'
+import { sendFeedbackEmail } from './lib/feedback.js'
 
 const USER_NAME = '현진'
 
@@ -122,17 +123,17 @@ export default function App() {
     }
   }
 
-  // 개발자에게 한마디 — 의견을 feedback 테이블에 기록(best-effort) 후 성공 토스트.
+  // 개발자에게 한마디 — 의견을 개발자 메일(svs9645@gmail.com)로 전송.
   const submitFeedback = async (content) => {
     try {
       const { data: auth } = await supabase.auth.getUser()
-      await supabase.from('feedback').insert({
+      await sendFeedbackEmail({
         content,
-        user_id: auth?.user?.id ?? null,
         email: auth?.user?.email ?? null,
+        userId: auth?.user?.id ?? null,
       })
     } catch {
-      /* 테이블이 없거나 실패해도 사용자에겐 전달 완료로 안내 */
+      /* 실패해도 사용자에겐 전달 완료로 안내 */
     }
     showToast('소중한 한마디가 잘 전달되었어요', undefined, true)
   }
