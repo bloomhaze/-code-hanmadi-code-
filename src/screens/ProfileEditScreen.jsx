@@ -1,24 +1,54 @@
-import { useState } from 'react'
-import { ProfileAvatar } from '../components/icons.jsx'
+import { useEffect, useRef, useState } from 'react'
+import { ProfileAvatar, PencilIcon } from '../components/icons.jsx'
 
-// 프로필 편집 — 아바타(+편집 뱃지) / 닉네임 수정 / 저장.
+// 프로필 편집 — 아바타(+편집 뱃지, 사진 선택) / 닉네임 수정 / 저장.
+// 사진은 선택 즉시 미리보기만 되고, 실제 반영은 '저장'을 눌러야 적용된다.
 export default function ProfileEditScreen({ name = '', avatarUrl = '', onBack, onSave, onToast }) {
   const [nick, setNick] = useState(name)
   const [broken, setBroken] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [preview, setPreview] = useState('') // 새로 고른 사진 미리보기 URL
+  const fileRef = useRef(null)
+  const pickedFile = useRef(null)
+
   const trimmed = nick.trim()
   const canSave = !!trimmed && !saving
+
+  // 미리보기용 objectURL 정리 (메모리 누수 방지)
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview)
+    }
+  }, [preview])
+
+  const pickPhoto = () => fileRef.current?.click()
+
+  const onFile = (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // 같은 파일 다시 고를 수 있게 초기화
+    if (!file) return
+    if (!file.type?.startsWith('image/')) {
+      onToast?.('이미지 파일만 선택할 수 있어요')
+      return
+    }
+    if (preview) URL.revokeObjectURL(preview)
+    pickedFile.current = file
+    setPreview(URL.createObjectURL(file))
+    setBroken(false)
+  }
 
   const save = async () => {
     if (!canSave) return
     setSaving(true)
     try {
-      await onSave?.(trimmed)
+      await onSave?.({ nick: trimmed, avatarFile: pickedFile.current })
       onBack?.()
     } finally {
       setSaving(false)
     }
   }
+
+  const shownAvatar = preview || (avatarUrl && !broken ? avatarUrl : '')
 
   return (
     <div className="absolute inset-0 z-40 flex flex-col bg-white">
@@ -48,34 +78,36 @@ export default function ProfileEditScreen({ name = '', avatarUrl = '', onBack, o
         <div className="mt-4 flex justify-center">
           <div className="relative h-[96px] w-[96px]">
             <div className="h-[96px] w-[96px] overflow-hidden rounded-full">
-              {avatarUrl && !broken ? (
+              {shownAvatar ? (
                 <img
-                  src={avatarUrl}
+                  src={shownAvatar}
                   alt="프로필"
                   referrerPolicy="no-referrer"
-                  onError={() => setBroken(true)}
+                  onError={() => {
+                    if (!preview) setBroken(true)
+                  }}
                   className="h-full w-full object-cover"
                 />
               ) : (
                 <ProfileAvatar size={96} />
               )}
             </div>
-            {/* 편집 뱃지 */}
+            {/* 편집 뱃지 — 글쓰기 아이콘, 누르면 사진 선택 */}
             <button
               type="button"
-              onClick={() => onToast?.('준비 중이에요')}
+              onClick={pickPhoto}
               className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-white"
               style={{ boxShadow: '0 1px 4px rgba(0,0,0,.18)' }}
             >
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M11.5 2.5a1.5 1.5 0 0 1 2.12 2.12l-7.3 7.3-2.82.7.7-2.82 7.3-7.3Z"
-                  stroke="#8a8a8a"
-                  strokeWidth="1.3"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <PencilIcon size={15} fill="#8a8a8a" />
             </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              onChange={onFile}
+              className="hidden"
+            />
           </div>
         </div>
 

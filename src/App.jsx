@@ -26,6 +26,7 @@ import { explainWord } from './lib/word.js'
 import { saveDiary, listMyDiaries, deleteDiary, todayTitle } from './lib/diaries.js'
 import { listMySaved, addSaved, removeSaved } from './lib/saved.js'
 import { saveQuizResult, reviewedCount } from './lib/quizlog.js'
+import { uploadAvatar } from './lib/avatar.js'
 
 const USER_NAME = '현진'
 
@@ -101,10 +102,17 @@ export default function App() {
   )
   const isSaved = (type, term) => savedSet.has(savedKey(type, term))
   // 저장돼 있으면 취소, 없으면 저장 (토글). 로그인 안 하면 안내.
-  // 닉네임 저장 — Supabase 사용자 메타데이터(full_name) 업데이트 → userName 갱신.
-  const saveNickname = async (nick) => {
+  // 프로필 저장 — 닉네임(full_name) + (사진 선택 시) 아바타 업로드 후 메타데이터 갱신.
+  // 사진은 '저장'을 눌러야 실제로 반영된다.
+  const saveProfile = async ({ nick, avatarFile }) => {
     try {
-      const { data, error } = await supabase.auth.updateUser({ data: { full_name: nick, name: nick } })
+      const meta = { full_name: nick, name: nick }
+      if (avatarFile) {
+        const url = await uploadAvatar(avatarFile)
+        meta.avatar_url = url
+        meta.picture = url
+      }
+      const { data, error } = await supabase.auth.updateUser({ data: meta })
       if (error) throw error
       if (data?.user) setSession((s) => (s ? { ...s, user: data.user } : s))
       showToast('저장했어요', undefined, true)
@@ -478,7 +486,7 @@ export default function App() {
             name={userName}
             avatarUrl={avatarUrl}
             onBack={closeOverlay}
-            onSave={saveNickname}
+            onSave={saveProfile}
             onToast={showToast}
           />
         )}
