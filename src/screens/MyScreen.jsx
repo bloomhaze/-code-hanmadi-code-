@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ProfileAvatar, GoogleLogo, ChevronRightSmall, ExternalArrow } from '../components/icons.jsx'
+import { ProfileAvatar, ChevronRightSmall, ExternalArrow } from '../components/icons.jsx'
 
 const ACCENT = '#0066FF'
 
@@ -127,8 +127,8 @@ export default function MyScreen({
                     2026년 1월 8일 가입
                   </span>
                 </div>
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white">
-                  <GoogleLogo />
+                <div className="flex shrink-0 items-center">
+                  <ChevronRightSmall />
                 </div>
               </div>
 
