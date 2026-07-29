@@ -119,7 +119,7 @@ export default function MyScreen({
                   </span>
                   <span
                     className="truncate font-inter text-[13px] font-extralight"
-                    style={{ color: '#AFAFAF', letterSpacing: '-.2px' }}
+                    style={{ color: '#8c8c8c', letterSpacing: '-.2px' }}
                   >
                     {displayEmail}
                   </span>
