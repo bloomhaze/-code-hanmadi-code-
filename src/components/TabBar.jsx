@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { HomeIcon, DiaryIcon, VocabIcon, MyIcon } from './icons.jsx'
 import { haptic } from '../lib/haptic.js'
 
@@ -10,13 +10,29 @@ const TABS = [
 ]
 
 // Shared bottom tab bar. Frosted-glass bar pinned to the bottom of the phone frame.
-export default function TabBar({ active, onChange }) {
+// hidden=true 이고 모바일(<640px)일 때만 아래로 슬라이드되어 숨는다(공간도 회수).
+export default function TabBar({ active, onChange, hidden = false }) {
   const [popped, setPopped] = useState(null)
+  const [mobile, setMobile] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)')
+    const update = () => setMobile(mq.matches)
+    update()
+    mq.addEventListener?.('change', update)
+    return () => mq.removeEventListener?.('change', update)
+  }, [])
+
+  const hide = hidden && mobile
 
   return (
     <div
-      className="z-20 w-full shrink-0"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="z-20 w-full shrink-0 transition-all duration-300"
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        transform: hide ? 'translateY(100%)' : 'translateY(0)',
+        marginBottom: hide ? 'calc(-56px - env(safe-area-inset-bottom))' : '0px',
+      }}
     >
       {/* 56px tab row (표준 하단탭 높이) — 컬럼 전체 폭에 균등 배치 */}
       <div className="flex h-14 w-full items-center justify-around px-4">

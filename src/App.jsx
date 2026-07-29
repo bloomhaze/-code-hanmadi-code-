@@ -332,6 +332,21 @@ export default function App() {
   // 우측에 패널 공간을 만든다. 모바일(<lg)에서는 밀지 않고 하단 바텀시트.
   const shiftForFix = fixPop.open ? 'lg:mr-[420px]' : ''
 
+  // 모바일: 스크롤 내리면 하단탭 숨김, 올리면 다시 표시
+  const [tabHidden, setTabHidden] = useState(false)
+  const lastScrollY = useRef(0)
+  useEffect(() => {
+    setTabHidden(false)
+    lastScrollY.current = 0
+  }, [tab])
+  const onContentScroll = (e) => {
+    const y = e.target?.scrollTop ?? 0
+    const last = lastScrollY.current
+    if (y > last + 6 && y > 48) setTabHidden(true) // 아래로 스크롤
+    else if (y < last - 6) setTabHidden(false) // 위로 스크롤
+    lastScrollY.current = y
+  }
+
   return (
     <div className="flex h-[100dvh] w-full flex-col items-center overflow-hidden bg-white">
       {/* brand bar spans the full width (max 1440), logo aligned left */}
@@ -343,7 +358,7 @@ export default function App() {
         style={{ fontFamily: "'Pretendard Variable', 'Pretendard', -apple-system, sans-serif" }}
       >
         {/* ---- tab screens (fill the region between the bars) ---- */}
-        <div className="relative min-h-0 flex-1">
+        <div className="relative min-h-0 flex-1" onScrollCapture={onContentScroll}>
           {tab === 'home' && (
             <HomeScreen
               key={homeKey}
@@ -392,7 +407,7 @@ export default function App() {
           )}
         </div>
 
-        {showTabBar && <TabBar active={tab} onChange={setTab} />}
+        {showTabBar && <TabBar active={tab} onChange={setTab} hidden={tabHidden} />}
 
         {/* ---- full-screen overlays ---- */}
         {overlay?.type === 'write' && (
