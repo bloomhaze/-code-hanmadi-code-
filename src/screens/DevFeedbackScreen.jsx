@@ -35,12 +35,12 @@ export default function DevFeedbackScreen({ onBack, onToast }) {
 
       {/* center content */}
       <div className="flex flex-1 flex-col items-center justify-center px-5 text-center">
-        <h1 className="font-sans text-[18px] font-bold text-ink" style={{ letterSpacing: '-.4px' }}>
+        <h1 className="font-sans text-[16px] font-medium text-ink" style={{ letterSpacing: '-.3px' }}>
           작은 의견 하나도 소중해요
         </h1>
         <p
-          className="mt-2.5 font-sans text-[14px] font-normal"
-          style={{ color: '#b0b0b0', lineHeight: '1.55', letterSpacing: '-.2px' }}
+          className="mt-2 font-sans text-[13px] font-light text-muted-2"
+          style={{ lineHeight: '1.55', letterSpacing: '-.2px' }}
         >
           아이디어, 오류, 의견, 칭찬 모두
           <br />
