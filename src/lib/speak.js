@@ -37,7 +37,7 @@ function b64ToUrl(b64, mime) {
   return URL.createObjectURL(new Blob([bytes], { type: mime || 'audio/mpeg' }))
 }
 
-function playUrl(url, onEnd, myGen) {
+function playUrl(url, onEnd, myGen, onStart) {
   stopCurrent()
   if (gen !== myGen) return
   const a = new Audio(url)
@@ -47,16 +47,22 @@ function playUrl(url, onEnd, myGen) {
   }
   a.onended = done
   a.onerror = done
+  a.onplaying = () => {
+    if (gen === myGen) onStart?.() // 실제 재생 시작 → 로딩 종료
+  }
   a.play().catch(() => {})
 }
 
-export async function speak(text, onEnd) {
+// speak(text, onEnd, onStart)
+//  - onStart(): 실제 소리가 나기 시작할 때 (로딩 스피너 종료용)
+//  - onEnd():   재생이 끝났을 때 (버튼 off용)
+export async function speak(text, onEnd, onStart) {
   const t = String(text || '').trim()
   if (!t) return
   const myGen = ++gen // 새 재생 시작 → 이전 것 무효화
   stopCurrent()
   if (urlCache.has(t)) {
-    playUrl(urlCache.get(t), onEnd, myGen)
+    playUrl(urlCache.get(t), onEnd, myGen, onStart)
     return
   }
   try {
@@ -69,10 +75,10 @@ export async function speak(text, onEnd) {
     const url = data?.url || (data?.audio ? b64ToUrl(data.audio, data.mime) : null)
     if (!url) throw new Error('no audio')
     urlCache.set(t, url)
-    playUrl(url, onEnd, myGen)
+    playUrl(url, onEnd, myGen, onStart)
   } catch {
     if (gen !== myGen) return
-    speakBrowser(t, onEnd, myGen)
+    speakBrowser(t, onEnd, myGen, onStart)
   }
 }
 
@@ -114,7 +120,7 @@ function pickVoice(voices) {
   return [...pool].sort((a, b) => score(b) - score(a))[0]
 }
 
-function speakBrowser(text, onEnd, myGen) {
+function speakBrowser(text, onEnd, myGen, onStart) {
   try {
     const synth = window.speechSynthesis
     if (!synth) return
@@ -125,6 +131,9 @@ function speakBrowser(text, onEnd, myGen) {
       u.lang = (voice && voice.lang) || 'en-US'
       u.rate = 0.96
       if (voice) u.voice = voice
+      u.onstart = () => {
+        if (gen === myGen) onStart?.()
+      }
       u.onend = () => {
         if (gen === myGen) onEnd?.()
       }

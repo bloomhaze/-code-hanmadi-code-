@@ -5,6 +5,7 @@ import {
   BookmarkSmall,
   PlayIcon,
   PencilIcon,
+  Spinner,
 } from '../components/icons.jsx'
 import { hlSegs } from '../lib/text.js'
 import { speak, stopSpeak } from '../lib/speak.js'
@@ -22,6 +23,7 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [playing, setPlaying] = useState(null) // 현재 재생 중인 카드 key (하나만)
+  const [loadingKey, setLoadingKey] = useState(null) // 음성 로딩 중인 카드 key
   const [rollIdx, setRollIdx] = useState(0)
 
   // 저장 취소는 "이번 방문 동안 보류(pending)" — 카드는 남고 북마크만 off,
@@ -79,15 +81,24 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
     .map((it) => ({ it, key: it.id }))
     .filter(({ it }) => matches(it))
 
-  // 켜면 재생(파랑), 다시 누르면 멈춤, 다 들으면 자동 off. 한 번에 하나만.
+  // 켜면 로딩→재생(파랑), 다시 누르면 멈춤, 다 들으면 자동 off. 한 번에 하나만.
   const toggleListen = (key, text) => {
-    if (playing === key) {
+    if (playing === key || loadingKey === key) {
       stopSpeak()
       setPlaying(null)
+      setLoadingKey(null)
       return
     }
-    setPlaying(key)
-    speak(text, () => setPlaying((cur) => (cur === key ? null : cur)))
+    setLoadingKey(key)
+    setPlaying(null)
+    speak(
+      text,
+      () => setPlaying((cur) => (cur === key ? null : cur)),
+      () => {
+        setLoadingKey((cur) => (cur === key ? null : cur))
+        setPlaying(key)
+      },
+    )
   }
   // 북마크 토글 — 취소는 DB 즉시 삭제 대신 pending에 넣고(카드 유지), 되돌리기 토스트.
   // 되돌리기(또는 다시 클릭)는 pending 해제 → 같은 카드 북마크 on (새 카드 X).
@@ -256,6 +267,7 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
             {items.map(({ it, key }) => {
               const saved = !pending.has(it.id) // 취소(pending)면 북마크 off, 카드는 유지
               const ls = playing === key
+              const lo = loadingKey === key
               if (it.type === 'sentence') {
                 return (
                   <div
@@ -279,7 +291,7 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
                         className="flex h-9 w-9 items-center justify-center rounded-full"
                         style={{ background: ls ? ACCENT : '#eee' }}
                       >
-                        <SpeakerSmall color={ls ? '#fff' : '#121212'} />
+                        {lo ? <Spinner size={17} color="#121212" /> : <SpeakerSmall color={ls ? '#fff' : '#121212'} />}
                       </button>
                       <button
                         type="button"
@@ -318,7 +330,7 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
                         className="flex h-8 w-8 items-center justify-center rounded-full"
                         style={{ background: ls ? ACCENT : '#eee' }}
                       >
-                        <SpeakerSmall color={ls ? '#fff' : '#121212'} />
+                        {lo ? <Spinner size={16} color="#121212" /> : <SpeakerSmall color={ls ? '#fff' : '#121212'} />}
                       </button>
                       <button
                         type="button"

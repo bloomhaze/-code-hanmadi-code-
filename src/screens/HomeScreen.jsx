@@ -23,20 +23,30 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
   const [calendarOpen, setCalendarOpen] = useState(false)
   const [promptIdx, setPromptIdx] = useState(0)
   const [playId, setPlayId] = useState(null) // 재생 중인 문장 키 `${entryId}-${i}`
+  const [loadId, setLoadId] = useState(null) // 음성 로딩 중인 문장 키
   const scrollRef = useRef(null)
 
   // 화면 벗어나면 재생 중지
   useEffect(() => () => stopSpeak(), [])
 
-  // 문장 듣기 — 한 번에 하나, 다시 누르면 정지, 끝나면 자동 off
+  // 문장 듣기 — 한 번에 하나, 로딩→재생, 다시 누르면 정지, 끝나면 자동 off
   const toggleListen = (pid, text) => {
-    if (playId === pid) {
+    if (playId === pid || loadId === pid) {
       stopSpeak()
       setPlayId(null)
+      setLoadId(null)
       return
     }
-    setPlayId(pid)
-    speak(text, () => setPlayId((c) => (c === pid ? null : c)))
+    setLoadId(pid)
+    setPlayId(null)
+    speak(
+      text,
+      () => setPlayId((c) => (c === pid ? null : c)),
+      () => {
+        setLoadId((c) => (c === pid ? null : c))
+        setPlayId(pid)
+      },
+    )
   }
 
   const prompts = PROMPTS(userName)
@@ -266,7 +276,7 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
                         </span>
                         <div className="mt-1 flex justify-end gap-2" onClick={(ev) => ev.stopPropagation()}>
                           <button type="button" onClick={() => toggleListen(pid, en)} className="h-8 w-8">
-                            <ListenIcon on={playId === pid} />
+                            <ListenIcon on={playId === pid} loading={loadId === pid} />
                           </button>
                           <button
                             type="button"

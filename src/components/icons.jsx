@@ -75,9 +75,36 @@ export function PencilIcon({ size = 26, fill = '#fff' }) {
 }
 
 // Speaker (listen). variant: 'on' filled accent, 'off' grey.
-export function ListenIcon({ on = false }) {
+// 음성 로딩/재생 중 표시용 스피너 (버튼 안에 들어가는 원형 로더)
+export function Spinner({ size = 16, color = '#121212', track = 'rgba(0,0,0,.15)' }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      style={{ animation: 'spin .8s linear infinite' }}
+    >
+      <circle cx="8" cy="8" r="6" stroke={track} strokeWidth="2" />
+      <path d="M8 2 a6 6 0 0 1 6 6" stroke={color} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function ListenIcon({ on = false, loading = false }) {
   const bg = on ? '#0066FF' : '#EEEEEE'
   const ink = on ? 'white' : '#121212'
+  if (loading) {
+    return (
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="16" fill={bg} />
+        <g style={{ transformOrigin: '16px 16px', animation: 'spin .8s linear infinite' }}>
+          <circle cx="16" cy="16" r="6.5" stroke={on ? 'rgba(255,255,255,.4)' : '#d6d6d6'} strokeWidth="2.2" />
+          <path d="M16 9.5 a6.5 6.5 0 0 1 6.5 6.5" stroke={ink} strokeWidth="2.2" strokeLinecap="round" />
+        </g>
+      </svg>
+    )
+  }
   return (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
       <rect width="32" height="32" rx="16" fill={bg} />

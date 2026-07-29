@@ -1,4 +1,4 @@
-import { ListenIcon, BookmarkIcon } from './icons.jsx'
+import { ListenIcon, BookmarkIcon, Spinner } from './icons.jsx'
 import { mkWords } from '../lib/text.js'
 
 const ACCENT = '#0066FF'
@@ -55,10 +55,12 @@ export default function SentenceResult({
   onTapWord,
   onTapFix,
   listen = {},
+  loading = {},
   onListen,
   bookmark = {},
   onBookmark,
   playing,
+  loadingAll = false,
   onTogglePlay,
 }) {
   const showSentence = hint === 'correction' ? true : mode === 'sentence'
@@ -132,6 +134,7 @@ export default function SentenceResult({
         <div className="flex flex-col gap-[9px]">
           {data.sentences.map((s, i) => {
             const ls = !!listen[i]
+            const lo = !!loading[i]
             const bm = !!bookmark[i]
             const isCorrection = !!s.correction
             const origFull = isCorrection ? s.enSegs.map((g) => g.t).join('') : ''
@@ -258,7 +261,7 @@ export default function SentenceResult({
                     onClick={() => onListen?.(i, isCorrection ? fixedFull : s.en)}
                     className="h-8 w-8"
                   >
-                    <ListenIcon on={ls} />
+                    <ListenIcon on={ls} loading={lo} />
                   </button>
                   <button type="button" onClick={() => onBookmark?.(i)} className="h-8 w-8">
                     <BookmarkIcon on={bm} />
@@ -287,14 +290,14 @@ export default function SentenceResult({
               type="button"
               onClick={onTogglePlay}
               className="box-border flex h-[38px] w-28 items-center justify-center gap-[7px] rounded-full"
-              style={{ background: playing ? ACCENT : '#eee' }}
+              style={{ background: playing || loadingAll ? ACCENT : '#eee' }}
             >
-              <PlayPause playing={playing} />
+              {loadingAll ? <Spinner size={16} color="#fff" track="rgba(255,255,255,.4)" /> : <PlayPause playing={playing} />}
               <span
                 className="font-sans text-[14px] font-medium"
-                style={{ color: playing ? '#fff' : '#121212' }}
+                style={{ color: playing || loadingAll ? '#fff' : '#121212' }}
               >
-                {playing ? '멈추기' : '전체 듣기'}
+                {loadingAll ? '준비 중' : playing ? '멈추기' : '전체 듣기'}
               </span>
             </button>
           </div>

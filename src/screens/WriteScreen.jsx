@@ -16,11 +16,14 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
   const [dm, setDm] = useState('sentence')
   const [bookmark, setBookmark] = useState({})
   const [playId, setPlayId] = useState(null) // null | 'all' | 문장 index (하나만 재생)
+  const [loadId, setLoadId] = useState(null) // null | 'all' | 문장 index (음성 로딩 중)
   const [wordSheet, setWordSheet] = useState(false)
   const timer = useRef(null)
 
   const playing = playId === 'all'
+  const loadingAll = loadId === 'all'
   const listen = typeof playId === 'number' ? { [playId]: true } : {}
+  const loading = typeof loadId === 'number' ? { [loadId]: true } : {}
 
   // 화면을 벗어나면 재생 중이던 음성 정지
   useEffect(() => () => stopSpeak(), [])
@@ -69,22 +72,40 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
 
   // 전체 듣기 / 문장별 듣기 — 한 번에 하나만, 다시 누르면 정지, 끝나면 자동 off.
   const togglePlay = () => {
-    if (playId === 'all') {
+    if (playId === 'all' || loadId === 'all') {
       stopSpeak()
       setPlayId(null)
+      setLoadId(null)
       return
     }
-    setPlayId('all')
-    speak(data.allEn, () => setPlayId((c) => (c === 'all' ? null : c)))
+    setLoadId('all')
+    setPlayId(null)
+    speak(
+      data.allEn,
+      () => setPlayId((c) => (c === 'all' ? null : c)),
+      () => {
+        setLoadId((c) => (c === 'all' ? null : c))
+        setPlayId('all')
+      },
+    )
   }
   const toggleListen = (i, text) => {
-    if (playId === i) {
+    if (playId === i || loadId === i) {
       stopSpeak()
       setPlayId(null)
+      setLoadId(null)
       return
     }
-    setPlayId(i)
-    speak(text, () => setPlayId((c) => (c === i ? null : c)))
+    setLoadId(i)
+    setPlayId(null)
+    speak(
+      text,
+      () => setPlayId((c) => (c === i ? null : c)),
+      () => {
+        setLoadId((c) => (c === i ? null : c))
+        setPlayId(i)
+      },
+    )
   }
   // 문장 표현 저장 — 교정문은 fixSegs 합침, 번역문은 en.
   const sentText = (s) => (s?.correction ? (s.fixSegs || []).map((g) => g.t).join('') : s?.en || '')
@@ -257,10 +278,12 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
               onTapWord={onTapWord}
               onTapFix={onTapFix}
               listen={listen}
+              loading={loading}
               onListen={toggleListen}
               bookmark={bookmark}
               onBookmark={toggleBookmark}
               playing={playing}
+              loadingAll={loadingAll}
               onTogglePlay={togglePlay}
             />
           </div>

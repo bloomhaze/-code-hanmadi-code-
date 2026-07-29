@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
-import { SpeakerSmall, BookmarkSmall, SearchIcon } from './icons.jsx'
+import { SpeakerSmall, BookmarkSmall, SearchIcon, Spinner } from './icons.jsx'
 import { hlSegs } from '../lib/text.js'
-import { speak } from '../lib/speak.js'
+import { speak, stopSpeak } from '../lib/speak.js'
 import { searchExpressions } from '../lib/search.js'
 
 // 단어 검색 시트 — 모르는 표현을 검색해 AI가 실제로 많이 쓰는 영어 표현 1~5개를 제안한다.
@@ -119,7 +119,17 @@ export default function WordSearchSheet({ onClose, onToast }) {
 
 function ResultCard({ w, onToast }) {
   const [saved, setSaved] = useState(false)
+  const [audio, setAudio] = useState('idle') // idle | loading | playing
   const segs = hlSegs(w.ex || '', w.term)
+  const onSpeak = () => {
+    if (audio !== 'idle') {
+      stopSpeak()
+      setAudio('idle')
+      return
+    }
+    setAudio('loading')
+    speak(`${w.term}. ${w.ex || ''}`, () => setAudio('idle'), () => setAudio('playing'))
+  }
   return (
     <div className="flex flex-col gap-2 rounded-2xl bg-[#f7f7f8] p-[18px]">
       <div className="flex items-start justify-between gap-2.5">
@@ -129,10 +139,15 @@ function ResultCard({ w, onToast }) {
         <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
-            onClick={() => speak(`${w.term}. ${w.ex || ''}`)}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-[#eee]"
+            onClick={onSpeak}
+            className="flex h-8 w-8 items-center justify-center rounded-full"
+            style={{ background: audio === 'playing' ? '#0066ff' : '#eee' }}
           >
-            <SpeakerSmall color="#121212" />
+            {audio === 'loading' ? (
+              <Spinner size={16} color="#121212" />
+            ) : (
+              <SpeakerSmall color={audio === 'playing' ? '#fff' : '#121212'} />
+            )}
           </button>
           <button
             type="button"

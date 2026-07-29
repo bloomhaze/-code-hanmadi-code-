@@ -1,12 +1,28 @@
-import { SpeakerSmall, BookmarkSmall } from './icons.jsx'
+import { useState } from 'react'
+import { SpeakerSmall, BookmarkSmall, Spinner } from './icons.jsx'
 import { hlSegs } from '../lib/text.js'
-import { speak } from '../lib/speak.js'
+import { speak, stopSpeak } from '../lib/speak.js'
 
 // Bottom-sheet showing a tapped word's meaning + example (단어 뜻 팝업).
 export default function WordPopup({ state, saved = false, onToggleSave, onClose, onToast }) {
+  const [audio, setAudio] = useState('idle') // idle | loading | playing
   if (!state?.open) return null
   const { term, loading, kr, ex, exKr } = state
   const segs = hlSegs(ex || '', term)
+
+  const onSpeak = () => {
+    if (audio !== 'idle') {
+      stopSpeak()
+      setAudio('idle')
+      return
+    }
+    setAudio('loading')
+    speak(
+      `${term}. ${ex || ''}`,
+      () => setAudio('idle'),
+      () => setAudio('playing'),
+    )
+  }
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/35 px-5" onClick={onClose}>
@@ -25,10 +41,15 @@ export default function WordPopup({ state, saved = false, onToggleSave, onClose,
           <div className="flex shrink-0 gap-2.5">
             <button
               type="button"
-              onClick={() => speak(`${term}. ${ex || ''}`)}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f1f1f2]"
+              onClick={onSpeak}
+              className="flex h-8 w-8 items-center justify-center rounded-full"
+              style={{ background: audio === 'playing' ? '#0066ff' : '#f1f1f2' }}
             >
-              <SpeakerSmall color="#121212" />
+              {audio === 'loading' ? (
+                <Spinner size={16} color="#121212" />
+              ) : (
+                <SpeakerSmall color={audio === 'playing' ? '#fff' : '#121212'} />
+              )}
             </button>
             <button
               type="button"
