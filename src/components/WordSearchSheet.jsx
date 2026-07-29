@@ -87,11 +87,6 @@ export default function WordSearchSheet({ onClose, onToast }) {
           </div>
         )}
 
-        {status === 'idle' && (
-          <div className="mt-24 flex flex-col items-center gap-3">
-            <SearchIcon color="#dcdcdc" />
-          </div>
-        )}
 
         {status === 'error' && (
           <div className="mt-24 flex flex-col items-center gap-3">
