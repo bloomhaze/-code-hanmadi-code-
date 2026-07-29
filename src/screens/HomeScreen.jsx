@@ -198,21 +198,19 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
             )}
           </div>
 
-          {/* today empty → prompt card */}
+          {/* today empty → prompt card (연필 아이콘 + 롤링 질문) */}
           {todayEmpty && (
             <button
               type="button"
               onClick={onWrite}
-              className="flex min-h-[71px] w-full flex-col items-center justify-center gap-0.5 rounded-[20px] px-[18px] py-4"
+              className="flex min-h-[71px] w-full items-center justify-center gap-2 rounded-[20px] px-[18px] py-4"
               style={{ outline: '.5px dashed #abcfff', outlineOffset: '-.5px' }}
             >
-              <span className="font-inter text-[12px]" style={{ color: ACCENT, letterSpacing: '-.2px' }}>
-                {date.label}
-              </span>
-              <div className="flex h-6 items-center justify-center overflow-hidden">
+              <PencilIcon size={15} fill={ACCENT} />
+              <div className="flex h-6 items-center overflow-hidden">
                 <span
                   key={promptIdx}
-                  className="font-inter text-[15px] font-medium"
+                  className="whitespace-nowrap font-inter text-[15px] font-medium"
                   style={{ color: ACCENT, lineHeight: '24px', letterSpacing: '-.2px', animation: 'promptFade 3.6s ease-in-out' }}
                 >
                   {prompts[promptIdx]}
