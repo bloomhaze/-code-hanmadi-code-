@@ -90,9 +90,6 @@ export default function WordSearchSheet({ onClose, onToast }) {
         {status === 'idle' && (
           <div className="mt-24 flex flex-col items-center gap-3">
             <SearchIcon color="#dcdcdc" />
-            <span className="text-center font-sans text-[14px]" style={{ color: '#c4c4c4' }}>
-              표현하고 싶은 단어를 검색해보세요
-            </span>
           </div>
         )}
 
