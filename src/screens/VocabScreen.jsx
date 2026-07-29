@@ -202,7 +202,7 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
                   className="mt-2 flex h-[50px] items-center justify-center gap-2 rounded-[20px] bg-ink"
                 >
                   <PlayIcon />
-                  <span className="font-sans text-[15px] font-medium text-white">퀴즈 시작</span>
+                  <span className="font-sans text-[15px] font-semibold text-white">퀴즈 시작</span>
                 </button>
               </>
             ) : (
