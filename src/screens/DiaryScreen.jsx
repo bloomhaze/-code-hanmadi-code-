@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SearchIcon, PencilIcon } from '../components/icons.jsx'
+import { SearchIcon, PencilIcon, DiaryEmptyIllust } from '../components/icons.jsx'
 import { diaryBadge } from '../data/diary.js'
 
 const ACCENT = '#0066FF'
@@ -122,8 +122,9 @@ export default function DiaryScreen({ diaries = [], onWrite, onOpen, deletedIds 
 
           {/* no diaries written at all */}
           {noDiaries && (
-            <div className="flex flex-col items-center gap-1.5 pt-[180px]">
-              <span className="font-inter text-[16px] font-medium text-ink">작성한 일기가 없어요</span>
+            <div className="flex flex-col items-center gap-1.5 pt-[150px]">
+              <DiaryEmptyIllust size={96} />
+              <span className="mt-4 font-inter text-[16px] font-medium text-ink">작성한 일기가 없어요</span>
               <span className="font-inter text-[13px] font-light text-muted-2">
                 내 이야기로 영어 공부를 시작해보세요
               </span>

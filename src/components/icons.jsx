@@ -322,3 +322,36 @@ export function ChevronDownSmall() {
     </svg>
   )
 }
+
+// 빈 상태 일러스트 — 펼친 책 자락 아래로 빼꼼 내다보는 캐릭터(선 드로잉).
+export function DiaryEmptyIllust({ size = 104, color = '#1f1f1f' }) {
+  return (
+    <svg
+      width={size}
+      height={Math.round(size * 0.9)}
+      viewBox="0 0 124 112"
+      fill="none"
+      stroke={color}
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {/* 책 접힘(상단) */}
+      <path d="M56 22 L57 13 L67 13 L68 22" />
+      {/* 자락 외곽 + 물결 밑단 */}
+      <path d="M56 22 C40 30 22 54 16 84 q6.5 9 13 1 q6.5 9 13 1 q6.5 9 13 1 q6.5 9 13 1 q6.5 9 13 1 q6.5 9 13 1 C102 54 84 30 68 22" />
+      {/* 주름 */}
+      <path d="M60 22 C52 44 44 62 35.5 84.5" />
+      <path d="M61 22 C57 44 53 62 49 80" />
+      <path d="M62 22 L62 74" />
+      <path d="M63 22 C67 44 71 62 75 80" />
+      <path d="M64 22 C72 44 80 62 88.5 84.5" />
+      {/* 눈 */}
+      <circle cx="56.5" cy="85" r="2.6" fill={color} stroke="none" />
+      <circle cx="67.5" cy="85" r="2.6" fill={color} stroke="none" />
+      {/* 손 */}
+      <path d="M47 91 C48.5 85.5 54 85.5 55.5 89" />
+      <path d="M77 91 C75.5 85.5 70 85.5 68.5 89" />
+    </svg>
+  )
+}

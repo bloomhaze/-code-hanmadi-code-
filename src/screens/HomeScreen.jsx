@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight, ChevronDownSmall, PencilIcon, ListenIcon, BookmarkIcon } from '../components/icons.jsx'
+import { ChevronLeft, ChevronRight, ChevronDownSmall, PencilIcon, ListenIcon, BookmarkIcon, DiaryEmptyIllust } from '../components/icons.jsx'
 import CalendarSheet from '../components/CalendarSheet.jsx'
 import { buildWeek, dateInfo, monthsRange, midnight, realToday } from '../lib/homecal.js'
 import { speak, stopSpeak } from '../lib/speak.js'
@@ -238,8 +238,9 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
 
           {/* empty past day */}
           {emptyPast && (
-            <div className="flex flex-col items-center gap-1.5 pb-10 pt-[120px]">
-              <span className="font-inter text-[16px] font-medium text-ink">작성한 일기가 없어요</span>
+            <div className="flex flex-col items-center gap-1.5 pb-10 pt-[92px]">
+              <DiaryEmptyIllust size={96} />
+              <span className="mt-4 font-inter text-[16px] font-medium text-ink">작성한 일기가 없어요</span>
               <span className="font-inter text-[13px] font-light text-muted-2">
                 내 이야기로 영어 공부를 시작해보세요
               </span>
