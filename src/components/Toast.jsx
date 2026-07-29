@@ -19,13 +19,13 @@ export default function Toast({ toast, onClose }) {
 
   return (
     <div
-      className="absolute left-4 right-4 top-2 z-50 flex min-h-[50px] items-center gap-2.5 rounded-2xl px-4 py-3"
+      className="absolute inset-x-4 bottom-[74px] z-50 flex min-h-[50px] items-center gap-2.5 rounded-2xl px-4 py-3"
       style={{
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         boxShadow: '0 0 24px 0 rgba(0,0,0,.22)',
         background: 'rgba(28,28,30,.6)',
-        animation: 'toastDown .34s cubic-bezier(.22,1,.36,1)',
+        animation: 'toastUp .34s cubic-bezier(.22,1,.36,1)',
       }}
     >
       {toast.check && (
