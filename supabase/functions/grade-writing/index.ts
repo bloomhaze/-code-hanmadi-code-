@@ -160,80 +160,56 @@ function gradePrompt(ko: string, answer: string, model: string) {
 
 function translatePrompt(text: string) {
   return (
-    '너는 한국어 일기를 원어민이 자기 일기장에 쓸 법한, 세련되고 완전히 자연스러운 영어로 옮기는 최고 수준의 번역가야. ' +
-    'ChatGPT처럼 매끄럽고 감정이 살아있는 영어를 뽑아내야 해.\n' +
-    '\n' +
-    '★ 작업 순서(머릿속으로):\n' +
-    '1) 먼저 각 문장이 "진짜로 말하려는 의미와 감정"을 파악해.\n' +
-    '2) 그 의미를 한국어 어순·단어에 얽매이지 말고, 원어민이 그 상황을 자기 일기에 어떻게 쓸지 상상해서 새로 써.\n' +
-    '3) 어색하면 문장을 합치거나 나눠도 되고, 접속사(but, and, so, that)로 자연스럽게 이어. 감정 표현은 살려서.\n' +
-    '\n' +
-    '★ 흐르는 문체(매우 중요 — 이게 자연스러움의 핵심):\n' +
-    '- 한 한국어 문장이 길고 여러 내용을 담고 있으면, 억지로 한 문장에 욱여넣지 말고 ' +
-    '"여러 개의 짧고 자연스러운 영어 문장"으로 나눠서 en에 담아. (en은 문장 여러 개여도 됨)\n' +
-    '- 원어민이 실제로 쓰는 담화 연결어로 흐름을 만들어: To be honest, Once ~, but, so, ' +
-    'On top of that, To make things worse, Now I ~, at least ~ 등.\n' +
-    '- 한국어에 눌려 압축된 감정·뉘앙스는 자연스럽게 풀어써(elaborate). ' +
-    '단, "없던 새 사건"을 지어내진 말고, 이미 담긴 감정을 원어민답게 확장하는 정도.\n' +
-    '\n' +
-    '★ 번역 원칙(매우 중요):\n' +
-    '- 절대 단어 대 단어 직역하지 마. 직역은 실패야.\n' +
-    '- 콩글리쉬/어색한 표현 절대 금지.\n' +
-    '- 한국 음식·문화 용어는 영어권 통용 표현으로(sashimi, tteokbokki, kimchi 등).\n' +
-    '- 격식 빼고 자연스러운 일기체. 대신 문법·관사·시제·전치사·관용구는 원어민 수준으로 정확히.\n' +
-    '- "기분이 좋았다" 같은 감정은 밋밋하게 "I was happy"로 끝내지 말고 ' +
-    '"it really made my day", "it put me in a great mood", "I couldn\'t have been happier" 처럼 생생하게.\n' +
-    '★ 어휘 난이도(매우 중요): 원어민이 일상 대화에서 자주 쓰는 쉽고 흔한 단어를 우선해. ' +
-    '문어적·시적·잘 안 쓰는 어려운 단어는 피하고, 더 쉬운 표현으로 같은 뜻을 전달할 수 있으면 그걸 써. ' +
-    '예: "linger"(X, 문어체) → "is still there"/"won\'t go away"(O), "a pang of regret"(X) → "a bit of regret"/"I felt bad"(O), ' +
-    '"commence"(X) → "start"(O), "utilize"(X) → "use"(O). 어려운 단어로 유식해 보이려 하지 말고, 실제 원어민이 편하게 쓰는 말로.\n' +
-    '\n' +
-    '★ 참고 예시 (이 수준·스타일 그대로 뽑아내):\n' +
-    '입력: "오늘 남자친구랑 모듬회를 먹었다. 갑자기 약속을 잡고 갔는데 너무 맛있어서 기분이좋았다"\n' +
-    '좋은 번역(O): "Today, my boyfriend and I went out for an assorted sashimi platter. ' +
-    'It was a spontaneous plan, but the food was so good that it put me in a great mood."\n' +
-    '또는(O): "Today, my boyfriend and I had an assorted sashimi platter. ' +
-    'We made plans at the last minute, and it turned out to be so delicious that it really made my day."\n' +
-    '나쁜 번역(X): "Today I ate mixed raw fish dish with my boyfriend. ' +
-    'We made a sudden plan and went, and it was so delicious that I felt good." ← 콩글리쉬·직역, 절대 이렇게 하지 마.\n' +
-    '\n' +
-    '★ 참고 예시2 — 긴 문장을 여러 개로 쪼개고 흐르게 (이 수준이 목표):\n' +
-    '입력 문장: "얼마전에 보톡스를 맞아서 웃는 표정이 되지않아서 사실 외적으로 좋은 인상을 주기 어렵다는 생각에 자신감이 일차적으로 떨어진 상태였다."\n' +
-    '좋은 번역(O): "To be honest, I had already lost some confidence before the interview even started, ' +
-    'because I recently got Botox and can\'t really smile right now. ' +
-    'I felt like it would be hard to make a good first impression, at least appearance-wise."\n' +
-    '입력 문장: "여유로운 마음을 가지고 해야하는데 막상 내가 준비했던 것보다 답변을 못해서 아쉽고, 자괴감이 든다."\n' +
-    '좋은 번역(O): "I wanted to stay calm and relaxed, but once the interview started, ' +
-    'I didn\'t answer the questions as well as I had during my preparation. ' +
-    'I\'m disappointed in myself, and I can\'t help feeling a bit defeated."\n' +
-    '입력 문장: "그리고 내가 생각했을 때, 면접관이 레드 플래그였던 말도 했어서 너무 불안하다."\n' +
-    '좋은 번역(O): "On top of that, one of the interviewers said something that I personally saw as a red flag, ' +
-    'which has made me even more anxious."\n' +
-    '→ 포인트: 긴 한 문장을 짧은 여러 문장으로 나누고, To be honest / but once ~ / On top of that 로 흐름을 만들고, 쉬운 단어를 씀.\n' +
-    '\n' +
-    '★ 표현 참고: "갑자기 약속을 잡다"→"made plans at the last minute"/"it was a spontaneous plan", ' +
-    '"모듬회"→"assorted sashimi (platter)", "너무 맛있어서"→"it was so good that"/"it turned out to be so delicious that", ' +
-    '"2차 면접"→"second-round interview", "레드 플래그"→"a red flag", "자괴감이 든다"→"I can\'t help feeling defeated".\n' +
-    '\n' +
-    '아래 일기를 문장 단위로 나누고, 각 문장마다 다음을 제공해:\n' +
-    '- ko: 원문 한국어 문장\n' +
-    '- en: 위 원칙과 예시 수준의 자연스러운 원어민 영어\n' +
-    '- phrases: 그 en 문장 안에 등장하는 아래 세 종류를 en에 나타난 표면형(철자·활용형) 그대로 배열로 담아:\n' +
-    '    (1) 구동사(phrasal verb) 예: run into, catch up on, come across, look forward to, give up\n' +
-    '    (2) 관용 표현/이디엄(idiom) 예: piece of cake, break the ice, under the weather, once in a while, on the same page, ' +
-    'mind goes blank(머리가 하얘지다), end up, let it go, make up my mind — 이런 여러 단어가 한 뜻으로 굳어진 표현은 통째로 넣어\n' +
-    '    (3) 하나의 뜻으로 굳어진 전치사·부사 표현 — 개별 단어로 쪼개면 뜻이 안 통하고 통째로 외워야 하는 표현. ' +
-    '예: at the last minute(막판에), in the meantime(그동안에), out of nowhere(난데없이), on purpose(일부러), ' +
-    'for a while(한동안), all of a sudden(갑자기), by the way(그런데), in advance(미리), at least(적어도), ' +
-    'as soon as(~하자마자), in the end(결국), a couple of(두어 개의), make my day(하루를 행복하게 하다)\n' +
-    '  ★ (3)번이 특히 중요해. "at the last minute" 같은 표현은 반드시 통째로 한 덩어리로 넣어. ' +
-    'at, the, last, minute 처럼 따로 넣으면 안 돼.\n' +
-    '  ★ 분리형 구동사(목적어가 동사와 부사 사이에 끼는 경우)는 동사가 활용된 형태 그대로, 문장에 나타난 전체 구간을 넣어. ' +
-    '예: "tried it out", "picked it up", "turn it off", "figured it out", "wears me out", "wore me out", "cheer me up" ' +
-    '(X: 기본형 "wear out"/"try out"만 넣지 말 것 — 문장에 "wears me out"이면 그대로 "wears me out")\n' +
-    '  단어 하나짜리는 넣지 말고, 반드시 두 단어 이상으로 묶여야 뜻이 통하는 표현만. 없으면 빈 배열 [].\n' +
-    '일기:\n' + text + '\n' +
-    '반드시 이 JSON만 반환: {"sentences": [{"ko": "...", "en": "...", "phrases": ["..."]}]}'
+    `너는 전문 원어민 영어 작가이자 에디터야. 한국어를 "축자 번역"하는 게 아니라, ` +
+    `영어권에서 교육받은 20~30대 원어민이 처음부터 영어로 쓴 것처럼 다시 써(rewrite). ` +
+    `아래 규칙을 엄격히 지켜. 결과물은 번역티가 절대 나면 안 되고, 원어민이 원래 영어로 쓴 글처럼 읽혀야 해.\n` +
+    `\n` +
+    `[최상위 목표] 정확한 직역보다 자연스러움·유창함·리듬·감정의 진정성을 항상 우선해.\n` +
+    `\n` +
+    `규칙1. 단어가 아니라 "의미"를 옮겨라. 한국어 문장 구조를 보존하지 말고, 의도를 먼저 이해한 뒤 영어로 자연스럽게 다시 써. 필요하면 어순을 완전히 바꿔.\n` +
+    `규칙2. 진짜 원어민처럼 써라. 개인 일기·SNS·블로그·대화에서 실제로 쓰는 표현을 사용. 교과서 영어·번역투 금지.\n` +
+    `규칙3. 감정을 보존하라. 답답함/실망/설렘/불안/고마움/그리움 등 원래 감정 톤을 그대로 살려. 로봇처럼 쓰지 마.\n` +
+    `규칙4. 흐름을 살려라. 문장별로 옮기지 말고 아이디어를 자연스럽게 연결. 원어민이라면 합칠 문장은 합치고, 나눌 긴 문장은 나눠.\n` +
+    `규칙5. 자연스러운 연어(collocation)를 써라. 예: make a good first impression, heat and humidity, cooler climate, ` +
+    `replay the interview in my head, stay calm, feel defeated, can't help but. 문법은 맞지만 잘 안 쓰는 어색한 조합은 피해.\n` +
+    `규칙6. 구어적으로. 교육받은 미국인이 실제로 말하는 방식 선호: It just occurred to me..., To be honest..., ` +
+    `I can't help feeling..., What really gets to me is..., On top of that..., I keep thinking about... (지나치게 격식적인 표현 대신).\n` +
+    `규칙7. 불필요한 반복 제거. 한국어는 비슷한 말을 반복하기도 함 — 영어는 하나의 강한 문장으로 합쳐.\n` +
+    `규칙8. 가독성. 문장 길이를 다양하게, 강조엔 짧은 문장. 모든 문장이 같은 리듬이 되지 않게.\n` +
+    `규칙9. 설명하지 말고 보여줘라(show, don't tell). "I felt uncomfortable" 대신 "I was sweating even while standing still" 처럼 구체적으로.\n` +
+    `규칙10. 원본처럼 들리게. 번역처럼 읽히면 실패. 원어민이 "원래 영어로 썼구나" 느껴야 함.\n` +
+    `규칙11. 어려운 어휘 남발 금지. 일상 단어를 써. 인상적인 것보다 자연스러운 게 낫다.\n` +
+    `규칙12. 직역이 어색하면 자유롭게 다시 써. 자연스러움 > 한국어 원문에 가깝게.\n` +
+    `규칙13. 글쓴이의 성격 유지. 감정을 과장하지 말고, 원본보다 더 드라마틱하게 만들지 말고, 미묘한 감정도 없애지 마.\n` +
+    `규칙14. 감정적으로 믿기게. 에세이가 아니라 진짜 자기 생각을 나누는 사람처럼.\n` +
+    `\n` +
+    `[우선순위] 1)자연스러움 2)진정성 3)감정의 뉘앙스 4)원어민 연어 5)매끄러운 흐름 6)가독성. ` +
+    `"정확한 번역"과 "원어민이 자연스럽게 쓸 법한 것" 중에선 언제나 후자를 택하되, 원래 의도와 감정은 보존해.\n` +
+    `단, 문법·관사·시제·전치사·철자는 원어민 수준으로 정확히. 없던 새 사건을 지어내진 말고 이미 담긴 감정만 자연스럽게 확장해.\n` +
+    `한국 음식·문화 용어는 영어권 통용 표현으로(sashimi, tteokbokki, kimchi 등).\n` +
+    `\n` +
+    `[참고 예시 — 이 수준이 목표]\n` +
+    `입력: "오늘 남자친구랑 모듬회를 먹었다. 갑자기 약속을 잡고 갔는데 너무 맛있어서 기분이좋았다"\n` +
+    `좋은(O): "Today, my boyfriend and I went out for an assorted sashimi platter. It was a spontaneous plan, but the food was so good that it put me in a great mood."\n` +
+    `나쁜(X): "Today I ate mixed raw fish dish with my boyfriend. We made a sudden plan and went, and it was so delicious that I felt good." (콩글리쉬·직역 — 절대 금지)\n` +
+    `입력: "여유로운 마음을 가지고 해야하는데 막상 내가 준비했던 것보다 답변을 못해서 아쉽고, 자괴감이 든다."\n` +
+    `좋은(O): "I wanted to stay calm and relaxed, but once the interview started, I didn't answer the questions as well as I had during my preparation. I'm disappointed in myself, and I can't help feeling a bit defeated."\n` +
+    `\n` +
+    `[출력 구조 — 매우 중요] 우리 앱은 단어 탭 기능 때문에 "원문 한국어 문장(ko) ↔ 자연스러운 영어(en)" 쌍이 필요해. ` +
+    `각 ko(원문 한국어 문장)마다 en을 주되, en은 그 한 문장만 축자로 옮기는 게 아니라 위 규칙대로 원어민답게 다시 쓴 결과여야 해. ` +
+    `en은 여러 문장이어도 되고, 흐름을 위해 접속사로 이어도 돼(To be honest, but once ~, On top of that 등).\n` +
+    `각 문장마다 제공:\n` +
+    `- ko: 원문 한국어 문장\n` +
+    `- en: 위 규칙 수준의 자연스러운 원어민 영어\n` +
+    `- phrases: 그 en 안에 등장하는 아래 종류를 en에 나타난 표면형(철자·활용형) 그대로 배열로:\n` +
+    `    (1) 구동사(phrasal verb): run into, catch up on, come across, look forward to, give up\n` +
+    `    (2) 관용/이디엄: piece of cake, break the ice, under the weather, once in a while, on the same page, mind goes blank, end up, let it go\n` +
+    `    (3) 하나의 뜻으로 굳어진 전치사·부사 표현: at the last minute, in the meantime, out of nowhere, on purpose, for a while, all of a sudden, by the way, in advance, at least, as soon as, in the end, a couple of, make my day\n` +
+    `  ★ "at the last minute" 같은 표현은 반드시 통째로 한 덩어리로. at, the, last, minute 처럼 쪼개 넣지 마.\n` +
+    `  ★ 분리형 구동사는 동사가 활용된 형태 그대로, 문장에 나타난 전체 구간을 넣어: "tried it out", "wears me out", "cheer me up" (X: 기본형 "wear out"만 넣기).\n` +
+    `  단어 하나짜리는 넣지 말고, 두 단어 이상 묶여야 뜻이 통하는 표현만. 없으면 빈 배열 [].\n` +
+    `일기:\n${text}\n` +
+    `반드시 이 JSON만 반환: {"sentences": [{"ko": "...", "en": "...", "phrases": ["..."]}]}`
   )
 }
 
