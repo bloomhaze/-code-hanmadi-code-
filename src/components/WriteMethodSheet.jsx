@@ -1,3 +1,5 @@
+import writeEnUrl from '../assets/write-en.svg'
+
 // Bottom sheet to pick how to write a diary: 한글로 작성 / 영어로 도전.
 export default function WriteMethodSheet({ onChoose, onClose, enLocked = false }) {
   const Chevron = ({ color = '#c4c4c4' }) => (
@@ -39,6 +41,14 @@ export default function WriteMethodSheet({ onChoose, onClose, enLocked = false }
             onClick={() => onChoose('en')}
             className="flex h-[90px] items-center gap-3 rounded-[20px] bg-[#f7f7f7] px-[18px] py-4 text-left active:bg-[#ececec]"
           >
+            <img
+              src={writeEnUrl}
+              alt=""
+              width={58}
+              height={35}
+              className="shrink-0 rounded-[8px]"
+              style={{ display: 'block' }}
+            />
             <div className="flex flex-1 flex-col gap-[7px]">
               <div className="flex items-center gap-1.5">
                 <span className="font-sans text-[16px] font-semibold text-ink" style={{ letterSpacing: '-.3px' }}>
