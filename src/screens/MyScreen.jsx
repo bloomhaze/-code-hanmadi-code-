@@ -29,6 +29,7 @@ export default function MyScreen({
   onLogin,
   onProfile,
   onNotif,
+  onFeedback,
   onLogout,
   onWithdraw,
   onToast,
@@ -202,7 +203,7 @@ export default function MyScreen({
               <div className="flex flex-col overflow-hidden rounded-2xl bg-[#f7f7f8]">
                 <Row label="이용 약관" onClick={() => onToast?.('준비 중이에요')} first />
                 <Row label="개인정보 처리" onClick={() => onToast?.('준비 중이에요')} />
-                <Row label="개발자에게 한마디" onClick={() => onToast?.('준비 중이에요')} last />
+                <Row label="개발자에게 한마디" onClick={onFeedback} last />
               </div>
             </div>
 

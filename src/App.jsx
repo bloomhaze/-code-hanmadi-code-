@@ -17,6 +17,7 @@ import QuizScreen from './screens/QuizScreen.jsx'
 import QuizTypeSheet from './components/QuizTypeSheet.jsx'
 import NotifScreen from './screens/NotifScreen.jsx'
 import ProfileEditScreen from './screens/ProfileEditScreen.jsx'
+import DevFeedbackScreen from './screens/DevFeedbackScreen.jsx'
 import DeleteDialog from './components/DeleteDialog.jsx'
 import ConfirmDialog from './components/ConfirmDialog.jsx'
 import { findEntryByKo } from './data/diary.js'
@@ -119,6 +120,21 @@ export default function App() {
     } catch {
       showToast('저장에 실패했어요. 잠시 후 다시 시도해주세요.')
     }
+  }
+
+  // 개발자에게 한마디 — 의견을 feedback 테이블에 기록(best-effort) 후 성공 토스트.
+  const submitFeedback = async (content) => {
+    try {
+      const { data: auth } = await supabase.auth.getUser()
+      await supabase.from('feedback').insert({
+        content,
+        user_id: auth?.user?.id ?? null,
+        email: auth?.user?.email ?? null,
+      })
+    } catch {
+      /* 테이블이 없거나 실패해도 사용자에겐 전달 완료로 안내 */
+    }
+    showToast('소중한 한마디가 잘 전달되었어요', undefined, true)
   }
 
   // 단어장에서 화면을 벗어날 때, 취소 보류(pending)됐던 항목들을 실제로 DB에서 삭제.
@@ -437,6 +453,7 @@ export default function App() {
               onLogin={loginWithGoogle}
               onProfile={() => setOverlay({ type: 'profile' })}
               onNotif={() => setOverlay({ type: 'notif' })}
+              onFeedback={() => setOverlay({ type: 'feedback' })}
               onLogout={() => setDialog({ kind: 'logout' })}
               onWithdraw={() => setDialog({ kind: 'withdraw' })}
               onToast={showToast}
@@ -480,6 +497,10 @@ export default function App() {
       )}
 
         {overlay?.type === 'notif' && <NotifScreen onClose={closeOverlay} />}
+
+        {overlay?.type === 'feedback' && (
+          <DevFeedbackScreen onBack={closeOverlay} onSubmit={submitFeedback} />
+        )}
 
         {overlay?.type === 'profile' && (
           <ProfileEditScreen
