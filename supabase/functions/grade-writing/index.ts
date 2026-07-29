@@ -131,15 +131,18 @@ async function callGroq(
   }
 }
 
-// 한국어 출력 필드 보호 — 한자(CJK)·일본어 가나·키릴(러시아어 등) 문자를 강제 제거.
-// 프롬프트로 막아도 모델이 드물게 섞어 내보내므로 코드에서 최종 차단한다.
-const FOREIGN_RE = /[぀-ヿ㐀-䶿一-鿿豈-﫿Ѐ-ӿ]/g
+// 한국어 출력 필드 보호 — 화이트리스트 방식.
+// 한글·영문·숫자·공백·일반 문장부호만 남기고, 그 외 모든 언어(태국어·아랍어·한자·가나·키릴 등)를 강제 제거.
+// 허용: 0-9 A-Za-z, 한글(AC00-D7A3, 자모 1100-11FF/3130-318F/A960-A97F/D7B0-D7FF),
+//       공백, 일반 문장부호(2010-205E 각종 대시·따옴표·… 포함), 기본 ASCII 부호, 도(°)/가운뎃점(·)
+const KEEP_SRC =
+  "0-9A-Za-z\\uAC00-\\uD7A3\\u1100-\\u11FF\\u3130-\\u318F\\uA960-\\uA97F\\uD7B0-\\uD7FF" +
+  "\\s.,!?'\"()\\[\\]{}:;~\\-/%&@#*+=<>\\u00B0\\u00B7\\u2010-\\u205E"
 function stripForeign(s: string): string {
-  return (s || '').replace(FOREIGN_RE, '').replace(/\s{2,}/g, ' ').trim()
+  return (s || '').replace(new RegExp('[^' + KEEP_SRC + ']', 'g'), '').replace(/\s{2,}/g, ' ').trim()
 }
 function hasForeign(s: string): boolean {
-  // /g 정규식의 .test()는 상태를 유지하므로, 플래그 없는 새 정규식으로 검사
-  return new RegExp(FOREIGN_RE.source).test(s || '')
+  return new RegExp('[^' + KEEP_SRC + ']').test(s || '')
 }
 
 function gradePrompt(ko: string, answer: string, model: string) {
@@ -385,13 +388,13 @@ Deno.serve(async (req) => {
       const word = (body.word || '').trim()
       if (!word) return json({ error: '단어가 없어요.' })
       let { data, error } = await callGroq(key, wordPrompt(word, (body.sentence || '').trim()))
-      // 한자·러시아어 등이 섞이면 SMART_MODEL로 한 번 재시도(품질↑), 그래도 남으면 코드에서 제거
-      if (!error && (hasForeign(data.kr) || hasForeign(data.exKr))) {
+      // 한글·영어 외 언어(태국어·한자 등)가 섞이면 SMART_MODEL로 한 번 재시도(품질↑), 그래도 남으면 코드에서 제거
+      if (!error && (hasForeign(data.kr) || hasForeign(data.ex) || hasForeign(data.exKr))) {
         const retry = await callGroq(key, wordPrompt(word, (body.sentence || '').trim()), SMART_MODEL, 0.2)
         if (!retry.error) data = retry.data
       }
       if (error) return json({ error })
-      return json({ kr: stripForeign(data.kr || ''), ex: (data.ex || '').trim(), exKr: stripForeign(data.exKr || '') })
+      return json({ kr: stripForeign(data.kr || ''), ex: stripForeign(data.ex || ''), exKr: stripForeign(data.exKr || '') })
     }
 
     if (action === 'search') {
@@ -402,9 +405,9 @@ Deno.serve(async (req) => {
       if (r.error) r = await callGroq(key, searchPrompt(q), GROQ_MODEL, 0.3)
       if (r.error) return json({ error: r.error })
       const results = (Array.isArray(r.data.results) ? r.data.results.slice(0, 5) : []).map((it: any) => ({
-        term: (it.term || '').trim(),
+        term: stripForeign(it.term || ''),
         kr: stripForeign(it.kr || ''),
-        ex: (it.ex || '').trim(),
+        ex: stripForeign(it.ex || ''),
         exKr: stripForeign(it.exKr || ''),
       }))
       return json({ results })
