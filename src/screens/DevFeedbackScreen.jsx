@@ -1,22 +1,24 @@
-import { useState } from 'react'
+const EMAIL = 'svs9645@gmail.com'
 
-const MAX = 1000
-
-// 개발자에게 한마디 — 자유 의견 입력 후 전달.
-export default function DevFeedbackScreen({ onBack, onSubmit }) {
-  const [text, setText] = useState('')
-  const [sending, setSending] = useState(false)
-  const trimmed = text.trim()
-  const canSend = !!trimmed && !sending
-
-  const send = async () => {
-    if (!canSend) return
-    setSending(true)
+// 개발자에게 한마디 — 안내 문구 + 이메일 복사.
+export default function DevFeedbackScreen({ onBack, onToast }) {
+  const copy = async () => {
     try {
-      await onSubmit?.(trimmed)
-      onBack?.()
-    } finally {
-      setSending(false)
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(EMAIL)
+      } else {
+        const ta = document.createElement('textarea')
+        ta.value = EMAIL
+        ta.style.position = 'fixed'
+        ta.style.opacity = '0'
+        document.body.appendChild(ta)
+        ta.select()
+        document.execCommand('copy')
+        document.body.removeChild(ta)
+      }
+      onToast?.('이메일을 복사했어요', undefined, true)
+    } catch {
+      onToast?.('복사에 실패했어요. 길게 눌러 복사해주세요.')
     }
   }
 
@@ -31,48 +33,39 @@ export default function DevFeedbackScreen({ onBack, onSubmit }) {
         </button>
       </div>
 
-      {/* body */}
-      <div className="flex min-h-0 flex-1 flex-col px-5 pt-3">
-        <h1
-          className="font-sans text-[23px] font-bold text-ink"
-          style={{ letterSpacing: '-.5px', lineHeight: '1.35' }}
-        >
-          작은 의견 하나도
-          <br />
-          소중하게 반영할게요
+      {/* center content */}
+      <div className="flex flex-1 flex-col items-center justify-center px-5 text-center">
+        <h1 className="font-sans text-[18px] font-bold text-ink" style={{ letterSpacing: '-.4px' }}>
+          작은 의견 하나도 소중해요
         </h1>
+        <p
+          className="mt-2.5 font-sans text-[14px] font-normal"
+          style={{ color: '#b0b0b0', lineHeight: '1.55', letterSpacing: '-.2px' }}
+        >
+          아이디어, 오류, 의견, 칭찬 모두
+          <br />
+          아래 메일로 보내주시면 꼼꼼하게 읽을게요 :)
+        </p>
+        <button
+          type="button"
+          onClick={copy}
+          className="mt-8 font-inter text-[21px] font-medium"
+          style={{ color: '#0066ff', letterSpacing: '-.3px' }}
+        >
+          {EMAIL}
+        </button>
+      </div>
 
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value.slice(0, MAX))}
-          maxLength={MAX}
-          placeholder="아이디어, 오류, 의견, 칭찬 모두 환영해요."
-          className="no-scrollbar mt-5 min-h-0 flex-1 resize-none border-none bg-transparent font-sans text-[15px] leading-[1.6] text-ink outline-none placeholder:text-[#b7b7b7]"
-          style={{ letterSpacing: '-.3px' }}
-        />
-
-        {/* char counter */}
-        <div className="flex justify-end pb-2 pt-1">
-          <span className="font-inter text-[13px]" style={{ color: '#b0b0b0', letterSpacing: '-.2px' }}>
-            {text.length}/{MAX}
-          </span>
-        </div>
-
-        {/* send button */}
-        <div className="pb-5">
-          <button
-            type="button"
-            onClick={send}
-            disabled={!canSend}
-            className="h-[54px] w-full rounded-[27px] font-sans text-[16px] font-semibold transition-colors"
-            style={{
-              background: canSend ? '#121212' : '#ececec',
-              color: canSend ? '#ffffff' : '#b0b0b0',
-            }}
-          >
-            전달하기
-          </button>
-        </div>
+      {/* copy button */}
+      <div className="px-5 pb-5">
+        <button
+          type="button"
+          onClick={copy}
+          className="h-[54px] w-full rounded-[27px] font-sans text-[16px] font-semibold text-white"
+          style={{ background: '#121212' }}
+        >
+          이메일 복사
+        </button>
       </div>
     </div>
   )

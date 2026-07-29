@@ -28,7 +28,6 @@ import { saveDiary, listMyDiaries, deleteDiary, todayTitle } from './lib/diaries
 import { listMySaved, addSaved, removeSaved } from './lib/saved.js'
 import { saveQuizResult, reviewedCount } from './lib/quizlog.js'
 import { uploadAvatar } from './lib/avatar.js'
-import { sendFeedbackEmail } from './lib/feedback.js'
 
 const USER_NAME = '현진'
 
@@ -121,21 +120,6 @@ export default function App() {
     } catch {
       showToast('저장에 실패했어요. 잠시 후 다시 시도해주세요.')
     }
-  }
-
-  // 개발자에게 한마디 — 의견을 개발자 메일(svs9645@gmail.com)로 전송.
-  const submitFeedback = async (content) => {
-    try {
-      const { data: auth } = await supabase.auth.getUser()
-      await sendFeedbackEmail({
-        content,
-        email: auth?.user?.email ?? null,
-        userId: auth?.user?.id ?? null,
-      })
-    } catch {
-      /* 실패해도 사용자에겐 전달 완료로 안내 */
-    }
-    showToast('소중한 한마디가 잘 전달되었어요', undefined, true)
   }
 
   // 단어장에서 화면을 벗어날 때, 취소 보류(pending)됐던 항목들을 실제로 DB에서 삭제.
@@ -500,7 +484,7 @@ export default function App() {
         {overlay?.type === 'notif' && <NotifScreen onClose={closeOverlay} />}
 
         {overlay?.type === 'feedback' && (
-          <DevFeedbackScreen onBack={closeOverlay} onSubmit={submitFeedback} />
+          <DevFeedbackScreen onBack={closeOverlay} onToast={showToast} />
         )}
 
         {overlay?.type === 'profile' && (
