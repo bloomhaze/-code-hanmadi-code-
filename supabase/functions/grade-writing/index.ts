@@ -165,6 +165,14 @@ function translatePrompt(text: string) {
     '2) 그 의미를 한국어 어순·단어에 얽매이지 말고, 원어민이 그 상황을 자기 일기에 어떻게 쓸지 상상해서 새로 써.\n' +
     '3) 어색하면 문장을 합치거나 나눠도 되고, 접속사(but, and, so, that)로 자연스럽게 이어. 감정 표현은 살려서.\n' +
     '\n' +
+    '★ 흐르는 문체(매우 중요 — 이게 자연스러움의 핵심):\n' +
+    '- 한 한국어 문장이 길고 여러 내용을 담고 있으면, 억지로 한 문장에 욱여넣지 말고 ' +
+    '"여러 개의 짧고 자연스러운 영어 문장"으로 나눠서 en에 담아. (en은 문장 여러 개여도 됨)\n' +
+    '- 원어민이 실제로 쓰는 담화 연결어로 흐름을 만들어: To be honest, Once ~, but, so, ' +
+    'On top of that, To make things worse, Now I ~, at least ~ 등.\n' +
+    '- 한국어에 눌려 압축된 감정·뉘앙스는 자연스럽게 풀어써(elaborate). ' +
+    '단, "없던 새 사건"을 지어내진 말고, 이미 담긴 감정을 원어민답게 확장하는 정도.\n' +
+    '\n' +
     '★ 번역 원칙(매우 중요):\n' +
     '- 절대 단어 대 단어 직역하지 마. 직역은 실패야.\n' +
     '- 콩글리쉬/어색한 표현 절대 금지.\n' +
@@ -186,8 +194,23 @@ function translatePrompt(text: string) {
     '나쁜 번역(X): "Today I ate mixed raw fish dish with my boyfriend. ' +
     'We made a sudden plan and went, and it was so delicious that I felt good." ← 콩글리쉬·직역, 절대 이렇게 하지 마.\n' +
     '\n' +
+    '★ 참고 예시2 — 긴 문장을 여러 개로 쪼개고 흐르게 (이 수준이 목표):\n' +
+    '입력 문장: "얼마전에 보톡스를 맞아서 웃는 표정이 되지않아서 사실 외적으로 좋은 인상을 주기 어렵다는 생각에 자신감이 일차적으로 떨어진 상태였다."\n' +
+    '좋은 번역(O): "To be honest, I had already lost some confidence before the interview even started, ' +
+    'because I recently got Botox and can\'t really smile right now. ' +
+    'I felt like it would be hard to make a good first impression, at least appearance-wise."\n' +
+    '입력 문장: "여유로운 마음을 가지고 해야하는데 막상 내가 준비했던 것보다 답변을 못해서 아쉽고, 자괴감이 든다."\n' +
+    '좋은 번역(O): "I wanted to stay calm and relaxed, but once the interview started, ' +
+    'I didn\'t answer the questions as well as I had during my preparation. ' +
+    'I\'m disappointed in myself, and I can\'t help feeling a bit defeated."\n' +
+    '입력 문장: "그리고 내가 생각했을 때, 면접관이 레드 플래그였던 말도 했어서 너무 불안하다."\n' +
+    '좋은 번역(O): "On top of that, one of the interviewers said something that I personally saw as a red flag, ' +
+    'which has made me even more anxious."\n' +
+    '→ 포인트: 긴 한 문장을 짧은 여러 문장으로 나누고, To be honest / but once ~ / On top of that 로 흐름을 만들고, 쉬운 단어를 씀.\n' +
+    '\n' +
     '★ 표현 참고: "갑자기 약속을 잡다"→"made plans at the last minute"/"it was a spontaneous plan", ' +
-    '"모듬회"→"assorted sashimi (platter)", "너무 맛있어서"→"it was so good that"/"it turned out to be so delicious that".\n' +
+    '"모듬회"→"assorted sashimi (platter)", "너무 맛있어서"→"it was so good that"/"it turned out to be so delicious that", ' +
+    '"2차 면접"→"second-round interview", "레드 플래그"→"a red flag", "자괴감이 든다"→"I can\'t help feeling defeated".\n' +
     '\n' +
     '아래 일기를 문장 단위로 나누고, 각 문장마다 다음을 제공해:\n' +
     '- ko: 원문 한국어 문장\n' +
@@ -390,9 +413,9 @@ Deno.serve(async (req) => {
     if (!text) return json({ error: '내용을 입력해주세요.' })
 
     if (action === 'translate') {
-      // 창의적 의역이 필요해 temperature 0.4. gpt-oss 실패 시 llama 폴백.
-      let r = await callGroq(key, translatePrompt(text), SMART_MODEL, 0.4)
-      if (r.error) r = await callGroq(key, translatePrompt(text), GROQ_MODEL, 0.4)
+      // 자연스러운 의역·문장 재구성이 필요해 temperature 0.6. gpt-oss 실패 시 llama 폴백.
+      let r = await callGroq(key, translatePrompt(text), SMART_MODEL, 0.6)
+      if (r.error) r = await callGroq(key, translatePrompt(text), GROQ_MODEL, 0.6)
       if (r.error) return json({ error: r.error })
       const sentences = (Array.isArray(r.data.sentences) ? r.data.sentences : []).map((s: any) => ({
         ...s,
