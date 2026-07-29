@@ -6,6 +6,7 @@ import {
   PlayIcon,
   PencilIcon,
   Spinner,
+  SearchEmptyIllust,
 } from '../components/icons.jsx'
 import { hlSegs } from '../lib/text.js'
 import { speak, stopSpeak } from '../lib/speak.js'
@@ -375,9 +376,11 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
 
           {/* search yielded nothing */}
           {items.length === 0 && q && (
-            <div className="mt-[120px] flex flex-col items-center">
-              <span className="font-sans text-[16px] font-medium text-ink">
-                검색한 단어·표현·뜻이 없어요
+            <div className="mt-[96px] flex flex-col items-center gap-2">
+              <SearchEmptyIllust size={96} />
+              <span className="mt-2 font-sans text-[16px] font-medium text-ink">검색 결과가 없어요</span>
+              <span className="font-sans text-[13px] font-light text-muted-2">
+                찾으시는 단어,표현,문장이 없어요
               </span>
             </div>
           )}

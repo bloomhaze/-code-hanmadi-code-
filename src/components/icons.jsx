@@ -1,5 +1,6 @@
 // Inline SVG icons ported from the "한마디" 시안.
 import diaryEmptyUrl from '../assets/diary-empty.svg'
+import vocabEmptyUrl from '../assets/vocab-empty.svg'
 
 export function HomeIcon({ fill = '#c4c4c4', className = '' }) {
   return (
@@ -332,6 +333,19 @@ export function DiaryEmptyIllust({ size = 104 }) {
       alt=""
       width={size}
       height={Math.round((size * 80) / 99)}
+      style={{ display: 'block' }}
+    />
+  )
+}
+
+// 검색 결과 없음 일러스트 — 돋보기를 든 손 + A/B (원본 에셋).
+export function SearchEmptyIllust({ size = 104 }) {
+  return (
+    <img
+      src={vocabEmptyUrl}
+      alt=""
+      width={size}
+      height={Math.round((size * 91) / 99)}
       style={{ display: 'block' }}
     />
   )
