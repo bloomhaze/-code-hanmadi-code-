@@ -34,7 +34,7 @@ export default function WordSearchSheet({ onClose, onToast }) {
     >
       <div
         className="ws-sheet flex max-h-[85vh] w-full flex-col rounded-t-[22px] bg-white px-5 pb-4 pt-5 sm:max-w-[440px] sm:rounded-[22px]"
-        style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'max(28px, calc(env(safe-area-inset-bottom) + 20px))' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex shrink-0 items-start justify-between">
