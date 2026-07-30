@@ -236,6 +236,16 @@ body {
   }
 }
 
+/* 단어 검색 시트: 모바일은 하단 바텀시트(sheetUp), 데스크탑(≥sm)은 중앙 카드(scaleIn) */
+.ws-sheet {
+  animation: sheetUp 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (min-width: 640px) {
+  .ws-sheet {
+    animation: scaleIn 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
 /* 모달 등장 — 모바일(<640px)은 하단 바텀시트처럼 올라오고(sheetUp),
    그 이상은 중앙에서 팝(scaleIn). */
 .modal-pop {

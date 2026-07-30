@@ -28,10 +28,13 @@ export default function WordSearchSheet({ onClose, onToast }) {
   }
 
   return (
-    <div className="fixed inset-0 z-[56] flex items-center justify-center bg-black/40 px-5" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-[56] flex items-end justify-center bg-black/40 sm:items-center sm:px-5"
+      onClick={onClose}
+    >
       <div
-        className="flex max-h-[85vh] w-full max-w-[440px] flex-col rounded-[22px] bg-white px-5 pb-4 pt-5"
-        style={{ animation: 'scaleIn .24s cubic-bezier(.22,1,.36,1)' }}
+        className="ws-sheet flex max-h-[85vh] w-full flex-col rounded-t-[22px] bg-white px-5 pb-4 pt-5 sm:max-w-[440px] sm:rounded-[22px]"
+        style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex shrink-0 items-start justify-between">
@@ -69,7 +72,7 @@ export default function WordSearchSheet({ onClose, onToast }) {
           <button
             type="button"
             onClick={run}
-            className="rounded-xl px-3 py-2"
+            className="flex h-8 items-center rounded-xl px-3.5"
             style={{ background: query.trim() ? '#121212' : '#f1f1f2' }}
           >
             <span className="font-sans text-[14px] font-medium" style={{ color: query.trim() ? '#fff' : '#b0b0b0' }}>
