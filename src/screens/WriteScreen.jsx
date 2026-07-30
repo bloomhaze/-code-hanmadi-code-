@@ -31,8 +31,18 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
   // 작성 주제 — 카테고리별 질문 풀에서 랜덤. 새로고침 시 직전과 다른 카테고리에서
   // 뽑고(같은 카테고리 연속 X), 카테고리는 노출하지 않고 질문만 보여준다. X로 닫기.
   const [topicOn, setTopicOn] = useState(true)
+  const [topicClosing, setTopicClosing] = useState(false)
   const [topic, setTopic] = useState(() => randomTopic())
   const shuffleTopic = () => setTopic((t) => randomTopic(t.cat))
+  // X → 스르르 사라지는 exit 애니메이션 후 실제 제거
+  const closeTopic = () => {
+    if (topicClosing) return
+    setTopicClosing(true)
+    setTimeout(() => {
+      setTopicOn(false)
+      setTopicClosing(false)
+    }, 280)
+  }
 
   const isEn = mode === 'en'
   const ctaActive = body.trim().length > 0
@@ -180,7 +190,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
               {/* 작성 주제 — 실선 테두리 카드, 문구는 원래대로 왼쪽 정렬, 새로고침/X 유지 */}
               {topicOn && (
                 <div
-                  className="mb-3.5 flex items-center gap-2 rounded-[20px] bg-white px-4 py-3"
+                  className={`mb-3.5 flex items-center gap-2 rounded-[20px] bg-white px-4 py-3${topicClosing ? ' topic-out' : ''}`}
                   style={{ outline: '1px solid #abcfff', outlineOffset: '-1px' }}
                 >
                   <span
@@ -208,7 +218,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
                     </button>
                     <button
                       type="button"
-                      onClick={() => setTopicOn(false)}
+                      onClick={closeTopic}
                       aria-label="주제 닫기"
                       className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#e8f0ff]"
                     >
