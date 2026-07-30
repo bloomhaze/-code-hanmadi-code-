@@ -164,7 +164,8 @@ function translatePrompt(text: string) {
     `영어권에서 교육받은 20~30대 원어민이 처음부터 영어로 쓴 것처럼 다시 써(rewrite). ` +
     `아래 규칙을 엄격히 지켜. 결과물은 번역티가 절대 나면 안 되고, 원어민이 원래 영어로 쓴 글처럼 읽혀야 해.\n` +
     `\n` +
-    `[최상위 목표] 정확한 직역보다 자연스러움·유창함·리듬·감정의 진정성을 항상 우선해.\n` +
+    `[최상위 목표] 자연스러움·유창함·리듬·감정의 진정성을 우선하되, 원문이 말하는 "사실·행위·상태"는 절대 바꾸지 마. ` +
+    `자연스러움을 핑계로 원문에 없는 감정·기대·해석을 덧붙이거나, 담백한 사실 서술을 감정 표현으로 바꾸는 "오버 의역"은 금지.\n` +
     `\n` +
     `규칙1. 단어가 아니라 "의미"를 옮겨라. 한국어 문장 구조를 보존하지 말고, 의도를 먼저 이해한 뒤 영어로 자연스럽게 다시 써. 필요하면 어순을 완전히 바꿔.\n` +
     `규칙2. 진짜 원어민처럼 써라. 개인 일기·SNS·블로그·대화에서 실제로 쓰는 표현을 사용. 교과서 영어·번역투 금지.\n` +
@@ -182,9 +183,14 @@ function translatePrompt(text: string) {
     `규칙12. 직역이 어색하면 자유롭게 다시 써. 자연스러움 > 한국어 원문에 가깝게.\n` +
     `규칙13. 글쓴이의 성격 유지. 감정을 과장하지 말고, 원본보다 더 드라마틱하게 만들지 말고, 미묘한 감정도 없애지 마.\n` +
     `규칙14. 감정적으로 믿기게. 에세이가 아니라 진짜 자기 생각을 나누는 사람처럼.\n` +
+    `규칙15. 오버 의역 금지(매우 중요). 원문의 사실·행위·상태를 임의로 다른 것으로 바꾸지 마. ` +
+    `특히 담백한 사실 서술을 원문에 없는 감정으로 바꾸지 마. ` +
+    `예: "계획중이다" → "are planning a trip"(O) / "are looking forward to a trip"(X — 원문에 없는 '기대·설렘'을 지어냄). ` +
+    `예: "먹었다" → "had / ate"(O) / 원문에 특별한 뉘앙스가 없는데 "treated myself to"(X). ` +
+    `원문에 실제로 담긴 감정만 살리고, 없는 감정은 만들지 마. 자연스럽게 다듬는 것과 내용을 바꾸는 건 다르다.\n` +
     `\n` +
-    `[우선순위] 1)자연스러움 2)진정성 3)감정의 뉘앙스 4)원어민 연어 5)매끄러운 흐름 6)가독성. ` +
-    `"정확한 번역"과 "원어민이 자연스럽게 쓸 법한 것" 중에선 언제나 후자를 택하되, 원래 의도와 감정은 보존해.\n` +
+    `[우선순위] 1)원문 사실·의도 보존 2)자연스러움 3)진정성 4)감정의 뉘앙스 5)원어민 연어 6)매끄러운 흐름 7)가독성. ` +
+    `"어색한 직역"과 "원어민이 자연스럽게 쓸 법한 것" 중에선 후자를 택하되, 원문의 사실·행위·의도·감정을 바꾸거나 없던 걸 더하지는 마.\n` +
     `단, 문법·관사·시제·전치사·철자는 원어민 수준으로 정확히. 없던 새 사건을 지어내진 말고 이미 담긴 감정만 자연스럽게 확장해.\n` +
     `한국 음식·문화 용어는 영어권 통용 표현으로(sashimi, tteokbokki, kimchi 등).\n` +
     `\n` +
@@ -419,9 +425,9 @@ Deno.serve(async (req) => {
     if (!text) return json({ error: '내용을 입력해주세요.' })
 
     if (action === 'translate') {
-      // 자연스러운 의역·문장 재구성이 필요해 temperature 0.6. gpt-oss 실패 시 llama 폴백.
-      let r = await callGroq(key, translatePrompt(text), SMART_MODEL, 0.6)
-      if (r.error) r = await callGroq(key, translatePrompt(text), GROQ_MODEL, 0.6)
+      // 자연스러운 재구성은 필요하되 오버 의역을 줄이려 temperature 0.45. gpt-oss 실패 시 llama 폴백.
+      let r = await callGroq(key, translatePrompt(text), SMART_MODEL, 0.45)
+      if (r.error) r = await callGroq(key, translatePrompt(text), GROQ_MODEL, 0.45)
       if (r.error) return json({ error: r.error })
       const sentences = (Array.isArray(r.data.sentences) ? r.data.sentences : []).map((s: any) => ({
         ...s,
