@@ -4,6 +4,7 @@ import TopBar from './components/TopBar.jsx'
 import TabBar from './components/TabBar.jsx'
 import Toast from './components/Toast.jsx'
 import WriteMethodSheet from './components/WriteMethodSheet.jsx'
+import SaveLoginSheet from './components/SaveLoginSheet.jsx'
 import WordPopup from './components/WordPopup.jsx'
 import FixPopup from './components/FixPopup.jsx'
 import HomeScreen from './screens/HomeScreen.jsx'
@@ -39,6 +40,7 @@ export default function App() {
   const [homeKey, setHomeKey] = useState(0) // bump to remount Home (logo "refresh")
   const [overlay, setOverlay] = useState(null) // {type:'write', mode} | {type:'detail', id}
   const [writeSheet, setWriteSheet] = useState(false)
+  const [loginSheet, setLoginSheet] = useState(false) // 비회원 저장 시 로그인 유도
   const [quizSheet, setQuizSheet] = useState(false)
   const [quiz, setQuiz] = useState(null) // { type }
   const [dialog, setDialog] = useState(null) // { kind:'delete', id } | { kind:'logout'|'withdraw' }
@@ -209,9 +211,9 @@ export default function App() {
     setFixPop({ open: false })
   }
   const saveWrite = async (payload) => {
-    // 게스트(비로그인)는 저장 불가 — 안내만.
+    // 게스트(비로그인)는 저장 전에 로그인 유도 바텀시트를 띄운다.
     if (!authed) {
-      showToast('로그인하면 일기를 저장할 수 있어요.')
+      setLoginSheet(true)
       return
     }
     try {
@@ -517,6 +519,7 @@ export default function App() {
 
         {/* ---- sheets & popups ---- */}
         {writeSheet && <WriteMethodSheet onChoose={chooseWrite} onClose={() => setWriteSheet(false)} />}
+        {loginSheet && <SaveLoginSheet onGoogle={loginWithGoogle} onClose={() => setLoginSheet(false)} />}
         {quizSheet && <QuizTypeSheet onStart={startQuiz} onClose={() => setQuizSheet(false)} />}
         <WordPopup
           state={wordPop}
