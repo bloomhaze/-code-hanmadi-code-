@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import SentenceResult from '../components/SentenceResult.jsx'
 import WordSearchSheet from '../components/WordSearchSheet.jsx'
+import { PencilIcon } from '../components/icons.jsx'
 import { speak, stopSpeak } from '../lib/speak.js'
 import { MOCK_KO_RESULT, MOCK_EN_RESULT } from '../data/lookups.js'
 import { randomTopic } from '../data/writeTopics.js'
@@ -177,21 +178,25 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
         <>
           <div className="no-scrollbar absolute inset-0 overflow-y-auto bg-white">
             <div className="px-5 pt-4">
-              {/* 작성 주제 — 새로고침으로 랜덤, X로 닫기 */}
+              {/* 작성 주제 — 홈 프롬프트 카드 스타일(실선 테두리 + 연필 + 파란 문구), 새로고침/X 유지 */}
               {topicOn && (
-                <div className="mb-3.5 flex items-center gap-2 rounded-2xl bg-accent-soft px-4 py-3">
+                <div
+                  className="relative mb-3.5 flex min-h-[56px] items-center justify-center gap-1.5 rounded-[20px] bg-white px-12 py-3"
+                  style={{ outline: '1px solid #abcfff', outlineOffset: '-1px' }}
+                >
+                  <PencilIcon size={15} fill="#0066ff" />
                   <span
-                    className="flex-1 font-sans text-[15px] font-medium"
+                    className="font-sans text-[15px] font-medium"
                     style={{ color: '#0066ff', lineHeight: '22px', letterSpacing: '-.2px' }}
                   >
                     {topic.q}
                   </span>
-                  <div className="flex shrink-0 items-center gap-0.5">
+                  <div className="absolute right-3 flex shrink-0 items-center gap-0.5">
                     <button
                       type="button"
                       onClick={shuffleTopic}
                       aria-label="다른 주제"
-                      className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#c4dcff]"
+                      className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#e8f0ff]"
                     >
                       <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                         <path
@@ -207,7 +212,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
                       type="button"
                       onClick={() => setTopicOn(false)}
                       aria-label="주제 닫기"
-                      className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#c4dcff]"
+                      className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#e8f0ff]"
                     >
                       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                         <path d="M2 2l10 10M12 2L2 12" stroke="#0066ff" strokeWidth="1.7" strokeLinecap="round" />

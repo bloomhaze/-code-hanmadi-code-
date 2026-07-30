@@ -72,7 +72,6 @@ export default function WordSearchSheet({ onClose, onToast }) {
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             placeholder="eg. 두근거리다"
-            autoFocus
             className="min-w-0 flex-1 border-none bg-transparent font-sans text-[15px] text-ink outline-none placeholder:text-[#b0b0b0]"
           />
           <button
