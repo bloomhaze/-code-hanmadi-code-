@@ -345,7 +345,7 @@ export function SearchEmptyIllust({ size = 104 }) {
       src={vocabEmptyUrl}
       alt=""
       width={size}
-      height={Math.round((size * 91) / 99)}
+      height={size}
       style={{ display: 'block' }}
     />
   )
