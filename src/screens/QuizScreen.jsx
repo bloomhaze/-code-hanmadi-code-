@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { buildQuizList, blankAnswerFor, writeHintFor, koOf } from '../data/quiz.js'
 import { gradeWriting } from '../lib/grade.js'
+import { SavedEmptyIllust } from '../components/icons.jsx'
 
 // left is a % of the container so confetti spreads across the full width (max 500)
 const CONFETTI = [
@@ -114,7 +115,7 @@ export default function QuizScreen({ type = 'flash', saved = [], onClose, onToas
           </button>
         </div>
         <div className="flex flex-1 flex-col items-center justify-center px-8 pb-24">
-          <span className="text-[40px]">📚</span>
+          <SavedEmptyIllust size={96} />
           <span className="mt-4 font-sans text-[17px] font-semibold text-ink" style={{ letterSpacing: '-.3px' }}>
             아직 복습할 {label}이 없어요
           </span>
