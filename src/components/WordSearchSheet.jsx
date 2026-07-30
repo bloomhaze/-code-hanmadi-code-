@@ -9,6 +9,7 @@ export default function WordSearchSheet({ onClose, onToast }) {
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState('idle') // idle | loading | results | error
   const [results, setResults] = useState([])
+  const [focused, setFocused] = useState(false)
   const reqId = useRef(0)
 
   const run = async () => {
@@ -61,13 +62,15 @@ export default function WordSearchSheet({ onClose, onToast }) {
         </div>
 
         <div
-          className="mt-4 flex h-12 shrink-0 items-center gap-2 rounded-2xl bg-white pl-4 pr-2"
-          style={{ boxShadow: 'inset 0 0 0 1px #ededed' }}
+          className="mt-4 flex h-12 shrink-0 items-center gap-2 rounded-2xl bg-white pl-4 pr-2 transition-shadow"
+          style={{ boxShadow: focused ? 'inset 0 0 0 2px #121212' : 'inset 0 0 0 1px #ededed' }}
         >
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && run()}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
             placeholder="eg. 두근거리다"
             autoFocus
             className="min-w-0 flex-1 border-none bg-transparent font-sans text-[15px] text-ink outline-none placeholder:text-[#b0b0b0]"
