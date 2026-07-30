@@ -1,6 +1,7 @@
 // Inline SVG icons ported from the "한마디" 시안.
 import diaryEmptyUrl from '../assets/diary-empty.svg'
 import vocabEmptyUrl from '../assets/vocab-empty.svg'
+import savedEmptyUrl from '../assets/saved-empty.svg'
 
 export function HomeIcon({ fill = '#c4c4c4', className = '' }) {
   return (
@@ -348,6 +349,20 @@ export function SearchEmptyIllust({ size = 96 }) {
       alt=""
       width={Math.round((size * 63.5) / 99)}
       height={Math.round((size * 79) / 99)}
+      style={{ display: 'block' }}
+    />
+  )
+}
+
+// 저장한 내용 없음 일러스트 — 빈 폴더 (원본 에셋).
+// 크롭된 viewBox(75.75×51.75)를 다른 일러스트와 동일한 스케일(size/99)로 렌더.
+export function SavedEmptyIllust({ size = 96 }) {
+  return (
+    <img
+      src={savedEmptyUrl}
+      alt=""
+      width={Math.round((size * 75.75) / 99)}
+      height={Math.round((size * 51.75) / 99)}
       style={{ display: 'block' }}
     />
   )

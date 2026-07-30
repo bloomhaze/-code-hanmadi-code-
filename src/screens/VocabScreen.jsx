@@ -7,6 +7,7 @@ import {
   PencilIcon,
   Spinner,
   SearchEmptyIllust,
+  SavedEmptyIllust,
 } from '../components/icons.jsx'
 import { hlSegs } from '../lib/text.js'
 import { speak, stopSpeak } from '../lib/speak.js'
@@ -387,8 +388,9 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
 
           {/* nothing saved at all */}
           {items.length === 0 && !q && (
-            <div className="mt-[120px] flex flex-col items-center gap-2">
-              <span className="font-sans text-[16px] font-medium text-ink">저장한 내용이 없어요</span>
+            <div className="mt-[96px] flex flex-col items-center gap-2">
+              <SavedEmptyIllust size={96} />
+              <span className="mt-2 font-sans text-[16px] font-medium text-ink">저장한 내용이 없어요</span>
               <span className="font-sans text-[13px] font-light text-muted-2">
                 내 이야기로 영어 공부를 시작해보세요
               </span>
