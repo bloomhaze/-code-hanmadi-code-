@@ -338,14 +338,16 @@ export function DiaryEmptyIllust({ size = 104 }) {
   )
 }
 
-// 검색 결과 없음 일러스트 — 돋보기를 든 손 + A/B (원본 에셋).
-export function SearchEmptyIllust({ size = 104 }) {
+// 검색 결과 없음 일러스트 — 흙더미에서 돋보기를 든 손 (원본 에셋).
+// diary-empty과 같은 화면 크기로 보이도록, 크롭된 viewBox(63.5×79)를
+// 일기 없음 일러스트와 동일한 단위→px 스케일(size/99)로 렌더한다.
+export function SearchEmptyIllust({ size = 96 }) {
   return (
     <img
       src={vocabEmptyUrl}
       alt=""
-      width={size}
-      height={size}
+      width={Math.round((size * 63.5) / 99)}
+      height={Math.round((size * 79) / 99)}
       style={{ display: 'block' }}
     />
   )
