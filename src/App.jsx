@@ -56,6 +56,7 @@ export default function App() {
   const fixReq = useRef(0)
   const wordReq = useRef(0)
   const wordCache = useRef(new Map()) // term+문장 → 조회 결과 (예문 고정)
+  const savingRef = useRef(false) // 저장 중복(더블탭) 방지
 
   const showToast = (message, undo, check) => setToast({ message, undo, check })
 
@@ -216,6 +217,9 @@ export default function App() {
       setLoginSheet(true)
       return
     }
+    // 저장 버튼을 두 번 눌러도 한 번만 기록되도록 — 저장 진행 중이면 무시.
+    if (savingRef.current) return
+    savingRef.current = true
     try {
       await saveDiary({ ...payload, title: todayTitle() })
       await refreshDiaries()
@@ -224,6 +228,8 @@ export default function App() {
       setTab('diary')
     } catch {
       showToast('저장에 실패했어요. 잠시 후 다시 시도해주세요.')
+    } finally {
+      savingRef.current = false
     }
   }
 
