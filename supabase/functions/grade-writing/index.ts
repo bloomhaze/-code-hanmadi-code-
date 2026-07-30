@@ -249,6 +249,11 @@ function correctPrompt(text: string) {
     '- 어휘는 원어민이 일상에서 자주 쓰는 쉽고 흔한 단어를 우선해. 문어적·잘 안 쓰는 어려운 단어(linger, commence, utilize 등)는 피하고 ' +
     '더 쉬운 표현(is still there, start, use 등)으로 바꿔.\n' +
     '- 단, 학습자의 원래 의도·의미는 반드시 유지해 (내용을 바꾸거나 새 사실을 덧붙이지 마).\n' +
+    '- 셀 수 있는 명사가 특정 한 개가 아니라 일반적인 의미로 쓰이면 자연스러운 복수형으로 고쳐. ' +
+    '예: "eat honey butter chip" → "eat honey butter chips", "buy chip" → "buy some chips". ' +
+    '한 개를 콕 집는 맥락이 아니면 "a chip"보다 "chips"를 선호해.\n' +
+    '- 일관성: 같은 일기 안에서 같은 대상을 가리키는 명사는 문장마다 표기를 통일해 ' +
+    '(한 문장은 "chips", 다른 문장은 "a chip"처럼 섞지 마).\n' +
     '- 이미 문법·철자·표현이 모두 정확하고 자연스러우면 corrected를 original과 똑같이 둬 (억지 교정 금지).\n' +
     '\n' +
     '★ 참고 예시(이 수준으로 다듬어):\n' +
