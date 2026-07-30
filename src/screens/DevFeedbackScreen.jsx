@@ -1,3 +1,5 @@
+import feedbackUrl from '../assets/feedback.svg'
+
 const EMAIL = 'svs9645@gmail.com'
 
 // 개발자에게 한마디 — 안내 문구 + 이메일 복사.
@@ -35,6 +37,7 @@ export default function DevFeedbackScreen({ onBack, onToast }) {
 
       {/* center content */}
       <div className="flex flex-1 flex-col items-center justify-center px-5 text-center">
+        <img src={feedbackUrl} width="96" height="96" alt="" className="mb-4" />
         <h1 className="font-sans text-[16px] font-medium text-ink" style={{ letterSpacing: '-.3px' }}>
           작은 의견 하나도 소중해요
         </h1>
