@@ -33,10 +33,13 @@ export default function WordSearchSheet({ onClose, onToast }) {
       onClick={onClose}
     >
       <div
-        className="ws-sheet flex max-h-[85vh] w-full flex-col rounded-t-[22px] bg-white px-5 pb-4 pt-5 sm:max-w-[440px] sm:rounded-[22px]"
+        className="ws-sheet flex h-[92dvh] max-h-[92dvh] w-full flex-col rounded-t-[22px] bg-white px-5 pb-4 pt-3 sm:h-auto sm:max-h-[85vh] sm:max-w-[440px] sm:rounded-[22px] sm:pt-5"
         style={{ paddingBottom: 'max(28px, calc(env(safe-area-inset-bottom) + 20px))' }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* 모바일 바텀시트 그랩 핸들 (데스크탑 중앙 카드에서는 숨김) */}
+        <div className="mx-auto mb-3 h-[5px] w-10 shrink-0 rounded-full bg-[#e3e3e3] sm:hidden" />
+
         <div className="flex shrink-0 items-start justify-between">
           <div className="flex flex-col gap-1.5">
             <span className="font-sans text-[20px] font-semibold text-ink" style={{ letterSpacing: '-.4px' }}>
