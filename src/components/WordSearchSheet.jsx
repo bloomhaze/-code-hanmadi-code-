@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { SpeakerSmall, BookmarkSmall, SearchIcon, Spinner } from './icons.jsx'
+import { SpeakerSmall, BookmarkSmall, SearchEmptyIllust, Spinner } from './icons.jsx'
 import { hlSegs } from '../lib/text.js'
 import { speak, stopSpeak } from '../lib/speak.js'
 import { searchExpressions } from '../lib/search.js'
@@ -92,11 +92,10 @@ export default function WordSearchSheet({ onClose, onToast }) {
 
 
         {status === 'error' && (
-          <div className="mt-24 flex flex-col items-center gap-3">
-            <SearchIcon color="#dcdcdc" />
-            <span className="text-center font-sans text-[14px]" style={{ color: '#c4c4c4' }}>
-              표현을 찾지 못했어요. 다시 검색해보세요
-            </span>
+          <div className="mt-24 flex flex-col items-center gap-2">
+            <SearchEmptyIllust size={96} />
+            <span className="mt-2 font-sans text-[16px] font-medium text-ink">표현을 찾지 못했어요</span>
+            <span className="font-sans text-[13px] font-light text-muted-2">다시 검색해보세요</span>
           </div>
         )}
 
