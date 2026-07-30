@@ -1,4 +1,4 @@
-// 로그아웃 / 탈퇴 확인 다이얼로그 (kind: 'logout' | 'withdraw').
+// 확인 다이얼로그 (kind: 'logout' | 'withdraw' | 'leaveWrite').
 const COPY = {
   logout: {
     title: '로그아웃 할까요?',
@@ -8,10 +8,17 @@ const COPY = {
     title: '정말 탈퇴하시겠어요?',
     desc: '탈퇴 후엔 모든 일기와 계정 정보가\n영구적으로 삭제되며 복구할 수 없어요',
   },
+  // 저장 안 하고 작성 화면을 나가려 할 때.
+  leaveWrite: {
+    title: '저장하지 않고 나갈까요?',
+    desc: '지금까지 작성한 내용이 사라져요.\n저장하지 않으면 다시 불러올 수 없어요',
+    yes: '나가기',
+    no: '계속 작성',
+  },
 }
 
 export default function ConfirmDialog({ kind = 'logout', onYes, onClose }) {
-  const { title, desc } = COPY[kind] || COPY.logout
+  const { title, desc, yes = '네', no = '아니요' } = COPY[kind] || COPY.logout
 
   return (
     <div className="fixed inset-0 z-[56] flex items-center justify-center bg-black/35 px-10" onClick={onClose}>
@@ -37,7 +44,7 @@ export default function ConfirmDialog({ kind = 'logout', onYes, onClose }) {
             style={{ boxShadow: 'inset 0 0 0 1px #ededed' }}
           >
             <span className="font-sans text-[14px] font-medium text-ink" style={{ letterSpacing: '-.3px' }}>
-              네
+              {yes}
             </span>
           </button>
           <button
@@ -46,7 +53,7 @@ export default function ConfirmDialog({ kind = 'logout', onYes, onClose }) {
             className="flex h-12 flex-1 items-center justify-center rounded-2xl bg-ink"
           >
             <span className="font-sans text-[14px] font-medium text-white" style={{ letterSpacing: '-.3px' }}>
-              아니요
+              {no}
             </span>
           </button>
         </div>

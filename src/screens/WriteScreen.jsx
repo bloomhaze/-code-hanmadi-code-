@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import SentenceResult from '../components/SentenceResult.jsx'
 import WordSearchSheet from '../components/WordSearchSheet.jsx'
+import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import { speak, stopSpeak } from '../lib/speak.js'
 import { MOCK_KO_RESULT, MOCK_EN_RESULT } from '../data/lookups.js'
 import { randomTopic } from '../data/writeTopics.js'
@@ -18,7 +19,14 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
   const [playId, setPlayId] = useState(null) // null | 'all' | 문장 index (하나만 재생)
   const [loadId, setLoadId] = useState(null) // null | 'all' | 문장 index (음성 로딩 중)
   const [wordSheet, setWordSheet] = useState(false)
+  const [confirmExit, setConfirmExit] = useState(false) // 저장 안 하고 나가기 확인
   const timer = useRef(null)
+
+  // 뒤로가기 — 작성한 내용이 있으면 사라진다고 안내 후 확인, 없으면 바로 나가기.
+  const handleBack = () => {
+    if (body.trim().length > 0) setConfirmExit(true)
+    else onBack?.()
+  }
 
   const playing = playId === 'all'
   const loadingAll = loadId === 'all'
@@ -132,7 +140,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
       <div className="relative flex h-12 shrink-0 items-center justify-between bg-white px-5 pt-4">
         <button
           type="button"
-          onClick={onBack}
+          onClick={handleBack}
           className="flex h-6 w-6 items-center justify-center"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -303,6 +311,17 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
         </div>
       )}
       </div>
+
+      {confirmExit && (
+        <ConfirmDialog
+          kind="leaveWrite"
+          onYes={() => {
+            setConfirmExit(false)
+            onBack?.()
+          }}
+          onClose={() => setConfirmExit(false)}
+        />
+      )}
     </div>
   )
 }
