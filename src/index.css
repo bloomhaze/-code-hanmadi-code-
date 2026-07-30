@@ -255,7 +255,7 @@ body {
 .topic-out {
   overflow: hidden;
   pointer-events: none;
-  animation: topicOut 0.36s cubic-bezier(0.33, 0, 0.15, 1) forwards;
+  animation: topicOut 0.22s cubic-bezier(0.33, 0, 0.15, 1) forwards;
 }
 @media (prefers-reduced-motion: reduce) {
   .topic-out {

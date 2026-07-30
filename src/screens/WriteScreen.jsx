@@ -41,7 +41,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
     setTimeout(() => {
       setTopicOn(false)
       setTopicClosing(false)
-    }, 360)
+    }, 220)
   }
 
   const isEn = mode === 'en'
