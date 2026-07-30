@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SearchIcon, PencilIcon, DiaryEmptyIllust } from '../components/icons.jsx'
+import { SearchIcon, PencilIcon, DiaryEmptyIllust, SearchEmptyIllust } from '../components/icons.jsx'
 import { diaryBadge } from '../data/diary.js'
 
 const ACCENT = '#0066FF'
@@ -115,8 +115,10 @@ export default function DiaryScreen({ diaries = [], onWrite, onOpen, deletedIds 
 
           {/* search yielded nothing (but diaries do exist) */}
           {noSearchResults && (
-            <div className="flex flex-col items-center pt-[180px]">
-              <span className="font-inter text-[16px] font-medium text-ink">관련된 일기가 없어요</span>
+            <div className="mt-[96px] flex flex-col items-center gap-2">
+              <SearchEmptyIllust size={96} />
+              <span className="mt-2 font-sans text-[16px] font-medium text-ink">검색 결과가 없어요</span>
+              <span className="font-sans text-[13px] font-light text-muted-2">찾으시는 일기가 없어요</span>
             </div>
           )}
 
