@@ -236,23 +236,18 @@ body {
   }
 }
 
-/* 작성 주제 칩 닫기 — 페이드 아웃(살짝 축소) 후 높이 접힘 */
+/* 작성 주제 칩 닫기 — 페이드와 높이 접힘을 동시에(작성영역이 부드럽게 위로) */
 @keyframes topicOut {
-  0% {
+  from {
     opacity: 1;
-    transform: scale(1);
     max-height: 80px;
     margin-bottom: 14px;
   }
-  55% {
+  40% {
     opacity: 0;
-    transform: scale(0.98);
-    max-height: 80px;
-    margin-bottom: 14px;
   }
-  100% {
+  to {
     opacity: 0;
-    transform: scale(0.98);
     max-height: 0;
     margin-bottom: 0;
   }
@@ -260,7 +255,7 @@ body {
 .topic-out {
   overflow: hidden;
   pointer-events: none;
-  animation: topicOut 0.34s ease forwards;
+  animation: topicOut 0.36s cubic-bezier(0.33, 0, 0.15, 1) forwards;
 }
 @media (prefers-reduced-motion: reduce) {
   .topic-out {
