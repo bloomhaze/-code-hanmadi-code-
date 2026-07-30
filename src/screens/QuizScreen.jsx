@@ -297,7 +297,7 @@ function Flashcard({ cur, side, setSide, revealed, setRevealed, mark, right, wro
       >
         <div className="flex grow flex-col items-center justify-center">
           <span
-            className="text-center text-[28px] font-normal"
+            className="text-center text-[28px] font-medium"
             style={{
               fontFamily: showingEn ? "'Inter Variable','Inter',sans-serif" : "'Pretendard Variable','Pretendard',sans-serif",
               lineHeight: '43.2px',
