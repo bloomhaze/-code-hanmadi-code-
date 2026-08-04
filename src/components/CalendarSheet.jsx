@@ -18,16 +18,19 @@ export default function CalendarSheet({ months = [], selOff, onSelect, onClose, 
   }
 
   return (
-    <>
-      {/* full-viewport dim */}
-      <div className="fixed inset-0 z-[45] bg-black/35" onClick={onClose} />
-
-      {/* floating rounded card — rounded top & bottom, dim covers the rest.
-          팝업(WordPopup 등)과 동일한 scaleIn 인터랙션으로 등장. */}
+    <div
+      className="fixed inset-0 z-[46] flex items-end justify-center bg-black/35 sm:items-center sm:px-5"
+      onClick={onClose}
+    >
+      {/* 모바일: 하단 바텀시트(sheetUp) / 데스크탑(≥sm): 중앙 카드(scaleIn).
+          .ws-sheet 클래스가 화면폭에 따라 등장 애니메이션을 바꿔준다. */}
       <div
-        className="absolute inset-x-0 bottom-2 top-2 z-[46] mx-auto flex w-full max-w-[500px] flex-col overflow-hidden rounded-[24px] bg-white"
-        style={{ animation: 'scaleIn .24s cubic-bezier(.22,1,.36,1)' }}
+        className="ws-sheet flex h-[88dvh] w-full max-w-[500px] flex-col overflow-hidden rounded-t-[24px] bg-white sm:h-[calc(100dvh-16px)] sm:rounded-[24px]"
+        onClick={(e) => e.stopPropagation()}
       >
+        {/* 모바일 바텀시트 그랩 핸들 (데스크탑에서는 숨김) */}
+        <div className="mx-auto mb-1 mt-3 h-[5px] w-10 shrink-0 rounded-full bg-[#e3e3e3] sm:hidden" />
+
         {/* header with close button (top-right) */}
         <div className="flex h-12 shrink-0 items-center justify-end px-3">
           <button
@@ -101,6 +104,6 @@ export default function CalendarSheet({ months = [], selOff, onSelect, onClose, 
           ))}
         </div>
       </div>
-    </>
+    </div>
   )
 }
