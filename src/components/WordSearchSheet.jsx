@@ -152,11 +152,8 @@ function ResultCard({ w, onToast }) {
             type="button"
             onClick={() => {
               setSaved((s) => !s)
-              onToast?.(
-                saved ? '저장을 취소했어요' : '단어를 저장했어요',
-                saved ? () => setSaved(true) : undefined,
-                saved ? undefined : true, // 저장 성공 → 체크 아이콘
-              )
+              // 저장 시엔 토스트를 띄우지 않고, 저장 취소 시에만 되돌리기 토스트 노출.
+              if (saved) onToast?.('저장을 취소했어요', () => setSaved(true))
             }}
             className="flex h-8 w-8 items-center justify-center rounded-full"
             style={{ background: saved ? '#0066ff' : '#eee' }}

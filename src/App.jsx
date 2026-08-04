@@ -161,7 +161,7 @@ export default function App() {
       } else {
         await addSaved({ type, term, data })
         await refreshSaved()
-        showToast('표현을 저장했어요', undefined, true) // 저장 성공 → 체크 아이콘
+        // 저장 성공 토스트는 표시하지 않음(북마크 아이콘 상태로 충분).
       }
     } catch {
       showToast('처리에 실패했어요. 잠시 후 다시 시도해주세요.')

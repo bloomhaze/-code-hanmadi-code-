@@ -174,7 +174,7 @@ export default function QuizScreen({ type = 'flash', saved = [], onClose, onToas
         <span className="z-[2] mt-6 font-sans text-[24px] font-semibold text-ink" style={{ letterSpacing: '-.5px' }}>
           대단해요!
         </span>
-        <span className="z-[2] mt-2.5 text-center font-sans text-[15px] text-muted" style={{ lineHeight: '22px' }}>
+        <span className="z-[2] mt-2.5 text-center font-sans text-[15px] font-medium text-muted" style={{ lineHeight: '22px' }}>
           오늘의 복습을 완료했어요
         </span>
         <span className="z-[2] mt-1.5 font-sans text-[14px]" style={{ color: '#c0c0c0' }}>
@@ -183,8 +183,12 @@ export default function QuizScreen({ type = 'flash', saved = [], onClose, onToas
         <button
           type="button"
           onClick={hasWrong ? retryWrong : continueMore}
-          className="absolute inset-x-5 bottom-9 z-[2] flex h-[50px] items-center justify-center rounded-[20px] bg-ink"
+          className="absolute inset-x-5 bottom-9 z-[2] flex h-[50px] items-center justify-center gap-1.5 rounded-[20px] bg-ink"
         >
+          <svg width="17" height="17" viewBox="0 0 20 20" fill="none">
+            <path d="M15.5 5.5A6.5 6.5 0 1 0 16.9 12" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" />
+            <path d="M16.5 3.2V6.2H13.5" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
           <span className="font-sans text-[16px] font-medium text-white">
             {hasWrong ? `틀린 ${wrong}개, 다시 복습` : '이어서 더 복습하기'}
           </span>
