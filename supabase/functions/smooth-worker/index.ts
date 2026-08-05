@@ -446,8 +446,9 @@ Deno.serve(async (req) => {
       return json({ sentences })
     }
     if (action === 'correct') {
-      let r = await callGroq(key, correctPrompt(text), SMART_MODEL, 0.4)
-      if (r.error) r = await callGroq(key, correctPrompt(text), GROQ_MODEL, 0.4)
+      // 최소 교정(원문 보존)이 목표라 temperature 0.2로 낮춰 과교정/드리프트를 줄임.
+      let r = await callGroq(key, correctPrompt(text), SMART_MODEL, 0.2)
+      if (r.error) r = await callGroq(key, correctPrompt(text), GROQ_MODEL, 0.2)
       if (r.error) return json({ error: r.error })
       const sentences = (Array.isArray(r.data.sentences) ? r.data.sentences : []).map((s: any) => ({
         ...s,
