@@ -56,7 +56,8 @@ export default function App() {
   const fixReq = useRef(0)
   const wordReq = useRef(0)
   const wordCache = useRef(new Map()) // term+문장 → 조회 결과 (예문 고정)
-  const savingRef = useRef(false) // 저장 중복(더블탭) 방지
+  const savingRef = useRef(false) // 일기 저장 중복(더블탭) 방지
+  const savingKeys = useRef(new Set()) // 표현 저장 중복(더블탭) 방지 — 진행 중인 key
 
   const showToast = (message, undo, check) => setToast({ message, undo, check })
 
@@ -72,7 +73,36 @@ export default function App() {
 
   // ---- 내 일기 / 저장 표현 로드 (로그인 시) ----
   const refreshDiaries = () => listMyDiaries().then(setMyDiaries).catch(() => {})
-  const refreshSaved = () => listMySaved().then(setMySaved).catch(() => {})
+  // 저장 목록을 불러오면서 중복(같은 type+term)은 최신 1개만 남기고 나머지는 DB에서 정리.
+  const refreshSaved = async () => {
+    try {
+      const list = await listMySaved()
+      const seen = new Set()
+      const unique = []
+      const dupIds = []
+      for (const s of list) {
+        const k = `${s.type}|${(s.term || '').trim().toLowerCase()}`
+        if (seen.has(k)) {
+          dupIds.push(s.id)
+          continue
+        }
+        seen.add(k)
+        unique.push(s)
+      }
+      if (dupIds.length) {
+        for (const id of dupIds) {
+          try {
+            await removeSaved(id)
+          } catch {
+            /* 개별 실패는 무시 */
+          }
+        }
+      }
+      setMySaved(unique)
+    } catch {
+      /* 조회 실패 시 기존 상태 유지 */
+    }
+  }
   const refreshReviewed = () => reviewedCount().then(setReviewed).catch(() => {})
   useEffect(() => {
     if (session?.user) {
@@ -142,11 +172,15 @@ export default function App() {
       return
     }
     const key = savedKey(type, term)
-    const existing = mySaved.find((s) => savedKey(s.type, s.term) === key)
+    // 같은 표현을 동시에(더블탭) 저장/취소하지 못하도록 진행 중 key는 무시.
+    if (savingKeys.current.has(key)) return
+    savingKeys.current.add(key)
+    // 같은 key의 항목 전부(혹시 남아있는 중복 포함) 취소 대상으로.
+    const existingAll = mySaved.filter((s) => savedKey(s.type, s.term) === key)
     try {
-      if (existing) {
-        const snap = existing // 되돌리기용 스냅샷 {id, type, term, ...data}
-        await removeSaved(existing.id)
+      if (existingAll.length) {
+        const snap = existingAll[0] // 되돌리기용 스냅샷 {id, type, term, ...data}
+        for (const it of existingAll) await removeSaved(it.id)
         await refreshSaved()
         const undo = async () => {
           const { id, type: t, term: tm, ...rest } = snap
@@ -165,6 +199,8 @@ export default function App() {
       }
     } catch {
       showToast('처리에 실패했어요. 잠시 후 다시 시도해주세요.')
+    } finally {
+      savingKeys.current.delete(key)
     }
   }
   const wordType = (term) => ((term || '').trim().includes(' ') ? 'phrase' : 'word')
