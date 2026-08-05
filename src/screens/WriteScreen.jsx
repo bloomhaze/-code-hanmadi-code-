@@ -194,7 +194,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
       {step === 'edit' && (
         <>
           <div className="no-scrollbar absolute inset-0 overflow-y-auto bg-white">
-            <div className="px-5 pt-4">
+            <div className="flex min-h-full flex-col px-5 pb-28 pt-4">
               {/* 작성 주제 — 실선 테두리 카드, 문구는 원래대로 왼쪽 정렬, 새로고침/X 유지 */}
               {topicOn && (
                 <div
@@ -242,7 +242,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
                 onChange={onBodyChange}
                 placeholder={isEn ? 'Write freely.' : '자유롭게 작성해주세요'}
                 autoFocus
-                className="min-h-[480px] w-full resize-none border-none bg-transparent font-inter text-[16px] text-ink outline-none placeholder:text-[#BFBFBF]"
+                className="min-h-[480px] w-full flex-1 resize-none border-none bg-transparent font-inter text-[16px] text-ink outline-none placeholder:text-[#BFBFBF]"
                 style={{ lineHeight: '30px', letterSpacing: '-.2px' }}
               />
             </div>
