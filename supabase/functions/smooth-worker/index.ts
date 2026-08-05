@@ -239,40 +239,39 @@ function translatePrompt(text: string) {
 
 function correctPrompt(text: string) {
   return (
-    '너는 원어민 영어 첨삭 선생님이야. 학습자가 영어로 일기를 썼어. ' +
-    'ChatGPT 수준으로 자연스럽고 세련된 영어로 다듬어줘야 해.\n' +
-    '★ 교정 원칙(매우 중요):\n' +
-    '- 문법·철자 오류는 하나도 빠짐없이 정확히 고쳐.\n' +
-    '- 문법은 맞지만 어색하거나 콩글리쉬한 표현은, 원어민이 실제로 쓰는 자연스럽고 매끄러운 표현으로 다듬어. ' +
-    '밋밋한 표현(I was happy, it was good)은 더 생생한 원어민 표현으로.\n' +
-    '- 필요하면 어순을 바꾸거나 접속사(but, so, and, that)로 문장을 자연스럽게 이어도 돼.\n' +
-    '- 어휘는 원어민이 일상에서 자주 쓰는 쉽고 흔한 단어를 우선해. 문어적·잘 안 쓰는 어려운 단어(linger, commence, utilize 등)는 피하고 ' +
-    '더 쉬운 표현(is still there, start, use 등)으로 바꿔.\n' +
-    '- 단, 학습자의 원래 의도·의미는 반드시 유지해 (내용을 바꾸거나 새 사실을 덧붙이지 마).\n' +
-    '- 셀 수 있는 명사가 특정 한 개가 아니라 일반적인 의미로 쓰이면 자연스러운 복수형으로 고쳐. ' +
-    '예: "eat honey butter chip" → "eat honey butter chips", "buy chip" → "buy some chips". ' +
-    '한 개를 콕 집는 맥락이 아니면 "a chip"보다 "chips"를 선호해.\n' +
-    '- 일관성: 같은 일기 안에서 같은 대상을 가리키는 명사는 문장마다 표기를 통일해 ' +
-    '(한 문장은 "chips", 다른 문장은 "a chip"처럼 섞지 마).\n' +
-    '- 원문이 이미 맞으면 "취향·문체 차이일 뿐 오류가 아닌 것"은 바꾸지 마(억지 교정 금지). ' +
-    '바꾸면 맞는 표현에 오류 표시(취소선)가 붙어 학습자가 헷갈려. 아래는 원문이 맞으면 모두 그대로 둬:\n' +
-    '  · 축약형 변환: "I will"↔"I\'ll", "it is"↔"it\'s", "do not"↔"don\'t", "I am"↔"I\'m"\n' +
-    '  · 숫자 표기: "3 times"↔"three times", "2"↔"two" 등 — 일기에서 아라비아 숫자로 써도 틀린 게 아니니 글자로 바꾸지 마.\n' +
-    '  실제 문법·철자 오류나 분명히 어색한 표현이 있을 때만 고쳐 ' +
-    '(예: "Why people have to eat" → "Why do people have to eat"처럼 빠진 조동사는 진짜 오류이므로 고침).\n' +
-    '- 이미 문법·철자·표현이 모두 정확하고 자연스러우면 corrected를 original과 똑같이 둬 (억지 교정 금지).\n' +
+    'You are an English writing tutor specializing in correcting diary entries written by Korean English learners.\n' +
     '\n' +
-    '★ 참고 예시(이 수준으로 다듬어):\n' +
-    'original: "Today I eat mixed raw fish with my boyfriend. It was very delicious so I feel good."\n' +
-    'corrected: "Today, my boyfriend and I had an assorted sashimi platter. ' +
-    'It was so delicious that it really made my day."\n' +
+    "Your goal is NOT to rewrite the user's writing. Preserve the user's original sentence as much as possible and only correct what is necessary.\n" +
     '\n' +
-    '아래 일기를 문장 단위로 나누고, 각 문장마다 다음을 제공해:\n' +
-    '- ko: 그 문장의 한국어 뜻\n' +
-    '- original: 학습자가 쓴 원문 그대로\n' +
-    '- corrected: 위 원칙으로 고친 버전\n' +
-    '일기:\n' + text + '\n' +
-    '반드시 이 JSON만 반환: {"sentences": [{"ko": "...", "original": "...", "corrected": "..."}]}'
+    'Split the diary into individual sentences. For EACH sentence, classify it into EXACTLY ONE of these four categories and correct it accordingly.\n' +
+    '\n' +
+    '1. grammar — The sentence is grammatically incorrect. Fix ONLY the grammatical mistakes. Keep the user\'s vocabulary and writing style.\n' +
+    '   "I goed home." -> "I went home."\n' +
+    '   "She don\'t like coffee." -> "She doesn\'t like coffee."\n' +
+    '\n' +
+    '2. unnatural — Grammar is acceptable, but the wording sounds unnatural or awkward to native speakers. Rewrite it so it sounds natural while preserving the original meaning.\n' +
+    '   "We talked many stories." -> "We talked about many things."\n' +
+    '   "It was very fun time." -> "We had such a great time."\n' +
+    '\n' +
+    '3. rewrite — The sentence has multiple issues (grammar + vocabulary + structure) and cannot be fixed with a few edits. Rewrite the whole sentence naturally while preserving the intended meaning.\n' +
+    '   "We catch up our story about what happend us recently." -> "We caught up on everything that had happened recently."\n' +
+    '\n' +
+    '4. correct — Already natural and grammatically correct. Return it UNCHANGED (corrected must equal original exactly).\n' +
+    '   "It was really fun."\n' +
+    '\n' +
+    'Important rules:\n' +
+    '- Never rewrite a sentence if only one or two words need correction (use grammar/unnatural, not rewrite).\n' +
+    '- Preserve the user\'s tone. Do not make the sentence more advanced than necessary.\n' +
+    '- Do not add information. Do not remove information. Only improve fluency when necessary. Prefer small edits over complete rewrites.\n' +
+    '- Do NOT treat stylistically-valid choices as errors — if the original is already correct, leave it unchanged: contractions ("I will" vs "I\'ll", "it is" vs "it\'s"), and numerals ("3 times" vs "three times", "2" vs "two").\n' +
+    '- Countable nouns used in a general sense should take the natural plural (e.g., "eat chips", not "eat chip"), and keep the same noun\'s form consistent across the whole entry.\n' +
+    '\n' +
+    'For each sentence also provide "ko": the Korean meaning of that sentence, written 100% in Korean (Hangul) only — never mix Japanese or Chinese characters.\n' +
+    '\n' +
+    'Diary:\n' + text + '\n' +
+    '\n' +
+    'Return JSON only, in EXACTLY this shape:\n' +
+    '{"sentences": [{"ko": "...", "type": "grammar | unnatural | rewrite | correct", "original": "...", "corrected": "..."}]}'
   )
 }
 
