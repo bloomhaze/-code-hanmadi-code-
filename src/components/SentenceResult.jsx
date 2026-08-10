@@ -204,9 +204,9 @@ export default function SentenceResult({
                             key={gi}
                             onClick={() => onTapFix?.(fid, g.t, origFull, fixedFull)}
                             style={{
-                              // 선택 시 파란 테두리 대신 배경·글자를 더 진하게.
-                              background: fixActive ? '#bcd8ff' : '#dcebff',
-                              color: fixActive ? '#0047cc' : '#0066ff',
+                              // 더 밝고 산뜻한 파랑. 선택 시 배경·글자를 살짝 진하게.
+                              background: fixActive ? '#d2e2ff' : '#e6efff',
+                              color: fixActive ? '#1a6bf0' : '#2979ff',
                               borderRadius: 5,
                               padding: '1px 3px',
                               fontWeight: fixActive ? 600 : 500,
