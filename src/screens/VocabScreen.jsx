@@ -349,7 +349,7 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
                   </div>
                   <span
                     className="font-sans text-[15px] font-semibold text-ink-2"
-                    style={{ lineHeight: '100%' }}
+                    style={{ lineHeight: '22px' }}
                   >
                     {it.kr}
                   </span>
