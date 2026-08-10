@@ -10,7 +10,7 @@
   --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-inter: 'Inter Variable', 'Inter', 'Pretendard Variable', 'Pretendard', sans-serif;
 
-  --color-accent: #2083E7;
+  --color-accent: #0066ff;
   --color-accent-soft: #dcebff;
   --color-ink: #121212;
   --color-ink-2: #1a1a1b;
@@ -300,7 +300,7 @@ body {
    모바일은 원래대로(강조 없음). */
 @media (min-width: 1024px) {
   .fix-active {
-    box-shadow: 0 0 0 2px #2083E7;
+    box-shadow: 0 0 0 2px #0066ff;
     border-radius: 5px;
   }
 }

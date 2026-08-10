@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ProfileAvatar, ChevronRightSmall, ExternalArrow } from '../components/icons.jsx'
 
-const ACCENT = '#2083E7'
+const ACCENT = '#0066FF'
 
 // 프로필 아바타 — 구글 프로필 사진이 있으면 그걸 쓰고, 없거나 로드 실패 시 기본 한마디 아바타.
 function Avatar({ url }) {
@@ -175,7 +175,7 @@ export default function MyScreen({
                 type="button"
                 onClick={() => onToast?.('준비 중이에요')}
                 className="flex h-[51px] items-center rounded-2xl px-[18px]"
-                style={{ background: 'linear-gradient(90deg,#2083E7 0%,#21aaff 100%)' }}
+                style={{ background: 'linear-gradient(90deg,#0066ff 0%,#21aaff 100%)' }}
               >
                 <span
                   className="flex-1 text-left font-sans text-[15px] font-normal text-white"

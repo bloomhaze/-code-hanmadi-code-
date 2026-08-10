@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { SearchIcon, PencilIcon, DiaryEmptyIllust, SearchEmptyIllust } from '../components/icons.jsx'
 import { diaryBadge } from '../data/diary.js'
 
-const ACCENT = '#2083E7'
+const ACCENT = '#0066FF'
 
 // 일기 탭 — 유저가 실제 저장한 일기 목록(diaries) + 검색.
 export default function DiaryScreen({ diaries = [], onWrite, onOpen, deletedIds }) {

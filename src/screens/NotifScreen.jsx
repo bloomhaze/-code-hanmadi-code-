@@ -29,7 +29,7 @@ export default function NotifScreen({ onClose }) {
             type="button"
             onClick={() => setOn((v) => !v)}
             className="relative h-5 w-10 rounded-xl transition-colors"
-            style={{ background: on ? '#2083E7' : '#d9d9d9' }}
+            style={{ background: on ? '#0066ff' : '#d9d9d9' }}
           >
             <span
               className="absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all"

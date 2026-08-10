@@ -43,7 +43,7 @@ export default function WordPopup({ state, saved = false, onToggleSave, onClose,
               type="button"
               onClick={onSpeak}
               className="flex h-8 w-8 items-center justify-center rounded-full"
-              style={{ background: audio === 'playing' ? '#2083E7' : '#f1f1f2' }}
+              style={{ background: audio === 'playing' ? '#0066ff' : '#f1f1f2' }}
             >
               {audio === 'loading' ? (
                 <Spinner size={16} color="#121212" />
@@ -55,7 +55,7 @@ export default function WordPopup({ state, saved = false, onToggleSave, onClose,
               type="button"
               onClick={() => (loading ? null : onToggleSave?.())}
               className="flex h-8 w-8 items-center justify-center rounded-full"
-              style={{ background: saved ? '#2083E7' : '#f1f1f2' }}
+              style={{ background: saved ? '#0066ff' : '#f1f1f2' }}
             >
               <BookmarkSmall fill={saved ? '#fff' : 'none'} stroke={saved ? '#fff' : '#121212'} />
             </button>
@@ -66,7 +66,7 @@ export default function WordPopup({ state, saved = false, onToggleSave, onClose,
           <div className="flex items-center gap-2.5 py-3">
             <div
               className="h-5 w-5 rounded-full border-[2.5px] border-[#e6e6e6]"
-              style={{ borderTopColor: '#2083E7', animation: 'spin .8s linear infinite' }}
+              style={{ borderTopColor: '#0066ff', animation: 'spin .8s linear infinite' }}
             />
             <span className="font-sans text-[14px] font-medium text-muted">뜻과 예문을 찾고 있어요</span>
           </div>
@@ -81,7 +81,7 @@ export default function WordPopup({ state, saved = false, onToggleSave, onClose,
               <div className="mt-4 flex flex-col gap-1.5 rounded-2xl bg-[#f7f7f7] p-4">
                 <span className="font-inter text-[15px] text-ink" style={{ lineHeight: '20.8px' }}>
                   {segs.map((g, i) => (
-                    <span key={i} style={{ color: g.accent ? '#2083E7' : '#121212' }}>
+                    <span key={i} style={{ color: g.accent ? '#0066ff' : '#121212' }}>
                       {g.t}
                     </span>
                   ))}

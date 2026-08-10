@@ -1,7 +1,7 @@
 import { ListenIcon, BookmarkIcon, Spinner } from './icons.jsx'
 import { mkWords } from '../lib/text.js'
 
-const ACCENT = '#2083E7'
+const ACCENT = '#0066FF'
 
 function HandIcon() {
   return (
@@ -119,7 +119,7 @@ export default function SentenceResult({
           {hint === 'correction' ? (
             <div className="flex items-center gap-1.5">
               <div className="flex items-center rounded bg-[#dcebff] px-1.5 py-[3px]">
-                <span className="font-inter text-[12px] font-medium leading-none text-[#2083E7]">파란 영역</span>
+                <span className="font-inter text-[12px] font-medium leading-none text-[#0066ff]">파란 영역</span>
               </div>
               <span className="font-sans text-[13px] text-muted">클릭하고 교정 이유 확인</span>
             </div>
@@ -205,7 +205,7 @@ export default function SentenceResult({
                             onClick={() => onTapFix?.(fid, g.t, origFull, fixedFull)}
                             style={{
                               background: '#dcebff',
-                              color: '#2083E7',
+                              color: '#0066ff',
                               borderRadius: 5,
                               padding: '1px 3px',
                               fontWeight: 500,
