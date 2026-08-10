@@ -296,15 +296,6 @@ body {
   }
 }
 
-/* 선택된 파란(교정) 영역 강조 — 데스크탑/태블릿에서만 2px 스트로크.
-   모바일은 원래대로(강조 없음). */
-@media (min-width: 1024px) {
-  .fix-active {
-    box-shadow: 0 0 0 2px #0066ff;
-    border-radius: 5px;
-  }
-}
-
 /* 탭 가능한 단어/구동사 — 호버 시 눌렀을 때 잡히는 영역이 보이게. */
 .tap-word {
   cursor: pointer;

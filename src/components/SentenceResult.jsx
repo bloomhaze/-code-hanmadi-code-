@@ -198,17 +198,18 @@ export default function SentenceResult({
                     <div className="mt-2 font-inter text-[16px] text-ink" style={{ lineHeight: '28.8px' }}>
                       {s.fixSegs.map((g, gi) => {
                         const fid = `${i}-${gi}`
+                        const fixActive = activeFix === fid
                         return g.kind === 'f' ? (
                           <span
                             key={gi}
-                            className={activeFix === fid ? 'fix-active' : undefined}
                             onClick={() => onTapFix?.(fid, g.t, origFull, fixedFull)}
                             style={{
-                              background: '#dcebff',
-                              color: '#0066ff',
+                              // 선택 시 파란 테두리 대신 배경·글자를 더 진하게.
+                              background: fixActive ? '#bcd8ff' : '#dcebff',
+                              color: fixActive ? '#0047cc' : '#0066ff',
                               borderRadius: 5,
                               padding: '1px 3px',
-                              fontWeight: 500,
+                              fontWeight: fixActive ? 600 : 500,
                               cursor: 'pointer',
                             }}
                           >
