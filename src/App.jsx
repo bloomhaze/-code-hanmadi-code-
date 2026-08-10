@@ -136,13 +136,16 @@ export default function App() {
   )
   const isSaved = (type, term) => savedSet.has(savedKey(type, term))
   // 저장돼 있으면 취소, 없으면 저장 (토글). 로그인 안 하면 안내.
-  // 프로필 저장 — 닉네임(full_name) + (사진 선택 시) 아바타 업로드 후 메타데이터 갱신.
+  // 프로필 저장 — 닉네임/아바타를 커스텀 키(nickname/custom_avatar_url)에 저장.
+  // 구글 OAuth 재로그인 시 full_name·avatar_url·picture는 구글 값으로 덮어써지므로,
+  // 구글이 건드리지 않는 커스텀 키에 넣어야 변경한 값이 계속 유지된다.
   // 사진은 '저장'을 눌러야 실제로 반영된다.
   const saveProfile = async ({ nick, avatarFile }) => {
     try {
-      const meta = { full_name: nick, name: nick }
+      const meta = { nickname: nick, full_name: nick, name: nick }
       if (avatarFile) {
         const url = await uploadAvatar(avatarFile)
+        meta.custom_avatar_url = url
         meta.avatar_url = url
         meta.picture = url
       }
@@ -221,9 +224,15 @@ export default function App() {
   const authed = !!session
   const user = session?.user
   const userEmail = user?.email || ''
-  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || USER_NAME
-  // 구글 프로필 사진(있으면). 없으면 MyScreen에서 기본 한마디 아바타로 폴백.
-  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || ''
+  // 커스텀 닉네임(nickname)을 최우선으로 — 재로그인 시 구글이 덮어쓰는 full_name/name보다 우선.
+  const userName =
+    user?.user_metadata?.nickname || user?.user_metadata?.full_name || user?.user_metadata?.name || USER_NAME
+  // 직접 올린 아바타(custom_avatar_url) 우선, 없으면 구글 프로필 사진, 그것도 없으면 MyScreen 기본 아바타.
+  const avatarUrl =
+    user?.user_metadata?.custom_avatar_url ||
+    user?.user_metadata?.avatar_url ||
+    user?.user_metadata?.picture ||
+    ''
   const showOnboarding = authReady && !authed && !guestMode
 
   // ---- navigation ----
