@@ -9,7 +9,7 @@ export const seg = (t, kind = 'n') => ({ t, kind })
 export const SEG_STYLE = {
   n: { bg: 'transparent', color: '#121212', strike: false, weight: 400 },
   w: { bg: '#ffe1e1', color: '#ff4242', strike: true, weight: 400 },
-  f: { bg: '#dcebff', color: '#0066ff', strike: false, weight: 500 },
+  f: { bg: '#e6efff', color: '#2979ff', strike: false, weight: 500 },
 }
 
 const S = seg

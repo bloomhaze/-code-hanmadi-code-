@@ -71,7 +71,7 @@ export default function FixPopup({ state, onClose }) {
           animation: 'fixPanelIn .28s cubic-bezier(.22,1,.36,1)',
         }}
       >
-        <div className="rounded-[20px] border-2 border-[#0066ff] bg-white px-5 py-[18px]">{Inner}</div>
+        <div className="rounded-[20px] border border-[#0066ff] bg-white px-5 py-[18px]">{Inner}</div>
       </div>
     </>
   )
