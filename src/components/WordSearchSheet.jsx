@@ -90,7 +90,7 @@ export default function WordSearchSheet({ onClose, onToast }) {
           <div className="mt-16 flex justify-center">
             <div
               className="h-9 w-9 rounded-full border-[3px] border-[#e8e8e8]"
-              style={{ borderTopColor: '#0066ff', animation: 'spin 1s linear infinite' }}
+              style={{ borderTopColor: '#2083E7', animation: 'spin 1s linear infinite' }}
             />
           </div>
         )}
@@ -140,7 +140,7 @@ function ResultCard({ w, onToast }) {
             type="button"
             onClick={onSpeak}
             className="flex h-8 w-8 items-center justify-center rounded-full"
-            style={{ background: audio === 'playing' ? '#0066ff' : '#eee' }}
+            style={{ background: audio === 'playing' ? '#2083E7' : '#eee' }}
           >
             {audio === 'loading' ? (
               <Spinner size={16} color="#121212" />
@@ -156,7 +156,7 @@ function ResultCard({ w, onToast }) {
               if (saved) onToast?.('저장을 취소했어요', () => setSaved(true))
             }}
             className="flex h-8 w-8 items-center justify-center rounded-full"
-            style={{ background: saved ? '#0066ff' : '#eee' }}
+            style={{ background: saved ? '#2083E7' : '#eee' }}
           >
             <BookmarkSmall fill={saved ? '#fff' : 'none'} stroke={saved ? '#fff' : '#121212'} />
           </button>
@@ -165,7 +165,7 @@ function ResultCard({ w, onToast }) {
       <span className="font-sans text-[15px] font-medium text-ink">{w.kr}</span>
       <span className="font-inter text-[14px]" style={{ lineHeight: '20px' }}>
         {segs.map((g, i) => (
-          <span key={i} style={{ color: g.accent ? '#0066ff' : '#4a4a4c' }}>
+          <span key={i} style={{ color: g.accent ? '#2083E7' : '#4a4a4c' }}>
             {g.t}
           </span>
         ))}

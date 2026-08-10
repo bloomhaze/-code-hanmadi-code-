@@ -165,7 +165,7 @@ export default function QuizScreen({ type = 'flash', saved = [], onClose, onToas
         </div>
         <div
           className="z-[2] flex h-20 w-20 items-center justify-center rounded-full"
-          style={{ background: '#0066FF', animation: 'donePop .5s cubic-bezier(.34,1.56,.64,1) both' }}
+          style={{ background: '#2083E7', animation: 'donePop .5s cubic-bezier(.34,1.56,.64,1) both' }}
         >
           <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
             <path d="M14 27l9 9 16-19" stroke="#fff" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
@@ -404,7 +404,7 @@ function BlankQuiz({ cur, blank, setBlank, blankChecked, setBlankChecked, applyM
   const btnLabel = blankChecked ? (qi >= total - 1 ? '완료' : '다음') : '정답 확인'
   const ready = blankChecked || blank.trim()
 
-  const pillInk = !blankChecked ? '#0066ff' : correct ? '#00a836' : '#ff4242'
+  const pillInk = !blankChecked ? '#2083E7' : correct ? '#00a836' : '#ff4242'
   const pillBg = !blankChecked ? '#eaf1ff' : correct ? '#e3f6ea' : '#ffe1e1'
   const showCaret = !blankChecked && !blank.trim()
   const sizer = blank || ' ' // thin space keeps an empty pill minimal-width

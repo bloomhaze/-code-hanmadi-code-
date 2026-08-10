@@ -203,7 +203,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
                 >
                   <span
                     className="flex-1 font-sans text-[15px] font-medium"
-                    style={{ color: '#0066ff', lineHeight: '22px', letterSpacing: '-.2px' }}
+                    style={{ color: '#2083E7', lineHeight: '22px', letterSpacing: '-.2px' }}
                   >
                     {topic.q}
                   </span>
@@ -217,11 +217,11 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
                       <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                         <path
                           d="M15.5 5.5A6.5 6.5 0 1 0 16.9 12"
-                          stroke="#0066ff"
+                          stroke="#2083E7"
                           strokeWidth="1.7"
                           strokeLinecap="round"
                         />
-                        <path d="M16.5 3.2V6.2H13.5" stroke="#0066ff" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M16.5 3.2V6.2H13.5" stroke="#2083E7" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </button>
                     <button
@@ -231,7 +231,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
                       className="tab-item flex h-7 w-7 items-center justify-center rounded-full outline-none active:bg-[#e8f0ff]"
                     >
                       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M2 2l10 10M12 2L2 12" stroke="#0066ff" strokeWidth="1.7" strokeLinecap="round" />
+                        <path d="M2 2l10 10M12 2L2 12" stroke="#2083E7" strokeWidth="1.7" strokeLinecap="round" />
                       </svg>
                     </button>
                   </div>
@@ -273,7 +273,7 @@ export default function WriteScreen({ mode = 'ko', onBack, onSave, onToast, onTa
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-[18px] bg-white">
           <div
             className="h-10 w-10 rounded-full border-[3px] border-[#dcebff]"
-            style={{ borderTopColor: '#0066ff', animation: 'spin .8s linear infinite' }}
+            style={{ borderTopColor: '#2083E7', animation: 'spin .8s linear infinite' }}
           />
           <span
             className="whitespace-pre-line text-center font-sans text-[15px] font-medium text-muted"

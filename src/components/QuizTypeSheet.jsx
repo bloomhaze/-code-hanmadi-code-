@@ -41,7 +41,7 @@ export default function QuizTypeSheet({ onStart, onClose }) {
                 <span
                   className="flex h-6 w-6 items-center justify-center rounded-full"
                   style={{
-                    background: active ? '#0066ff' : '#fff',
+                    background: active ? '#2083E7' : '#fff',
                     boxShadow: active ? 'none' : 'inset 0 0 0 1.5px #dcdcdc',
                   }}
                 >

@@ -95,7 +95,7 @@ export function Spinner({ size = 16, color = '#121212', track = 'rgba(0,0,0,.15)
 }
 
 export function ListenIcon({ on = false, loading = false }) {
-  const bg = on ? '#0066FF' : '#EEEEEE'
+  const bg = on ? '#2083E7' : '#EEEEEE'
   const ink = on ? 'white' : '#121212'
   if (loading) {
     return (
@@ -133,7 +133,7 @@ export function ListenIcon({ on = false, loading = false }) {
 
 // Bookmark. on = filled accent, off = outline.
 export function BookmarkIcon({ on = false }) {
-  const bg = on ? '#0066FF' : '#EEEEEE'
+  const bg = on ? '#2083E7' : '#EEEEEE'
   const fill = on ? 'white' : 'none'
   const stroke = on ? 'white' : '#121212'
   return (
@@ -269,7 +269,7 @@ export function ProfileAvatar({ size = 54, mono = false }) {
       />
       <defs>
         <linearGradient id="pf0" x1="0" y1="0" x2="54" y2="54" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#0066FF" />
+          <stop stopColor="#2083E7" />
           <stop offset="1" stopColor="#3D8BFF" />
         </linearGradient>
       </defs>

@@ -12,7 +12,7 @@ import {
 import { hlSegs } from '../lib/text.js'
 import { speak, stopSpeak } from '../lib/speak.js'
 
-const ACCENT = '#0066FF'
+const ACCENT = '#2083E7'
 const TABS = [
   { key: 'word', label: '단어' },
   { key: 'phrase', label: '표현' },
@@ -163,7 +163,7 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
           {/* Quick Quiz card */}
           <div
             className="flex flex-col gap-2 overflow-hidden rounded-[20px] p-5"
-            style={{ background: 'linear-gradient(180deg,#0066ff 0%,#2e82ff 84%)' }}
+            style={{ background: 'linear-gradient(180deg,#2083E7 0%,#2e82ff 84%)' }}
           >
             <div className="flex items-center justify-between">
               <div className="flex h-[30px] items-center gap-1.5 rounded-full bg-white pl-2.5 pr-3">
@@ -357,7 +357,7 @@ export default function VocabScreen({ saved = [], onUnsaveCommit, onWrite, onToa
                     <div className="mt-1.5 flex flex-col gap-0.5">
                       <div className="font-inter text-[14px] font-normal" style={{ lineHeight: '20.8px' }}>
                         {segs.map((g, i) => (
-                          <span key={i} style={{ color: g.accent ? '#0066ff' : '#737373' }}>
+                          <span key={i} style={{ color: g.accent ? '#2083E7' : '#737373' }}>
                             {g.t}
                           </span>
                         ))}

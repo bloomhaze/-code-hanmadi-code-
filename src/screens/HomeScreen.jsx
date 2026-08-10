@@ -5,7 +5,7 @@ import { buildWeek, dateInfo, monthsRange, midnight, realToday } from '../lib/ho
 import { speak, stopSpeak } from '../lib/speak.js'
 import { PROMPTS } from '../data/diary.js'
 
-const ACCENT = '#0066FF'
+const ACCENT = '#2083E7'
 
 // 문장의 영어 표시 텍스트 (교정본 우선, 없으면 원문/번역)
 function enText(s) {
@@ -190,7 +190,7 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
               >
                 <span
                   className="font-inter text-[11px] font-medium"
-                  style={{ color: lang === 'EN' ? '#0066ff' : '#7a7b7d' }}
+                  style={{ color: lang === 'EN' ? '#2083E7' : '#7a7b7d' }}
                 >
                   {lang}
                 </span>
