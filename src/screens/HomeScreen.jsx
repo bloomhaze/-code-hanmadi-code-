@@ -203,8 +203,8 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
             <button
               type="button"
               onClick={onWrite}
-              className="flex min-h-[71px] w-full items-center justify-center gap-2 rounded-[20px] border border-dashed px-[18px] py-4"
-              style={{ borderColor: '#abcfff' }}
+              className="flex min-h-[71px] w-full items-center justify-center gap-2 rounded-[20px] px-[18px] py-4"
+              style={{ outline: '.5px dashed #abcfff', outlineOffset: '-.5px' }}
             >
               <div className="flex h-6 items-center justify-center overflow-hidden">
                 <span
@@ -227,8 +227,8 @@ export default function HomeScreen({ userName = '현진', diaries = [], signupDa
           {/* future / before-signup */}
           {blocked && (
             <div
-              className="flex min-h-[71px] flex-col items-center justify-center rounded-[20px] border border-dashed bg-[#fafafa] px-[18px] py-5 opacity-60"
-              style={{ borderColor: '#e2e2e2' }}
+              className="flex min-h-[71px] flex-col items-center justify-center rounded-[20px] bg-[#fafafa] px-[18px] py-5 opacity-60"
+              style={{ outline: '.5px dashed #e2e2e2', outlineOffset: '-.5px' }}
             >
               <span className="font-inter text-[14px] font-medium text-muted-2">
                 {isFuture ? '아직 오지 않은 날이에요' : '가입 전 날짜예요'}
