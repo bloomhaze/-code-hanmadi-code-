@@ -397,21 +397,28 @@ Deno.serve(async (req) => {
       const original = (body.original || '').trim()
       const corrected = (body.corrected || '').trim()
       if (!phrase || !original) return json({ error: '설명할 내용이 부족해요.' })
-      const { data, error } = await callGroq(key, explainPrompt(original, corrected, phrase))
-      if (error) return json({ error })
-      return json({ reason: stripForeign(data.reason || '') })
+      const p = explainPrompt(original, corrected, phrase)
+      // 모델 하나(llama)만 쓰면 그 모델 장애/레이트리밋 시 실패 — gpt-oss 우선 + llama 폴백.
+      let r = await callGroq(key, p, SMART_MODEL, 0.2)
+      if (r.error) r = await callGroq(key, p, GROQ_MODEL, 0)
+      if (r.error) return json({ error: r.error })
+      return json({ reason: stripForeign(r.data.reason || '') })
     }
 
     if (action === 'word') {
       const word = (body.word || '').trim()
       if (!word) return json({ error: '단어가 없어요.' })
-      let { data, error } = await callGroq(key, wordPrompt(word, (body.sentence || '').trim()))
-      // 한글·영어 외 언어(태국어·한자 등)가 섞이면 SMART_MODEL로 한 번 재시도(품질↑), 그래도 남으면 코드에서 제거
-      if (!error && (hasForeign(data.kr) || hasForeign(data.ex) || hasForeign(data.exKr))) {
-        const retry = await callGroq(key, wordPrompt(word, (body.sentence || '').trim()), SMART_MODEL, 0.2)
+      const p = wordPrompt(word, (body.sentence || '').trim())
+      // gpt-oss 우선 + llama 폴백 (모델 하나 죽어도 동작하게).
+      let r = await callGroq(key, p, SMART_MODEL, 0.2)
+      if (r.error) r = await callGroq(key, p, GROQ_MODEL, 0)
+      if (r.error) return json({ error: r.error })
+      let data = r.data
+      // 한글·영어 외 언어(한자 등)가 섞이면 한 번 더 정리 시도
+      if (hasForeign(data.kr) || hasForeign(data.ex) || hasForeign(data.exKr)) {
+        const retry = await callGroq(key, p, GROQ_MODEL, 0.2)
         if (!retry.error) data = retry.data
       }
-      if (error) return json({ error })
       return json({ kr: stripForeign(data.kr || ''), ex: stripForeign(data.ex || ''), exKr: stripForeign(data.exKr || '') })
     }
 
