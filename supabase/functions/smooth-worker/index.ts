@@ -113,7 +113,11 @@ async function callGroq(
     }),
   })
   const j = await r.json().catch(() => ({}))
-  if (!r.ok) return { error: `AI 오류(${r.status}): ${j?.error?.message || JSON.stringify(j).slice(0, 200)}` }
+  if (!r.ok) {
+    const msg = `AI 오류(${r.status}) [${model}]: ${j?.error?.message || JSON.stringify(j).slice(0, 200)}`
+    console.error('[groq]', msg) // 실제 원인을 Supabase Logs에서 볼 수 있게 기록
+    return { error: msg }
+  }
   const content = j?.choices?.[0]?.message?.content || ''
   if (!content) return { error: 'AI 응답이 비었어요.' }
   try {
