@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import LegalScreen from './LegalScreen.jsx'
 
 const SLIDES = [
   {
@@ -30,6 +31,7 @@ const SHOW_APPLE = false
 // onGoogle: start Supabase Google OAuth. Guest("먼저 둘러볼래요") goes to intro.
 export default function OnboardingScreen({ onGoogle, onComplete, onToast }) {
   const [step, setStep] = useState('auth') // 'auth' | 1..4
+  const [legal, setLegal] = useState(null) // 'terms' | 'privacy' | null
 
   const startIntro = () => setStep(1)
   const next = () => {
@@ -39,6 +41,7 @@ export default function OnboardingScreen({ onGoogle, onComplete, onToast }) {
 
   if (step === 'auth') {
     return (
+      <>
       <div className="no-scrollbar absolute inset-0 z-40 overflow-y-auto bg-white">
         <div className="relative mx-auto h-[812px] w-[375px] max-w-full">
         <div className="absolute left-[135px] top-[244px] h-[120px] w-[105px]">
@@ -88,11 +91,11 @@ export default function OnboardingScreen({ onGoogle, onComplete, onToast }) {
             style={{ color: '#a0a0a0', lineHeight: '18px', letterSpacing: '-.2px' }}
           >
             로그인 시{' '}
-            <button type="button" onClick={() => onToast?.('이용약관')} className="underline underline-offset-2" style={{ color: '#7a7a7a' }}>
+            <button type="button" onClick={() => setLegal('terms')} className="underline underline-offset-2" style={{ color: '#7a7a7a' }}>
               이용약관
             </button>{' '}
             및{' '}
-            <button type="button" onClick={() => onToast?.('개인정보처리방침')} className="underline underline-offset-2" style={{ color: '#7a7a7a' }}>
+            <button type="button" onClick={() => setLegal('privacy')} className="underline underline-offset-2" style={{ color: '#7a7a7a' }}>
               개인정보처리방침
             </button>
             에
@@ -102,6 +105,8 @@ export default function OnboardingScreen({ onGoogle, onComplete, onToast }) {
         </div>
         </div>
       </div>
+      {legal && <LegalScreen kind={legal} onBack={() => setLegal(null)} />}
+      </>
     )
   }
 

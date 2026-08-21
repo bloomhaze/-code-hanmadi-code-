@@ -30,6 +30,8 @@ export default function MyScreen({
   onProfile,
   onNotif,
   onFeedback,
+  onTerms,
+  onPrivacy,
   onLogout,
   onWithdraw,
   onToast,
@@ -201,8 +203,8 @@ export default function MyScreen({
             <div className="flex flex-col gap-2.5">
               <SectionLabel>약관 및 지원</SectionLabel>
               <div className="flex flex-col overflow-hidden rounded-2xl bg-[#f7f7f8]">
-                <Row label="이용 약관" onClick={() => onToast?.('준비 중이에요')} first />
-                <Row label="개인정보 처리" onClick={() => onToast?.('준비 중이에요')} />
+                <Row label="이용 약관" onClick={onTerms} first />
+                <Row label="개인정보 처리" onClick={onPrivacy} />
                 <Row label="개발자에게 한마디" onClick={onFeedback} last />
               </div>
             </div>

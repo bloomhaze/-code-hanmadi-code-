@@ -19,6 +19,7 @@ import QuizTypeSheet from './components/QuizTypeSheet.jsx'
 import NotifScreen from './screens/NotifScreen.jsx'
 import ProfileEditScreen from './screens/ProfileEditScreen.jsx'
 import DevFeedbackScreen from './screens/DevFeedbackScreen.jsx'
+import LegalScreen from './screens/LegalScreen.jsx'
 import DeleteDialog from './components/DeleteDialog.jsx'
 import ConfirmDialog from './components/ConfirmDialog.jsx'
 import { findEntryByKo } from './data/diary.js'
@@ -492,6 +493,8 @@ export default function App() {
               onProfile={() => setOverlay({ type: 'profile' })}
               onNotif={() => setOverlay({ type: 'notif' })}
               onFeedback={() => setOverlay({ type: 'feedback' })}
+              onTerms={() => setOverlay({ type: 'terms' })}
+              onPrivacy={() => setOverlay({ type: 'privacy' })}
               onLogout={() => setDialog({ kind: 'logout' })}
               onWithdraw={() => setDialog({ kind: 'withdraw' })}
               onToast={showToast}
@@ -539,6 +542,8 @@ export default function App() {
         {overlay?.type === 'feedback' && (
           <DevFeedbackScreen onBack={closeOverlay} onToast={showToast} />
         )}
+        {overlay?.type === 'terms' && <LegalScreen kind="terms" onBack={closeOverlay} />}
+        {overlay?.type === 'privacy' && <LegalScreen kind="privacy" onBack={closeOverlay} />}
 
         {overlay?.type === 'profile' && (
           <ProfileEditScreen
