@@ -3,7 +3,7 @@
 // Clicking the logo returns to a fresh Home tab.
 export default function TopBar({ onLogoClick }) {
   return (
-    <div className="flex h-14 w-full shrink-0 items-center border-b border-[#f0f0f0] bg-white px-5 md:pl-[60px] md:pr-6">
+    <div className="hidden h-14 w-full shrink-0 items-center border-b border-[#f0f0f0] bg-white px-5 sm:flex md:pl-[60px] md:pr-6">
       <button
         type="button"
         onClick={onLogoClick}
