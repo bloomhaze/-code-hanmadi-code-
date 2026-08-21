@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import LegalScreen from './LegalScreen.jsx'
-import { TERMS_URL } from '../data/legal.js'
+import { TERMS_URL, PRIVACY_URL } from '../data/legal.js'
 
 const SLIDES = [
   {
@@ -96,7 +96,7 @@ export default function OnboardingScreen({ onGoogle, onComplete, onToast }) {
               이용약관
             </button>{' '}
             및{' '}
-            <button type="button" onClick={() => setLegal('privacy')} className="underline underline-offset-2" style={{ color: '#7a7a7a' }}>
+            <button type="button" onClick={() => window.open(PRIVACY_URL, '_blank', 'noopener,noreferrer')} className="underline underline-offset-2" style={{ color: '#7a7a7a' }}>
               개인정보처리방침
             </button>
             에

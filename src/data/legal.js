@@ -5,8 +5,9 @@
 
 export const LEGAL_UPDATED = '2026년 8월 21일'
 
-// 이용약관은 외부 노션 페이지로 연결한다.
+// 이용약관 / 개인정보처리방침은 외부 노션 페이지로 연결한다.
 export const TERMS_URL = 'https://app.notion.com/p/3c30a5f8f7b580679513f2a9082054e5?source=copy_link'
+export const PRIVACY_URL = 'https://app.notion.com/p/3c30a5f8f7b580c8980ae35e89effc98?source=copy_link'
 
 export const TERMS = {
   title: '이용약관',

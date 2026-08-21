@@ -20,7 +20,7 @@ import NotifScreen from './screens/NotifScreen.jsx'
 import ProfileEditScreen from './screens/ProfileEditScreen.jsx'
 import DevFeedbackScreen from './screens/DevFeedbackScreen.jsx'
 import LegalScreen from './screens/LegalScreen.jsx'
-import { TERMS_URL } from './data/legal.js'
+import { TERMS_URL, PRIVACY_URL } from './data/legal.js'
 import DeleteDialog from './components/DeleteDialog.jsx'
 import ConfirmDialog from './components/ConfirmDialog.jsx'
 import { findEntryByKo } from './data/diary.js'
@@ -495,7 +495,7 @@ export default function App() {
               onNotif={() => setOverlay({ type: 'notif' })}
               onFeedback={() => setOverlay({ type: 'feedback' })}
               onTerms={() => window.open(TERMS_URL, '_blank', 'noopener,noreferrer')}
-              onPrivacy={() => setOverlay({ type: 'privacy' })}
+              onPrivacy={() => window.open(PRIVACY_URL, '_blank', 'noopener,noreferrer')}
               onLogout={() => setDialog({ kind: 'logout' })}
               onWithdraw={() => setDialog({ kind: 'withdraw' })}
               onToast={showToast}
