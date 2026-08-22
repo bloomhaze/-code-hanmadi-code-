@@ -6,7 +6,7 @@
 export const LEGAL_UPDATED = '2026년 8월 21일'
 
 // 이용약관 / 개인정보처리방침은 외부 노션 페이지로 연결한다.
-export const TERMS_URL = 'https://app.notion.com/p/3c40a5f8f7b5803d92fdcca24d784760?source=copy_link'
+export const TERMS_URL = 'https://pie-penalty-583.notion.site/3c40a5f8f7b5803d92fdcca24d784760?source=copy_link'
 export const PRIVACY_URL = 'https://app.notion.com/p/3c30a5f8f7b580c8980ae35e89effc98?source=copy_link'
 
 export const TERMS = {
