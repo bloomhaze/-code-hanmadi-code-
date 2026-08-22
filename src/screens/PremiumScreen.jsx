@@ -55,9 +55,20 @@ export default function PremiumScreen({ onBack, onToast }) {
   }
 
   return (
-    <div className="absolute inset-0 z-40 flex flex-col bg-white">
-      {/* top bar */}
-      <div className="flex h-12 shrink-0 items-center justify-between px-5 pt-4">
+    <div
+      className="fixed inset-0 z-[56] flex items-end justify-center bg-black/40 sm:items-center sm:px-5"
+      onClick={onBack}
+    >
+      {/* 모바일: 하단 바텀시트(sheetUp) / 데스크탑(≥sm): 중앙 모달(scaleIn) */}
+      <div
+        className="ws-sheet flex h-[93dvh] max-h-[93dvh] w-full flex-col overflow-hidden rounded-t-[24px] bg-white sm:h-auto sm:max-h-[88vh] sm:max-w-[430px] sm:rounded-[24px]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* 모바일 그랩 핸들 */}
+        <div className="mx-auto mb-1 mt-3 h-[5px] w-10 shrink-0 rounded-full bg-[#e3e3e3] sm:hidden" />
+
+        {/* top bar */}
+        <div className="flex h-12 shrink-0 items-center justify-between px-5 pt-2 sm:pt-4">
         <button type="button" onClick={onBack} className="flex h-8 w-8 items-center justify-center" aria-label="닫기">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M4 4l12 12M16 4L4 16" stroke="#121212" strokeWidth="1.8" strokeLinecap="round" />
@@ -149,18 +160,22 @@ export default function PremiumScreen({ onBack, onToast }) {
         </div>
       </div>
 
-      {/* CTA */}
-      <div className="shrink-0 px-5 pb-7 pt-2">
-        <button
-          type="button"
-          onClick={() => onToast?.('결제 기능은 곧 제공될 예정이에요')}
-          className="flex h-[54px] w-full items-center justify-center rounded-[18px]"
-          style={{ background: '#0066ff' }}
+        {/* CTA */}
+        <div
+          className="shrink-0 px-5 pt-2"
+          style={{ paddingBottom: 'max(20px, calc(env(safe-area-inset-bottom) + 12px))' }}
         >
-          <span className="font-sans text-[16px] font-bold text-white" style={{ letterSpacing: '-.3px' }}>
-            {cur.cta}
-          </span>
-        </button>
+          <button
+            type="button"
+            onClick={() => onToast?.('결제 기능은 곧 제공될 예정이에요')}
+            className="flex h-[54px] w-full items-center justify-center rounded-[18px]"
+            style={{ background: '#0066ff' }}
+          >
+            <span className="font-sans text-[16px] font-bold text-white" style={{ letterSpacing: '-.3px' }}>
+              {cur.cta}
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   )
