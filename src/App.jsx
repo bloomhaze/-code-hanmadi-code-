@@ -20,6 +20,7 @@ import NotifScreen from './screens/NotifScreen.jsx'
 import ProfileEditScreen from './screens/ProfileEditScreen.jsx'
 import DevFeedbackScreen from './screens/DevFeedbackScreen.jsx'
 import LegalScreen from './screens/LegalScreen.jsx'
+import PremiumScreen from './screens/PremiumScreen.jsx'
 import { TERMS_URL, PRIVACY_URL } from './data/legal.js'
 import DeleteDialog from './components/DeleteDialog.jsx'
 import ConfirmDialog from './components/ConfirmDialog.jsx'
@@ -494,6 +495,7 @@ export default function App() {
               onProfile={() => setOverlay({ type: 'profile' })}
               onNotif={() => setOverlay({ type: 'notif' })}
               onFeedback={() => setOverlay({ type: 'feedback' })}
+              onPremium={() => setOverlay({ type: 'premium' })}
               onTerms={() => window.open(TERMS_URL, '_blank', 'noopener,noreferrer')}
               onPrivacy={() => window.open(PRIVACY_URL, '_blank', 'noopener,noreferrer')}
               onLogout={() => setDialog({ kind: 'logout' })}
@@ -543,6 +545,7 @@ export default function App() {
         {overlay?.type === 'feedback' && (
           <DevFeedbackScreen onBack={closeOverlay} onToast={showToast} />
         )}
+        {overlay?.type === 'premium' && <PremiumScreen onBack={closeOverlay} onToast={showToast} />}
         {overlay?.type === 'terms' && <LegalScreen kind="terms" onBack={closeOverlay} />}
         {overlay?.type === 'privacy' && <LegalScreen kind="privacy" onBack={closeOverlay} />}
 

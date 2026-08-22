@@ -30,6 +30,7 @@ export default function MyScreen({
   onProfile,
   onNotif,
   onFeedback,
+  onPremium,
   onTerms,
   onPrivacy,
   onLogout,
@@ -175,7 +176,7 @@ export default function MyScreen({
               <SectionLabel>프리미엄</SectionLabel>
               <button
                 type="button"
-                onClick={() => onToast?.('준비 중이에요')}
+                onClick={onPremium}
                 className="flex h-[51px] items-center rounded-2xl px-[18px]"
                 style={{ background: 'linear-gradient(90deg,#0066ff 0%,#21aaff 100%)' }}
               >
